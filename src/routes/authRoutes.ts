@@ -5,47 +5,44 @@ import prisma from "../config/prisma";
 import { enviarCodigoVerificacaoEmail } from "../services/emailService";
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || "mvp_agendamento_2025_seguro_abc123";
+const JWT_SECRET = process.env.JWT_SECRET || "desenvolvimento_secret_key_123";
 
+// REGISTRO (Criar Conta da Empresa com 7 Dias de Trial Grátis)
 router.post("/registro", async (req: Request, res: Response) => {
   const { nome, email, senha, nicho } = req.body;
-  if (!nome || !email || !senha)
-    return res.status(400).json({ erro: "Nome, email e senha são obrigatórios" });
 
-  const existe = await prisma.empresa.findUnique({ where: { email } });
-  if (existe) return res.status(400).json({ erro: "Email já cadastrado" });
-
-  const hash = await bcrypt.hash(senha, 10);
-
-  let slug = nome
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  const slugExiste = await prisma.empresa.findUnique({ where: { slug } });
-  if (slugExiste) {
-    slug = `${slug}-${Date.now().toString(36)}`;
+  if (!nome || !email || !senha) {
+    return res.status(400).json({ erro: "Nome, e-mail e senha são obrigatórios" });
   }
 
-  const trialExpiraEm = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 dias grátis
+  const emailExiste = await prisma.empresa.findUnique({ where: { email } });
+  if (emailExiste) {
+    return res.status(400).json({ erro: "Este e-mail já está cadastrado no sistema" });
+  }
+
+  const senha_hash = await bcrypt.hash(senha, 10);
+  let slug = nome.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
+  
+  // Garantir unicidade do slug
+  const slugExiste = await prisma.empresa.findUnique({ where: { slug } });
+  if (slugExiste) {
+    slug = `${slug}-${Math.floor(Math.random() * 1000)}`;
+  }
+
+  // Define expiração do trial para 7 dias a partir de agora
+  const trialExpira = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   const empresa = await prisma.empresa.create({
     data: {
       nome,
       email,
-      senha: hash,
-      nicho: nicho || "barbearia",
+      senha: senha_hash,
+      nicho: nicho || "Geral",
       slug,
       plano: "trial",
       status_assinatura: "trial",
-      trial_expira_em: trialExpiraEm,
+      trial_expira_em: trialExpira,
     },
-  });
-
-  await prisma.configuracao.create({
-    data: { empresa_id: empresa.id },
   });
 
   res.status(201).json({
@@ -82,10 +79,16 @@ router.post("/login", async (req: Request, res: Response) => {
   // Enviar e-mail em background
   enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo);
 
+  const smtpConfigurado = !!process.env.SMTP_HOST && !!process.env.SMTP_USER;
+
   res.json({
     requereCodigo: true,
     email: empresa.email,
-    mensagem: "Código de verificação enviado para seu e-mail. Por favor, verifique sua caixa de entrada e a pasta de Spam.",
+    smtpConfigurado,
+    codigoDev: smtpConfigurado ? undefined : codigo,
+    mensagem: smtpConfigurado
+      ? "Código de verificação enviado para seu e-mail. Verifique a caixa de entrada e a pasta de Spam."
+      : `⚠️ Servidor sem SMTP configurado. Seu código de teste é: ${codigo}`,
   });
 });
 
@@ -165,8 +168,13 @@ router.post("/reenviar-codigo", async (req: Request, res: Response) => {
 
   enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo);
 
+  const smtpConfigurado = !!process.env.SMTP_HOST && !!process.env.SMTP_USER;
+
   res.json({
-    mensagem: "Novo código enviado com sucesso! Verifique sua caixa de entrada e a pasta de Spam.",
+    mensagem: smtpConfigurado
+      ? "Novo código enviado com sucesso para seu e-mail."
+      : `⚠️ Servidor sem SMTP configurado. Seu novo código de teste é: ${codigo}`,
+    codigoDev: smtpConfigurado ? undefined : codigo,
   });
 });
 

@@ -442,10 +442,11 @@ body {
 .input-wrapper {
   display: flex;
   align-items: center;
-  background: rgba(255,255,255,0.04);
+  background: #141414;
   border: 1px solid var(--border-light);
   border-radius: 12px;
   padding: 0 14px;
+  overflow: hidden;
   transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
 }
 
@@ -473,12 +474,23 @@ body {
   flex: 1;
   padding: 14px 12px;
   border: none;
-  background: transparent;
+  background: transparent !important;
   font-size: 14px;
   font-family: var(--font);
-  color: var(--text);
+  color: var(--text) !important;
   outline: none;
   width: 100%;
+}
+
+/* FIX DEFINITIVO PARA AUTOFILL / AUTOCOMPLETAR DO CHROME, EDGE E SAFARI */
+.input-wrapper input:-webkit-autofill,
+.input-wrapper input:-webkit-autofill:hover, 
+.input-wrapper input:-webkit-autofill:focus, 
+.input-wrapper input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #141414 inset !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  caret-color: #FFFFFF !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .input-wrapper input::placeholder {
