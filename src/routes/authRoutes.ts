@@ -62,6 +62,25 @@ router.post("/login", async (req: Request, res: Response) => {
   const valida = await bcrypt.compare(senha, empresa.senha);
   if (!valida) return res.status(401).json({ erro: "Email ou senha inválidos" });
 
+  // Se já verificou o email antes, pula o OTP e faz login direto
+  if (empresa.email_verificado) {
+    const token = jwt.sign({ id: empresa.id, email: empresa.email }, JWT_SECRET, { expiresIn: "7d" });
+    return res.json({
+      mensagem: "Login realizado com sucesso",
+      token,
+      empresa: {
+        id: empresa.id,
+        nome: empresa.nome,
+        nicho: empresa.nicho,
+        slug: empresa.slug,
+        plano: empresa.plano,
+        status_assinatura: empresa.status_assinatura,
+        trial_expira_em: empresa.trial_expira_em,
+        proximo_vencimento: empresa.proximo_vencimento,
+      },
+    });
+  }
+
   const codigo = Math.floor(100000 + Math.random() * 900000).toString();
   const expiracao = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -121,6 +140,7 @@ router.post("/verificar-codigo", async (req: Request, res: Response) => {
     data: {
       codigo_login: null,
       codigo_expira_em: null,
+      email_verificado: true,
     },
   });
 

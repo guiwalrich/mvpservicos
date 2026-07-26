@@ -379,29 +379,37 @@
                 body: JSON.stringify({ email, senha }),
             });
 
-            if (response.ok && data?.requereCodigo) {
-                modo = "otp";
-                emailPendencia = email;
-                userEmailDisplay.textContent = email;
+            if (response.ok) {
+                if (data.token) {
+                    // Login direto (já verificado)
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("empresa", JSON.stringify(data.empresa));
+                    mostrarSucesso("Login realizado com sucesso! Redirecionando...");
+                    setTimeout(() => { window.location.href = "/dashboard.html"; }, 1500);
+                } else if (data.requereCodigo) {
+                    modo = "otp";
+                    emailPendencia = email;
+                    userEmailDisplay.textContent = email;
 
-                loginForm.classList.add("hidden");
-                otpForm.classList.remove("hidden");
-                
-                title.textContent = "Verificação de Segurança";
-                subtitle.textContent = "Insira o código enviado por e-mail para concluir o acesso.";
-                welcomeIcon.innerHTML = '<i class="fa-solid fa-shield-halved"></i>';
+                    loginForm.classList.add("hidden");
+                    otpForm.classList.remove("hidden");
+                    
+                    title.textContent = "Verificação de Segurança";
+                    subtitle.textContent = "Insira o código enviado por e-mail para concluir o acesso.";
+                    welcomeIcon.innerHTML = '<i class="fa-solid fa-shield-halved"></i>';
 
-                toggleText.textContent = "E-mail incorreto?";
-                toggleLink.textContent = "Voltar ao início";
+                    toggleText.textContent = "E-mail incorreto?";
+                    toggleLink.textContent = "Voltar ao início";
 
-                if (data.erroEmail) {
-                    mostrarErro(data.mensagem);
-                } else {
-                    mostrarSucesso(data.mensagem || "Código enviado! Verifique sua caixa de entrada e a pasta de Spam.");
+                    if (data.erroEmail) {
+                        mostrarErro(data.mensagem);
+                    } else {
+                        mostrarSucesso(data.mensagem || "Código enviado! Verifique sua caixa de entrada e a pasta de Spam.");
+                    }
+
+                    document.getElementById("otpCodigo").value = "";
+                    document.getElementById("otpCodigo").focus();
                 }
-
-                document.getElementById("otpCodigo").value = "";
-                document.getElementById("otpCodigo").focus();
             } else {
                 mostrarErro(data?.erro || "Email ou senha incorretos. Tente novamente.");
             }

@@ -14,6 +14,7 @@ model Empresa {
   status_assinatura String        @default("trial")
   trial_expira_em DateTime?
   proximo_vencimento DateTime?
+  email_verificado Boolean @default(false)
   criado_em       DateTime        @default(now())
   configuracoes   Configuracao?
   profissionais   Profissional[]
