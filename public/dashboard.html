@@ -6,27 +6,27 @@
     <title>MVP Agenda | Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         :root {
             --bg: #FAFAFA;
             --surface: #FFFFFF;
-            --surface-hover: #F9FAFB;
+            --surface-hover: #F4F4F5;
             --glass: #FFFFFF;
-            --glass-border: #E5E7EB;
-            --text: #111827;
-            --text-secondary: #4B5563;
-            --text-muted: #6B7280;
-            --accent: #FF6B35;
-            --accent-dark: #E85D2B;
-            --accent-glow: rgba(255,107,53,0.1);
-            --border: #E5E7EB;
-            --border-light: #F3F4F6;
+            --glass-border: #E4E4E7;
+            --text: #09090B;
+            --text-secondary: #3F3F46;
+            --text-muted: #71717A;
+            --accent: #18181B;
+            --accent-dark: #27272A;
+            --accent-glow: #F4F4F5;
+            --border: #E4E4E7;
+            --border-light: #F4F4F5;
             --danger: #EF4444;
             --success: #10B981;
             --warning: #F59E0B;
-            --font: 'Inter', -apple-system, sans-serif;
+            --font: 'Plus Jakarta Sans', -apple-system, sans-serif;
             --sidebar-width: 260px;
         }
 
@@ -77,7 +77,7 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            color: var(--accent);
+            color: var(--text);
         }
 
         .sidebar-logo-text h2 {
@@ -114,7 +114,7 @@
             align-items: center;
             gap: 12px;
             padding: 11px 14px;
-            border-radius: 10px;
+            border-radius: 6px;
             font-size: 14px;
             font-weight: 500;
             color: var(--text-muted);
@@ -135,7 +135,7 @@
 
         .nav-item.active {
             background: var(--accent-glow);
-            color: var(--accent);
+            color: var(--text);
             font-weight: 600;
         }
 
@@ -164,7 +164,7 @@
             font-size: 10px;
             font-weight: 700;
             padding: 2px 7px;
-            border-radius: 50px;
+            border-radius: 6px;
             min-width: 20px;
             text-align: center;
         }
@@ -179,7 +179,7 @@
             align-items: center;
             gap: 10px;
             padding: 10px 12px;
-            border-radius: 10px;
+            border-radius: 6px;
             transition: background 0.2s;
             cursor: pointer;
         }
@@ -189,14 +189,14 @@
         .user-avatar {
             width: 36px;
             height: 36px;
-            border-radius: 10px;
+            border-radius: 6px;
             background: var(--accent-glow);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             font-weight: 700;
-            color: var(--accent);
+            color: var(--text);
             flex-shrink: 0;
         }
 
@@ -275,7 +275,7 @@
         .topbar-btn {
             width: 38px;
             height: 38px;
-            border-radius: 10px;
+            border-radius: 6px;
             border: 1px solid var(--border-light);
             background: var(--glass);
             color: var(--text-muted);
@@ -309,11 +309,11 @@
             align-items: center;
             gap: 8px;
             font-size: 13px;
-            color: var(--accent);
+            color: var(--text);
             cursor: pointer;
             border: 1px solid rgba(202,255,51,0.3);
             padding: 9px 18px;
-            border-radius: 10px;
+            border-radius: 6px;
             background: var(--accent-glow);
             font-family: var(--font);
             font-weight: 600;
@@ -323,8 +323,8 @@
         .link-copy:hover {
             background: var(--accent);
             color: #FFFFFF;
-            box-shadow: 0 4px 20px rgba(255,107,53,0.3);
-            border-color: var(--accent);
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            border-color: var(--text);
         }
 
         /* ===== CONTENT AREA ===== */
@@ -359,7 +359,7 @@
             letter-spacing: -0.02em;
         }
 
-        .welcome-banner h2 span { color: var(--accent); }
+        .welcome-banner h2 span { color: var(--text); }
 
         .welcome-banner p {
             color: var(--text-muted);
@@ -382,7 +382,7 @@
             position: relative;
         }
 
-        .welcome-date i { color: var(--accent); }
+        .welcome-date i { color: var(--text); }
 
         /* CARDS */
         .cards {
@@ -417,7 +417,7 @@
         .card:hover {
             border-color: var(--border-light);
             transform: translateY(-3px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         }
 
         .card:hover::before { opacity: 1; }
@@ -432,14 +432,14 @@
         .card-icon {
             width: 40px;
             height: 40px;
-            border-radius: 10px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 16px;
         }
 
-        .card-icon.green { background: rgba(202,255,51,0.1); color: var(--accent); }
+        .card-icon.green { background: rgba(202,255,51,0.1); color: var(--text); }
         .card-icon.blue { background: rgba(96,165,250,0.1); color: #60A5FA; }
         .card-icon.red { background: rgba(255,107,107,0.1); color: var(--danger); }
         .card-icon.yellow { background: rgba(251,191,36,0.1); color: var(--warning); }
@@ -497,7 +497,7 @@
             gap: 8px;
         }
 
-        .table-title i { color: var(--accent); font-size: 14px; }
+        .table-title i { color: var(--text); font-size: 14px; }
 
         .table-actions {
             display: flex;
@@ -528,8 +528,8 @@
         .action-btn.primary {
             background: var(--accent-glow);
             border-color: rgba(202,255,51,0.2);
-            color: var(--accent);
-        }
+            color: var(--text);
+         box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), inset 0 1px 0 rgba(255,255,255,0.1); border: 1px solid transparent;}
 
         .action-btn.primary:hover {
             background: var(--accent);
@@ -571,7 +571,7 @@
             align-items: center;
             gap: 5px;
             padding: 5px 12px;
-            border-radius: 50px;
+            border-radius: 6px;
             font-size: 11px;
             font-weight: 600;
         }
@@ -584,7 +584,7 @@
             background: currentColor;
         }
 
-        .badge-agendado { background: var(--accent-glow); color: var(--accent); }
+        .badge-agendado { background: #F4F4F5; color: #18181B; }
         .badge-confirmado { background: rgba(52,211,153,0.1); color: var(--success); }
         .badge-cancelado { background: rgba(255,107,107,0.1); color: var(--danger); }
 
@@ -613,7 +613,7 @@
             right: 24px;
             background: var(--surface);
             border: 1px solid var(--border-light);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 14px 20px;
             display: flex;
             align-items: center;
@@ -621,7 +621,7 @@
             font-size: 13px;
             font-weight: 500;
             color: var(--text);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             z-index: 100;
             animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             opacity: 0;
@@ -742,7 +742,7 @@
             width: 100%;
             padding: 12px 14px;
             border: 1px solid var(--border-light);
-            border-radius: 10px;
+            border-radius: 6px;
             background: var(--surface-hover);
             color: var(--text);
             font-size: 14px;
@@ -753,7 +753,7 @@
 
         .modal-form input:focus,
         .modal-form select:focus {
-            border-color: var(--accent);
+            border-color: var(--text);
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
@@ -768,7 +768,7 @@
         .modal-actions button {
             flex: 1;
             padding: 12px;
-            border-radius: 10px;
+            border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
             font-family: var(--font);
@@ -780,7 +780,7 @@
             background: var(--accent);
             color: #FFFFFF;
             border: none;
-        }
+         box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), inset 0 1px 0 rgba(255,255,255,0.1); border: 1px solid transparent;}
 
         .modal-btn-primary:hover {
             box-shadow: 0 4px 20px rgba(202,255,51,0.3);
@@ -811,7 +811,7 @@
         }
 
         .settings-input:focus {
-            border-color: var(--accent);
+            border-color: var(--text);
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
@@ -826,7 +826,7 @@
             gap: 14px;
             padding: 14px 16px;
             background: var(--surface-hover);
-            border-radius: 10px;
+            border-radius: 6px;
             border: 1px solid var(--border);
             flex-wrap: wrap;
             transition: border-color 0.2s;
@@ -837,7 +837,7 @@
         }
 
         .settings-toggle {
-            accent-color: var(--accent);
+            accent-color: var(--text);
             width: 16px;
             height: 16px;
             cursor: pointer;
@@ -861,7 +861,7 @@
             align-items: center;
             gap: 6px;
             padding: 6px 14px;
-            border-radius: 50px;
+            border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
             background: var(--surface-hover);
@@ -884,7 +884,7 @@
         .subscription-badge.equipe {
             background: rgba(202, 255, 51, 0.12);
             border-color: rgba(202, 255, 51, 0.3);
-            color: var(--accent);
+            color: var(--text);
         }
 
         .subscription-badge.premium {
@@ -979,7 +979,7 @@
         }
 
         .plan-card:hover, .plan-card.selected {
-            border-color: var(--accent);
+            border-color: var(--text);
             transform: translateY(-2px);
             background: rgba(202, 255, 51, 0.03);
         }
@@ -999,7 +999,7 @@
         }
 
         .plan-badge.featured-badge {
-            color: var(--accent);
+            color: var(--text);
         }
 
         .plan-card h3 {
@@ -1038,14 +1038,14 @@
         }
 
         .plan-card ul li i {
-            color: var(--accent);
+            color: var(--text);
             font-size: 11px;
         }
 
         .plan-select-btn {
             width: 100%;
             padding: 10px;
-            border-radius: 10px;
+            border-radius: 6px;
             border: 1px solid var(--border-light);
             background: rgba(255, 255, 255, 0.05);
             color: var(--text);
@@ -1058,7 +1058,7 @@
         .plan-select-btn:hover, .plan-card.selected .plan-select-btn {
             background: var(--accent);
             color: #FFFFFF;
-            border-color: var(--accent);
+            border-color: var(--text);
         }
 
         .pix-payment-box {
@@ -1074,7 +1074,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            color: var(--accent);
+            color: var(--text);
             font-weight: 700;
             font-size: 15px;
             margin-bottom: 6px;
@@ -1093,10 +1093,10 @@
             background: #FFFFFF;
             border: 1px solid var(--border-light);
             padding: 10px 18px;
-            border-radius: 10px;
+            border-radius: 6px;
             font-family: monospace;
             font-size: 14px;
-            color: var(--accent);
+            color: var(--text);
             margin-bottom: 18px;
         }
 
@@ -1129,7 +1129,7 @@
             font-weight: 700;
             font-size: 14px;
             padding: 14px 28px;
-            border-radius: 12px;
+            border-radius: 8px;
             text-decoration: none;
             transition: transform 0.2s, background-color 0.2s;
             box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
@@ -1148,7 +1148,7 @@
     <div class="sidebar-header">
         <div class="sidebar-logo">
             <div class="sidebar-logo-icon">
-                <i class="fa-solid fa-calendar-check"></i>
+                <i class="ph ph-calendar-check"></i>
             </div>
             <div class="sidebar-logo-text">
                 <h2>MVP Agenda</h2>
@@ -1160,16 +1160,16 @@
     <nav class="sidebar-nav">
         <div class="nav-label">Principal</div>
         <button class="nav-item active tab" data-tab="agenda">
-            <i class="fa-solid fa-calendar-days"></i>
+            <i class="ph ph-calendar"></i>
             Agenda
             <span class="badge-count" id="agendaCount">0</span>
         </button>
         <button class="nav-item tab" data-tab="servicos">
-            <i class="fa-solid fa-scissors"></i>
+            <i class="ph ph-scissors"></i>
             Serviços
         </button>
         <button class="nav-item tab" data-tab="profissionais">
-            <i class="fa-solid fa-users"></i>
+            <i class="ph ph-users"></i>
             Profissionais
         </button>
         <button class="nav-item tab" data-tab="clientes">
@@ -1178,7 +1178,7 @@
         </button>
         <div class="nav-label">Configurações</div>
         <button class="nav-item tab" data-tab="horarios">
-            <i class="fa-solid fa-clock"></i>
+            <i class="ph ph-clock"></i>
             Horários
         </button>
         <button class="nav-item tab" data-tab="disponibilidade">
@@ -1196,7 +1196,7 @@
             <div class="user-avatar" id="userInitial">?</div>
             <div class="user-info">
                 <div class="user-name" id="userName">Minha Empresa</div>
-                <div class="user-role"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</div>
+                <div class="user-role"><i class="ph ph-sign-out"></i> Sair</div>
             </div>
         </div>
     </div>
@@ -1210,7 +1210,7 @@
     <header class="topbar">
         <div class="topbar-left">
             <button class="mobile-menu-btn" id="menuBtn">
-                <i class="fa-solid fa-bars"></i>
+                <i class="ph ph-list"></i>
             </button>
             <div class="topbar-title">
                 <h1 id="pageTitle">Agenda</h1>
@@ -1224,7 +1224,7 @@
                 <span>Copiar Link</span>
             </button>
             <button class="topbar-btn" title="Notificações">
-                <i class="fa-regular fa-bell"></i>
+                <i class="ph ph-bell"></i>
                 <div class="notification-dot"></div>
             </button>
         </div>
@@ -1237,7 +1237,7 @@
                 <h2>Bom dia! 👋 <span id="welcomeName">Bem-vindo</span></h2>
                 <p>Aqui está o resumo dos seus agendamentos. Acompanhe tudo em tempo real.</p>
                 <div class="welcome-date">
-                    <i class="fa-regular fa-calendar"></i>
+                    <i class="ph ph-calendar-blank"></i>
                     <span id="currentDate"></span>
                 </div>
             </div>
@@ -1250,7 +1250,7 @@
                     </div>
                     <div class="table-actions">
                         <button class="action-btn primary" id="btnAddAgendamento">
-                            <i class="fa-solid fa-plus"></i> Novo Agendamento
+                            <i class="ph ph-plus"></i> Novo Agendamento
                         </button>
                     </div>
                 </div>
@@ -1274,12 +1274,12 @@
             <div class="table-section">
                 <div class="table-header">
                     <div class="table-title">
-                        <i class="fa-solid fa-scissors"></i>
+                        <i class="ph ph-scissors"></i>
                         Seus Serviços
                     </div>
                     <div class="table-actions">
                         <button class="action-btn primary" id="btnAddServico">
-                            <i class="fa-solid fa-plus"></i> Novo Serviço
+                            <i class="ph ph-plus"></i> Novo Serviço
                         </button>
                     </div>
                 </div>
@@ -1297,12 +1297,12 @@
             <div class="table-section">
                 <div class="table-header">
                     <div class="table-title">
-                        <i class="fa-solid fa-users"></i>
+                        <i class="ph ph-users"></i>
                         Sua Equipe
                     </div>
                     <div class="table-actions">
                         <button class="action-btn primary" id="btnAddProfissional">
-                            <i class="fa-solid fa-plus"></i> Novo Profissional
+                            <i class="ph ph-plus"></i> Novo Profissional
                         </button>
                     </div>
                 </div>
@@ -1325,7 +1325,7 @@
                     </div>
                     <div class="table-actions">
                         <button class="action-btn primary" id="btnAddCliente">
-                            <i class="fa-solid fa-plus"></i> Novo Cliente
+                            <i class="ph ph-plus"></i> Novo Cliente
                         </button>
                     </div>
                 </div>
@@ -1343,7 +1343,7 @@
             <div class="table-section">
                 <div class="table-header">
                     <div class="table-title">
-                        <i class="fa-solid fa-clock"></i>
+                        <i class="ph ph-clock"></i>
                         Horários de Funcionamento
                     </div>
                     <div class="table-actions">
@@ -1582,14 +1582,14 @@
             document.getElementById("cardsAgenda").innerHTML = `
                 <div class="card" style="--card-accent: var(--accent);">
                     <div class="card-header">
-                        <div class="card-icon green"><i class="fa-solid fa-calendar-check"></i></div>
+                        <div class="card-icon green"><i class="ph ph-calendar-check"></i></div>
                     </div>
                     <h3>Total</h3>
                     <div class="numero">${total}</div>
                 </div>
                 <div class="card" style="--card-accent: #60A5FA;">
                     <div class="card-header">
-                        <div class="card-icon blue"><i class="fa-solid fa-clock"></i></div>
+                        <div class="card-icon blue"><i class="ph ph-clock"></i></div>
                     </div>
                     <h3>Pendentes</h3>
                     <div class="numero">${pendentes}</div>
@@ -1614,7 +1614,7 @@
                 document.getElementById("tabelaAgenda").innerHTML = `
                     <tr><td colspan="5">
                         <div class="empty-state">
-                            <i class="fa-regular fa-calendar-xmark"></i>
+                            <i class="ph ph-calendar-blank-xmark"></i>
                             <p>Nenhum agendamento encontrado.</p>
                         </div>
                     </td></tr>`;
@@ -1648,7 +1648,7 @@
                 document.getElementById("tabelaServicos").innerHTML = `
                     <tr><td colspan="3">
                         <div class="empty-state">
-                            <i class="fa-solid fa-scissors"></i>
+                            <i class="ph ph-scissors"></i>
                             <p>Nenhum serviço cadastrado. Adicione seu primeiro serviço!</p>
                         </div>
                     </td></tr>`;
@@ -1821,7 +1821,7 @@
                 document.getElementById("tabelaProfissionais").innerHTML = `
                     <tr><td colspan="3">
                         <div class="empty-state">
-                            <i class="fa-solid fa-users"></i>
+                            <i class="ph ph-users"></i>
                             <p>Nenhum profissional cadastrado. Adicione sua equipe!</p>
                         </div>
                     </td></tr>`;
@@ -1935,7 +1935,7 @@
             if (profissionais.length === 0) {
                 select.innerHTML = '<option value="">Nenhum profissional cadastrado</option>';
                 document.getElementById("gradeDisponibilidade").innerHTML =
-                    '<div class="empty-state"><i class="fa-solid fa-users"></i><p>Cadastre um profissional primeiro na aba Profissionais.</p></div>';
+                    '<div class="empty-state"><i class="ph ph-users"></i><p>Cadastre um profissional primeiro na aba Profissionais.</p></div>';
                 return;
             }
 
@@ -2019,7 +2019,7 @@
             if (profissionais.length === 0) {
                 select.innerHTML = '<option value="">Nenhum profissional cadastrado</option>';
                 document.getElementById("tabelaDuracao").innerHTML =
-                    '<tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-users"></i><p>Cadastre um profissional primeiro.</p></div></td></tr>';
+                    '<tr><td colspan="4"><div class="empty-state"><i class="ph ph-users"></i><p>Cadastre um profissional primeiro.</p></div></td></tr>';
                 return;
             }
 
@@ -2040,7 +2040,7 @@
             const tbody = document.getElementById("tabelaDuracao");
 
             if (servicos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-scissors"></i><p>Cadastre serviços primeiro na aba Serviços.</p></div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="ph ph-scissors"></i><p>Cadastre serviços primeiro na aba Serviços.</p></div></td></tr>';
                 return;
             }
 
@@ -2126,10 +2126,10 @@
                 <h3>Plano Solo</h3>
                 <div class="plan-price">R$ 49,90 <span>/mês</span></div>
                 <ul>
-                    <li><i class="fa-solid fa-check"></i> 1 Profissional</li>
-                    <li><i class="fa-solid fa-check"></i> Agendamentos Ilimitados</li>
-                    <li><i class="fa-solid fa-check"></i> Página Pública Exclusiva</li>
-                    <li><i class="fa-solid fa-check"></i> Confirmações via WhatsApp</li>
+                    <li><i class="ph ph-check"></i> 1 Profissional</li>
+                    <li><i class="ph ph-check"></i> Agendamentos Ilimitados</li>
+                    <li><i class="ph ph-check"></i> Página Pública Exclusiva</li>
+                    <li><i class="ph ph-check"></i> Confirmações via WhatsApp</li>
                 </ul>
                 <button class="plan-select-btn" type="button">Escolher Solo</button>
             </div>
@@ -2139,10 +2139,10 @@
                 <h3>Plano Equipe</h3>
                 <div class="plan-price">R$ 99,90 <span>/mês</span></div>
                 <ul>
-                    <li><i class="fa-solid fa-check"></i> Até 5 Profissionais</li>
-                    <li><i class="fa-solid fa-check"></i> Lembretes WhatsApp 24h/1h</li>
-                    <li><i class="fa-solid fa-check"></i> Relatório de Comissões</li>
-                    <li><i class="fa-solid fa-check"></i> Suporte Preferencial</li>
+                    <li><i class="ph ph-check"></i> Até 5 Profissionais</li>
+                    <li><i class="ph ph-check"></i> Lembretes WhatsApp 24h/1h</li>
+                    <li><i class="ph ph-check"></i> Relatório de Comissões</li>
+                    <li><i class="ph ph-check"></i> Suporte Preferencial</li>
                 </ul>
                 <button class="plan-select-btn featured-btn" type="button">Escolher Equipe</button>
             </div>
@@ -2152,10 +2152,10 @@
                 <h3>Plano Premium</h3>
                 <div class="plan-price">R$ 149,90 <span>/mês</span></div>
                 <ul>
-                    <li><i class="fa-solid fa-check"></i> Profissionais Ilimitados</li>
-                    <li><i class="fa-solid fa-check"></i> Tudo do Plano Equipe</li>
-                    <li><i class="fa-solid fa-check"></i> Múltiplos Administradores</li>
-                    <li><i class="fa-solid fa-check"></i> Suporte VIP WhatsApp</li>
+                    <li><i class="ph ph-check"></i> Profissionais Ilimitados</li>
+                    <li><i class="ph ph-check"></i> Tudo do Plano Equipe</li>
+                    <li><i class="ph ph-check"></i> Múltiplos Administradores</li>
+                    <li><i class="ph ph-check"></i> Suporte VIP WhatsApp</li>
                 </ul>
                 <button class="plan-select-btn" type="button">Escolher Premium</button>
             </div>
@@ -2170,12 +2170,12 @@
             <div class="pix-key-wrapper">
                 <span id="pixKeyText">bbyluv303@gmail.com</span>
                 <button type="button" id="btnCopiarPix" class="btn-copy-pix">
-                    <i class="fa-regular fa-copy"></i> Copiar Chave
+                    <i class="ph ph-copy"></i> Copiar Chave
                 </button>
             </div>
             <div class="whatsapp-unlock-action">
                 <a id="btnEnviarComprovanteWhatsApp" target="_blank" class="whatsapp-unlock-btn">
-                    <i class="fa-brands fa-whatsapp"></i> Enviar Comprovante no WhatsApp para Liberação
+                    <i class="ph ph-whatsapp-logo"></i> Enviar Comprovante no WhatsApp para Liberação
                 </a>
             </div>
         </div>
@@ -2236,10 +2236,10 @@
                 const planoNome = (data.plano || "solo").toLowerCase();
                 if (planoNome === "premium") {
                     badge.className = "subscription-badge premium";
-                    badge.innerHTML = `<i class="fa-solid fa-crown"></i> Plano Premium VIP (${data.dias_restantes}d)`;
+                    badge.innerHTML = `<i class="ph ph-crown"></i> Plano Premium VIP (${data.dias_restantes}d)`;
                 } else if (planoNome === "equipe") {
                     badge.className = "subscription-badge equipe";
-                    badge.innerHTML = `<i class="fa-solid fa-users"></i> Plano Equipe (${data.dias_restantes}d)`;
+                    badge.innerHTML = `<i class="ph ph-users"></i> Plano Equipe (${data.dias_restantes}d)`;
                 } else {
                     badge.className = "subscription-badge solo";
                     badge.innerHTML = `<i class="fa-solid fa-user"></i> Plano Solo (${data.dias_restantes}d)`;

@@ -3,25 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MVP Agenda | Plataforma Inteligente de Agendamento</title>
+    <title>MVP Agenda | Plataforma Inteligente</title>
     <meta name="description" content="Automatize agendamentos, envie lembretes e gerencie seu negócio. Teste 7 dias grátis!">
+    <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         :root {
             --bg: #FAFAFA;
             --surface: #FFFFFF;
-            --text-main: #111827;
-            --text-secondary: #6B7280;
-            --border: #E5E7EB;
-            --primary: #FF6B35;
-            --primary-hover: #E85D2B;
-            --font: 'Inter', -apple-system, sans-serif;
+            --text-main: #09090B;
+            --text-secondary: #71717A;
+            --border: #E4E4E7;
+            --primary: #18181B;
+            --primary-hover: #27272A;
+            --brand: #FF6B35;
+            --font: 'Plus Jakarta Sans', sans-serif;
+            --radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: var(--font);
@@ -38,10 +45,11 @@
             padding: 0 24px;
         }
 
-        /* ===== HEADER ===== */
+        /* ===== NAVBAR ===== */
         header {
-            padding: 20px 0;
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
@@ -52,6 +60,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            height: 72px;
         }
 
         .logo {
@@ -60,7 +69,7 @@
             gap: 10px;
             text-decoration: none;
             color: var(--text-main);
-            font-weight: 800;
+            font-weight: 700;
             font-size: 18px;
             letter-spacing: -0.02em;
         }
@@ -74,7 +83,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 18px;
+            box-shadow: var(--shadow-sm);
         }
 
         nav.nav-links {
@@ -95,93 +105,102 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
         .btn-outline {
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: var(--radius);
             border: 1px solid var(--border);
             background: var(--surface);
             color: var(--text-main);
             text-decoration: none;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-outline:hover {
-            border-color: #D1D5DB;
-            background: #F9FAFB;
+            background: #F4F4F5;
         }
 
         .btn-primary {
             padding: 8px 18px;
-            border-radius: 6px;
-            background: var(--text-main);
+            border-radius: var(--radius);
+            background: var(--primary);
             color: var(--surface);
             text-decoration: none;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 1px solid transparent;
+        }
+        
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-main);
+            cursor: pointer;
         }
 
-        .btn-primary:hover {
-            background: #000000;
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 72px;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 24px;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: var(--shadow-md);
         }
+        .mobile-menu.active { display: flex; }
+        .mobile-menu nav { display: flex; flex-direction: column; gap: 16px; }
+        .mobile-menu .header-actions { flex-direction: column; width: 100%; margin-top: 16px; }
+        .mobile-menu .header-actions a { width: 100%; text-align: center; justify-content: center; padding: 12px; }
 
-        .btn-brand {
-            background: var(--primary);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.2s;
-        }
-
-        .btn-brand:hover {
-            background: var(--primary-hover);
-        }
-
-        /* ===== HERO SECTION ===== */
+        /* ===== HERO ===== */
         .hero {
             padding: 100px 0 80px;
             text-align: center;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
         }
 
         .trial-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 12px;
-            border-radius: 100px;
             background: #FFF7ED;
-            border: 1px solid #FFEDD5;
-            color: var(--primary);
-            font-size: 12px;
+            color: var(--brand);
+            padding: 6px 16px;
+            border-radius: 99px;
+            font-size: 13px;
             font-weight: 600;
             margin-bottom: 24px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            border: 1px solid #FFEDD5;
         }
 
         .hero h1 {
             font-size: 56px;
-            font-weight: 800;
+            font-weight: 700;
             line-height: 1.1;
             letter-spacing: -0.03em;
-            max-width: 800px;
-            margin: 0 auto 24px;
+            margin-bottom: 24px;
             color: var(--text-main);
+            max-width: 800px;
+            margin-inline: auto;
         }
 
         .hero p {
@@ -189,7 +208,6 @@
             color: var(--text-secondary);
             max-width: 600px;
             margin: 0 auto 40px;
-            line-height: 1.5;
         }
 
         .hero-cta {
@@ -197,124 +215,103 @@
             align-items: center;
             justify-content: center;
             gap: 16px;
-            flex-wrap: wrap;
+            margin-bottom: 48px;
         }
+
+        .btn-brand {
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .btn-brand:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .btn-brand:active { transform: scale(0.98); }
 
         .hero-benefits {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 24px;
-            margin-top: 40px;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-secondary);
             font-weight: 500;
         }
 
-        .hero-benefits span {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .hero-benefits i { color: var(--text-main); }
 
-        .hero-benefits i { color: var(--primary); font-size: 12px; }
-
-        /* ===== FEATURES SECTION ===== */
-        .features {
-            padding: 100px 0;
-            background: var(--bg);
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 64px;
-        }
-
-        .section-header h2 {
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 16px;
-        }
-
-        .section-header p {
-            color: var(--text-secondary);
-            font-size: 18px;
-        }
+        /* ===== FEATURES ===== */
+        .features { padding: 80px 0; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .section-header { text-align: center; margin-bottom: 64px; }
+        .section-header h2 { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+        .section-header p { font-size: 16px; color: var(--text-secondary); max-width: 500px; margin: 0 auto; }
 
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
+            gap: 24px;
         }
 
         .feature-card {
-            background: var(--surface);
+            background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 8px;
             padding: 32px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-            transition: box-shadow 0.2s;
+            border-radius: 12px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .feature-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-color: #D4D4D8;
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
         .feature-icon {
-            width: 40px;
-            height: 40px;
-            background: #F3F4F6;
-            border-radius: 6px;
+            width: 48px;
+            height: 48px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 24px;
             color: var(--text-main);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
         }
 
-        .feature-card h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            letter-spacing: -0.01em;
-        }
+        .feature-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em; }
+        .feature-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
 
-        .feature-card p {
-            color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        /* ===== PRICING SECTION ===== */
-        .pricing {
-            padding: 100px 0;
-            background: var(--surface);
-            border-top: 1px solid var(--border);
-        }
-
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
+        /* ===== PRICING ===== */
+        .pricing { padding: 80px 0; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start; }
+        
         .pricing-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 40px 32px;
-            display: flex;
-            flex-direction: column;
+            border-radius: 12px;
+            padding: 32px;
             position: relative;
+            box-shadow: var(--shadow-sm);
         }
 
         .pricing-card.popular {
             border: 2px solid var(--text-main);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-md);
         }
 
         .popular-tag {
@@ -324,121 +321,51 @@
             transform: translateX(-50%);
             background: var(--text-main);
             color: var(--surface);
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
             padding: 4px 12px;
-            border-radius: 100px;
-        }
-
-        .pricing-card h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.01em;
-        }
-
-        .pricing-card .desc {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 24px;
-            min-height: 42px;
-        }
-
-        .price {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--text-main);
-            margin-bottom: 32px;
-            letter-spacing: -0.02em;
-        }
-
-        .price span {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .pricing-card ul {
-            list-style: none;
-            margin-bottom: 40px;
-            flex-grow: 1;
-        }
-
-        .pricing-card ul li {
-            font-size: 14px;
-            color: var(--text-main);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            line-height: 1.4;
-        }
-
-        .pricing-card ul li i {
-            color: var(--text-main);
+            border-radius: 99px;
             font-size: 12px;
-            margin-top: 3px;
-        }
-
-        .pricing-card .btn-outline {
-            text-align: center;
-            padding: 12px;
-            display: block;
             font-weight: 600;
         }
 
-        /* ===== FAQ SECTION ===== */
-        .faq {
-            padding: 100px 0;
-            background: var(--bg);
-            border-top: 1px solid var(--border);
-        }
+        .pricing-card h3 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 8px; }
+        .pricing-card .desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; min-height: 42px; }
+        .pricing-card .price { font-size: 40px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 24px; }
+        .pricing-card .price span { font-size: 16px; font-weight: 500; color: var(--text-secondary); }
 
-        .faq-grid {
-            max-width: 700px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+        .pricing-card ul { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
+        .pricing-card ul li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-main); font-weight: 500; }
+        .pricing-card ul li i { color: var(--text-main); font-size: 16px; }
 
+        .pricing-card .btn-outline { display: block; text-align: center; padding: 10px; }
+        .pricing-card .btn-brand { display: flex; justify-content: center; width: 100%; padding: 12px; }
+
+        /* ===== FAQ ===== */
+        .faq { padding: 80px 0; background: var(--surface); border-top: 1px solid var(--border); }
+        .faq-grid { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
         .faq-item {
-            background: var(--surface);
+            background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 24px;
         }
-
-        .faq-item h4 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text-main);
-            letter-spacing: -0.01em;
-        }
-
-        .faq-item p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
+        .faq-item h4 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 8px; }
+        .faq-item p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
 
         /* ===== FOOTER ===== */
-        footer {
-            padding: 48px 0;
-            background: var(--surface);
-            border-top: 1px solid var(--border);
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 13px;
+        footer { padding: 48px 0; background: var(--bg); text-align: center; color: var(--text-secondary); font-size: 13px; }
+
+        @media (max-width: 900px) {
+            .pricing-grid { grid-template-columns: 1fr; }
+            .pricing-card.popular { transform: none; }
         }
 
         @media (max-width: 768px) {
             .hero h1 { font-size: 40px; }
-            nav.nav-links { display: none; }
-            .pricing-grid { grid-template-columns: 1fr; }
+            nav.nav-links, .header-actions { display: none; }
+            .mobile-menu-btn { display: block; }
+            .hero-cta { flex-direction: column; width: 100%; }
+            .hero-cta a { width: 100%; text-align: center; justify-content: center; }
+            .hero-benefits { flex-direction: column; gap: 12px; }
         }
     </style>
 </head>
@@ -448,7 +375,7 @@
     <div class="container header-content">
         <a href="/" class="logo">
             <div class="logo-icon">
-                <i class="fa-solid fa-calendar-check"></i>
+                <i class="ph ph-calendar-check"></i>
             </div>
             <span>MVP Agenda</span>
         </a>
@@ -461,7 +388,24 @@
 
         <div class="header-actions">
             <a href="/login.html" class="btn-outline">Login</a>
-            <a href="/login.html?modo=registro" class="btn-primary">Criar Conta</a>
+            <a href="/login.html?modo=registro" class="btn-primary">Criar Conta <i class="ph ph-arrow-right"></i></a>
+        </div>
+
+        <button class="mobile-menu-btn" onclick="toggleMenu()">
+            <i class="ph ph-list"></i>
+        </button>
+    </div>
+    
+    <!-- Menu Mobile -->
+    <div class="mobile-menu" id="mobileMenu">
+        <nav>
+            <a href="#recursos" onclick="toggleMenu()">Recursos</a>
+            <a href="#planos" onclick="toggleMenu()">Planos</a>
+            <a href="#faq" onclick="toggleMenu()">Dúvidas</a>
+        </nav>
+        <div class="header-actions">
+            <a href="/login.html" class="btn-outline">Login</a>
+            <a href="/login.html?modo=registro" class="btn-primary">Criar Conta <i class="ph ph-arrow-right"></i></a>
         </div>
     </div>
 </header>
@@ -471,24 +415,24 @@
     <section class="hero">
         <div class="container">
             <div class="trial-badge">
-                Teste 7 Dias Grátis
+                <i class="ph ph-sparkle"></i> Teste 7 Dias Grátis
             </div>
             <h1>A plataforma inteligente de agendamento</h1>
-            <p>Automatize agendamentos 24/7, evite faltas com lembretes via WhatsApp e centralize a gestão da sua equipe com elegância e simplicidade.</p>
+            <p>Automatize agendamentos 24/7, evite faltas com lembretes automáticos e centralize a gestão da sua equipe com elegância e simplicidade.</p>
             
             <div class="hero-cta">
                 <a href="/login.html?modo=registro" class="btn-brand">
-                    Começar Gratuitamente
+                    Começar Gratuitamente <i class="ph ph-arrow-right"></i>
                 </a>
-                <a href="#planos" class="btn-outline" style="padding: 12px 24px; font-weight: 600;">
+                <a href="#planos" class="btn-outline" style="padding: 12px 24px;">
                     Ver Planos
                 </a>
             </div>
 
             <div class="hero-benefits">
-                <span><i class="fa-solid fa-check"></i> Configuração rápida</span>
-                <span><i class="fa-solid fa-check"></i> Sem cartão de crédito</span>
-                <span><i class="fa-solid fa-check"></i> Suporte premium</span>
+                <span><i class="ph ph-check-circle"></i> Configuração rápida</span>
+                <span><i class="ph ph-check-circle"></i> Sem cartão de crédito</span>
+                <span><i class="ph ph-check-circle"></i> Suporte premium</span>
             </div>
         </div>
     </section>
@@ -503,37 +447,37 @@
 
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon"><i class="fa-solid fa-globe"></i></div>
+                    <div class="feature-icon"><i class="ph ph-globe"></i></div>
                     <h3>Página de Agendamento</h3>
                     <p>Clientes marcam horários de forma independente em uma página rápida, otimizada para qualquer dispositivo.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon"><i class="fa-brands fa-whatsapp"></i></div>
+                    <div class="feature-icon"><i class="ph ph-whatsapp-logo"></i></div>
                     <h3>Lembretes Automáticos</h3>
                     <p>Reduza faltas a quase zero enviando mensagens de confirmação e lembretes prévios pelo WhatsApp.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="feature-icon"><i class="ph ph-users"></i></div>
                     <h3>Gestão de Equipe</h3>
                     <p>Centralize o controle de profissionais. Cada membro possui sua própria agenda, serviços e regras.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon"><i class="fa-solid fa-clock"></i></div>
+                    <div class="feature-icon"><i class="ph ph-clock"></i></div>
                     <h3>Controle de Tempo</h3>
                     <p>Personalize durações específicas para cada serviço e profissional, garantindo organização total.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon"><i class="fa-solid fa-shield-check"></i></div>
+                    <div class="feature-icon"><i class="ph ph-shield-check"></i></div>
                     <h3>Segurança Reforçada</h3>
                     <p>Proteção da conta via código no e-mail (2FA), garantindo que apenas os administradores tenham acesso.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon"><i class="fa-solid fa-qrcode"></i></div>
+                    <div class="feature-icon"><i class="ph ph-qr-code"></i></div>
                     <h3>Assinatura Descomplicada</h3>
                     <p>Pagamento de mensalidades direto via PIX, sem taxas extras ou retenção de cartão de crédito.</p>
                 </div>
@@ -556,10 +500,10 @@
                     <p class="desc">Para o profissional autônomo e independente.</p>
                     <div class="price">R$ 49,90 <span>/ mês</span></div>
                     <ul>
-                        <li><i class="fa-solid fa-check"></i> 1 Profissional</li>
-                        <li><i class="fa-solid fa-check"></i> Agendamentos ilimitados</li>
-                        <li><i class="fa-solid fa-check"></i> Página pública de agendamento</li>
-                        <li><i class="fa-solid fa-check"></i> Suporte por e-mail</li>
+                        <li><i class="ph ph-check"></i> 1 Profissional</li>
+                        <li><i class="ph ph-check"></i> Agendamentos ilimitados</li>
+                        <li><i class="ph ph-check"></i> Página pública</li>
+                        <li><i class="ph ph-check"></i> Suporte por e-mail</li>
                     </ul>
                     <a href="/login.html?modo=registro" class="btn-outline">Iniciar Trial Grátis</a>
                 </div>
@@ -571,12 +515,12 @@
                     <p class="desc">Para times em crescimento e pequenos negócios.</p>
                     <div class="price">R$ 99,90 <span>/ mês</span></div>
                     <ul>
-                        <li><i class="fa-solid fa-check"></i> Até 5 Profissionais</li>
-                        <li><i class="fa-solid fa-check"></i> Lembretes automáticos via WhatsApp</li>
-                        <li><i class="fa-solid fa-check"></i> Duração personalizada de serviços</li>
-                        <li><i class="fa-solid fa-check"></i> Suporte prioritário</li>
+                        <li><i class="ph ph-check"></i> Até 5 Profissionais</li>
+                        <li><i class="ph ph-check"></i> Lembretes automáticos via WhatsApp</li>
+                        <li><i class="ph ph-check"></i> Duração personalizada</li>
+                        <li><i class="ph ph-check"></i> Suporte prioritário</li>
                     </ul>
-                    <a href="/login.html?modo=registro" class="btn-brand" style="justify-content:center; padding: 12px;">Iniciar Trial Grátis</a>
+                    <a href="/login.html?modo=registro" class="btn-brand" style="width: 100%; justify-content: center;">Iniciar Trial Grátis</a>
                 </div>
 
                 <!-- PREMIUM -->
@@ -585,10 +529,10 @@
                     <p class="desc">Para grandes operações, redes e estúdios robustos.</p>
                     <div class="price">R$ 149,90 <span>/ mês</span></div>
                     <ul>
-                        <li><i class="fa-solid fa-check"></i> Profissionais Ilimitados</li>
-                        <li><i class="fa-solid fa-check"></i> Todos os recursos avançados</li>
-                        <li><i class="fa-solid fa-check"></i> Atendimento via WhatsApp</li>
-                        <li><i class="fa-solid fa-check"></i> Selo de Certificação VIP</li>
+                        <li><i class="ph ph-check"></i> Profissionais Ilimitados</li>
+                        <li><i class="ph ph-check"></i> Todos os recursos avançados</li>
+                        <li><i class="ph ph-check"></i> Atendimento via WhatsApp</li>
+                        <li><i class="ph ph-check"></i> Selo VIP</li>
                     </ul>
                     <a href="/login.html?modo=registro" class="btn-outline">Iniciar Trial Grátis</a>
                 </div>
@@ -609,12 +553,10 @@
                     <h4>Como funcionam os 7 dias grátis?</h4>
                     <p>Ao se cadastrar, você tem acesso completo à plataforma. Não exigimos cartão de crédito. É a melhor forma de validar o sistema no seu negócio.</p>
                 </div>
-
                 <div class="faq-item">
                     <h4>Como pago a mensalidade depois?</h4>
                     <p>Os pagamentos são efetuados via PIX, o que torna o processo livre de taxas bancárias abusivas. Você receberá as instruções na própria plataforma.</p>
                 </div>
-
                 <div class="faq-item">
                     <h4>Meus clientes precisam instalar um app?</h4>
                     <p>Não. A página de agendamento é acessível via link e funciona perfeitamente em qualquer navegador mobile ou desktop.</p>
@@ -633,6 +575,13 @@
         </div>
     </div>
 </footer>
+
+<script>
+    function toggleMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.toggle('active');
+    }
+</script>
 
 </body>
 </html>

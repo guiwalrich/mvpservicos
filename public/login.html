@@ -6,7 +6,8 @@
     <title>MVP Agenda | Login</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="/login.css">
 </head>
@@ -21,12 +22,12 @@
         <div class="brand-section">
             <div class="logo-box">
                 <div class="logo-icon">
-                    <i class="fa-solid fa-calendar-check"></i>
+                    <i class="ph ph-calendar-check"></i>
                 </div>
                 <h2>MVP Agenda</h2>
             </div>
             <div class="tagline-badge">
-                <i class="fa-solid fa-bolt"></i> Plataforma inteligente
+                <i class="ph ph-lightning"></i> Plataforma inteligente
             </div>
         </div>
 
@@ -94,7 +95,7 @@
         <div class="form-container">
             <div class="form-header">
                 <div class="welcome-icon" id="welcomeIcon">
-                    <i class="fa-solid fa-hand-sparkles"></i>
+                    <i class="ph ph-hand-waving"></i>
                 </div>
                 <h2 id="title">Bem-vindo de volta</h2>
                 <p id="subtitle">Acesse sua conta e gerencie seus agendamentos com facilidade.</p>
@@ -112,16 +113,16 @@
                 <div class="form-group">
                     <label for="senha">Senha</label>
                     <div class="input-wrapper password-field">
-                        <i class="fa-solid fa-lock"></i>
+                        <i class="ph ph-lock"></i>
                         <input type="password" id="senha" placeholder="••••••••" required>
                         <button type="button" id="togglePassword" aria-label="Mostrar senha">
-                            <i class="fa-regular fa-eye"></i>
+                            <i class="ph ph-eye"></i>
                         </button>
                     </div>
                 </div>
                 <button class="login-btn" type="submit">
                     <span>Acessar Painel</span>
-                    <i class="fa-solid fa-arrow-right"></i>
+                    <i class="ph ph-arrow-right"></i>
                 </button>
             </form>
 
@@ -182,7 +183,7 @@
                 <div class="form-group">
                     <label for="regSenha">Senha</label>
                     <div class="input-wrapper">
-                        <i class="fa-solid fa-lock"></i>
+                        <i class="ph ph-lock"></i>
                         <input type="password" id="regSenha" placeholder="Mínimo 6 caracteres" required>
                     </div>
                 </div>
@@ -305,7 +306,7 @@
     togglePassword.addEventListener("click", () => {
         const isPassword = senhaInput.type === "password";
         senhaInput.type = isPassword ? "text" : "password";
-        togglePassword.innerHTML = isPassword ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
+        togglePassword.innerHTML = isPassword ? '<i class="ph ph-eye-slash"></i>' : '<i class="ph ph-eye"></i>';
     });
 
     toggleLink.addEventListener("click", () => {
@@ -333,7 +334,7 @@
                 subtitle.textContent = "Acesse sua conta e gerencie seus agendamentos com facilidade.";
                 toggleText.textContent = "Ainda não tem conta?";
                 toggleLink.textContent = "Comece grátis →";
-                welcomeIcon.innerHTML = '<i class="fa-solid fa-hand-sparkles"></i>';
+                welcomeIcon.innerHTML = '<i class="ph ph-hand-waving"></i>';
             }
             formContainer.classList.remove('transitioning');
         }, 200);
