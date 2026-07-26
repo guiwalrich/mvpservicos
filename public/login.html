@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP Agenda | Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="/login.css">
+</head>
+<body>
+
+<!-- ANIMATED BACKGROUND -->
+<div class="bg-animation">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+    <div class="grid-overlay"></div>
+</div>
+
+<!-- FLOATING PARTICLES -->
+<div class="particles">
+    <div class="particle" style="--delay: 0s; --x: 10%; --y: 20%;"></div>
+    <div class="particle" style="--delay: 1s; --x: 80%; --y: 10%;"></div>
+    <div class="particle" style="--delay: 2s; --x: 30%; --y: 70%;"></div>
+    <div class="particle" style="--delay: 3s; --x: 70%; --y: 80%;"></div>
+    <div class="particle" style="--delay: 4s; --x: 50%; --y: 40%;"></div>
+    <div class="particle" style="--delay: 0.5s; --x: 90%; --y: 60%;"></div>
+    <div class="particle" style="--delay: 1.5s; --x: 15%; --y: 90%;"></div>
+    <div class="particle" style="--delay: 2.5s; --x: 60%; --y: 15%;"></div>
+</div>
+
+<div class="login-container">
+
+    <!-- PAINEL ESQUERDO -->
+    <section class="left-side">
+        <div class="brand-section">
+            <div class="logo-box">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <h2>MVP Agenda</h2>
+            </div>
+            <div class="tagline-badge">
+                <i class="fa-solid fa-bolt"></i> Plataforma inteligente
+            </div>
+        </div>
+
+        <div class="hero-text">
+            <h1>Transforme sua <span class="highlight">agenda</span> em resultados.</h1>
+            <p>Automatize agendamentos, fidelize clientes e acompanhe métricas em tempo real — tudo em um único painel.</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-number">2.5k+</div>
+                <div class="stat-label">Agendamentos/mês</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <div class="stat-number">98%</div>
+                <div class="stat-label">Satisfação</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Disponível</div>
+            </div>
+        </div>
+
+        <div class="dashboard-preview">
+            <div class="preview-card">
+                <div class="preview-header">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="preview-content">
+                    <div class="preview-row">
+                        <div class="preview-avatar"></div>
+                        <div class="preview-lines">
+                            <div class="preview-line"></div>
+                            <div class="preview-line short"></div>
+                        </div>
+                        <div class="preview-badge"></div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-avatar"></div>
+                        <div class="preview-lines">
+                            <div class="preview-line"></div>
+                            <div class="preview-line short"></div>
+                        </div>
+                        <div class="preview-badge alt"></div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-avatar"></div>
+                        <div class="preview-lines">
+                            <div class="preview-line"></div>
+                            <div class="preview-line short"></div>
+                        </div>
+                        <div class="preview-badge"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAINEL DIREITO -->
+    <section class="right-side">
+        <div class="form-container">
+            <div class="form-header">
+                <div class="welcome-icon" id="welcomeIcon">
+                    <i class="fa-solid fa-hand-sparkles"></i>
+                </div>
+                <h2 id="title">Bem-vindo de volta</h2>
+                <p id="subtitle">Acesse sua conta e gerencie seus agendamentos com facilidade.</p>
+            </div>
+
+            <!-- LOGIN (PASSO 1) -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="email" placeholder="seu@email.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <div class="input-wrapper password-field">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="senha" placeholder="••••••••" required>
+                        <button type="button" id="togglePassword" aria-label="Mostrar senha">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="login-btn" type="submit">
+                    <span>Acessar Painel</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- VERIFICAÇÃO DE CÓDIGO (PASSO 2) -->
+            <form id="otpForm" class="hidden">
+                <div class="spam-warning-box">
+                    <div class="spam-header">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Código de Segurança Enviado</span>
+                    </div>
+                    <p>Enviamos um código de 6 dígitos para <strong id="userEmailDisplay"></strong>.</p>
+                    
+                    <!-- AVISO DE SPAM DESTACADO -->
+                    <div class="spam-alert">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <div>
+                            <strong>Importante:</strong> Não encontrou na Caixa de Entrada? Por favor, verifique sua pasta de <strong>Spam</strong> ou <strong>Lixo Eletrônico</strong>.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="otpCodigo">Código de Verificação (6 dígitos)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="text" id="otpCodigo" placeholder="123456" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" required style="letter-spacing: 4px; font-weight: 700; font-size: 1.1rem; text-align: center;">
+                    </div>
+                </div>
+
+                <button class="login-btn" type="submit">
+                    <span>Confirmar Código</span>
+                    <i class="fa-solid fa-check"></i>
+                </button>
+
+                <div style="margin-top: 14px; text-align: center;">
+                    <button type="button" id="btnReenviarCodigo" class="btn-secondary-link">
+                        <i class="fa-solid fa-rotate-right"></i> Reenviar código por e-mail
+                    </button>
+                </div>
+            </form>
+
+            <!-- CADASTRO -->
+            <form id="registerForm" class="hidden">
+                <div class="form-group">
+                    <label for="regNome">Nome do estabelecimento</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-store"></i>
+                        <input type="text" id="regNome" placeholder="Ex: Barbearia Premium" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="regEmail" placeholder="seu@email.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regSenha">Senha</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="regSenha" placeholder="Mínimo 6 caracteres" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regNicho">Tipo de negócio</label>
+                    <div class="input-wrapper select-wrapper">
+                        <i class="fa-solid fa-briefcase"></i>
+                        <select id="regNicho" required>
+                            <option value="barbearia">💈 Barbearia</option>
+                            <option value="salao">💅 Salão de Beleza</option>
+                            <option value="clinica">🏥 Clínica</option>
+                            <option value="tatuador">🎨 Tatuador</option>
+                            <option value="outro">📋 Outro</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="login-btn" type="submit">
+                    <span>Criar Minha Conta</span>
+                    <i class="fa-solid fa-rocket"></i>
+                </button>
+            </form>
+
+            <div class="form-footer">
+                <p class="toggle">
+                    <span id="toggleText">Ainda não tem conta?</span>
+                    <a id="toggleLink">Comece grátis →</a>
+                </p>
+            </div>
+
+            <div class="error" id="erro"></div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    const API = window.location.origin;
+
+    const loginForm = document.getElementById("loginForm");
+    const otpForm = document.getElementById("otpForm");
+    const registroForm = document.getElementById("registerForm");
+    const title = document.getElementById("title");
+    const subtitle = document.getElementById("subtitle");
+    const toggleText = document.getElementById("toggleText");
+    const toggleLink = document.getElementById("toggleLink");
+    const erro = document.getElementById("erro");
+    const togglePassword = document.getElementById("togglePassword");
+    const senhaInput = document.getElementById("senha");
+    const userEmailDisplay = document.getElementById("userEmailDisplay");
+    const btnReenviarCodigo = document.getElementById("btnReenviarCodigo");
+    const welcomeIcon = document.getElementById("welcomeIcon");
+
+    let modo = "login"; // "login", "otp", "registro"
+    let emailPendencia = "";
+
+    function setLoading(form, isLoading, text) {
+        const button = form.querySelector("button[type='submit']");
+        if (!button) return;
+        button.disabled = isLoading;
+        if (isLoading) {
+            button.innerHTML = `<span>${text}</span> <i class="fa-solid fa-spinner fa-spin"></i>`;
+        } else {
+            button.innerHTML = button.dataset.defaultHtml || `<span>${text}</span>`;
+        }
+    }
+
+    function clearForms() {
+        loginForm.reset();
+        otpForm.reset();
+        registroForm.reset();
+        erro.style.display = "none";
+        erro.textContent = "";
+    }
+
+    function mostrarErro(mensagem) {
+        erro.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${mensagem}`;
+        erro.style.display = "flex";
+        erro.classList.add('shake');
+        setTimeout(() => erro.classList.remove('shake'), 600);
+    }
+
+    function mostrarSucesso(mensagem) {
+        erro.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> ${mensagem}`;
+        erro.style.display = "flex";
+        erro.style.color = "#22c55e";
+        erro.style.background = "rgba(34, 197, 94, 0.1)";
+        erro.style.borderColor = "rgba(34, 197, 94, 0.2)";
+    }
+
+    async function fazerRequisicao(url, options = {}) {
+        const response = await fetch(url, options);
+        const text = await response.text();
+
+        let data = null;
+        if (text) {
+            try {
+                data = JSON.parse(text);
+            } catch (err) {
+                console.error("Resposta não foi JSON válida:", text);
+                throw new Error("Resposta inválida do servidor");
+            }
+        }
+        return { response, data };
+    }
+
+    togglePassword.addEventListener("click", () => {
+        const isPassword = senhaInput.type === "password";
+        senhaInput.type = isPassword ? "text" : "password";
+        togglePassword.innerHTML = isPassword ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
+    });
+
+    toggleLink.addEventListener("click", () => {
+        clearForms();
+        const formContainer = document.querySelector('.form-container');
+        formContainer.classList.add('transitioning');
+        
+        setTimeout(() => {
+            if (modo === "login" || modo === "otp") {
+                modo = "registro";
+                loginForm.classList.add("hidden");
+                otpForm.classList.add("hidden");
+                registroForm.classList.remove("hidden");
+                title.textContent = "Crie sua conta";
+                subtitle.textContent = "Configure seu negócio em menos de 2 minutos.";
+                toggleText.textContent = "Já tem uma conta?";
+                toggleLink.textContent = "Fazer login →";
+                welcomeIcon.innerHTML = '<i class="fa-solid fa-rocket"></i>';
+            } else {
+                modo = "login";
+                registroForm.classList.add("hidden");
+                otpForm.classList.add("hidden");
+                loginForm.classList.remove("hidden");
+                title.textContent = "Bem-vindo de volta";
+                subtitle.textContent = "Acesse sua conta e gerencie seus agendamentos com facilidade.";
+                toggleText.textContent = "Ainda não tem conta?";
+                toggleLink.textContent = "Comece grátis →";
+                welcomeIcon.innerHTML = '<i class="fa-solid fa-hand-sparkles"></i>';
+            }
+            formContainer.classList.remove('transitioning');
+        }, 200);
+    });
+
+    // PASSO 1: SUBMIT LOGIN
+    loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value.trim();
+        const senha = document.getElementById("senha").value;
+
+        if (!email || !senha) {
+            mostrarErro("Preencha email e senha para continuar.");
+            return;
+        }
+
+        const submitButton = loginForm.querySelector("button[type='submit']");
+        submitButton.dataset.defaultHtml = submitButton.innerHTML;
+        setLoading(loginForm, true, "Verificando...");
+
+        try {
+            const { response, data } = await fazerRequisicao(`${API}/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, senha }),
+            });
+
+            if (response.ok && data?.requereCodigo) {
+                modo = "otp";
+                emailPendencia = email;
+                userEmailDisplay.textContent = email;
+
+                loginForm.classList.add("hidden");
+                otpForm.classList.remove("hidden");
+                
+                title.textContent = "Verificação de Segurança";
+                subtitle.textContent = "Insira o código enviado por e-mail para concluir o acesso.";
+                welcomeIcon.innerHTML = '<i class="fa-solid fa-shield-halved"></i>';
+
+                toggleText.textContent = "E-mail incorreto?";
+                toggleLink.textContent = "Voltar ao início";
+
+                erro.style.display = "none";
+                document.getElementById("otpCodigo").focus();
+            } else {
+                mostrarErro(data?.erro || "Email ou senha incorretos. Tente novamente.");
+            }
+        } catch (err) {
+            console.error(err);
+            mostrarErro("Não foi possível conectar ao servidor. Verifique sua conexão.");
+        } finally {
+            setLoading(loginForm, false, "Acessar Painel");
+        }
+    });
+
+    // PASSO 2: SUBMIT CÓDIGO OTP
+    otpForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const codigo = document.getElementById("otpCodigo").value.trim();
+
+        if (!codigo || codigo.length !== 6) {
+            mostrarErro("Digite o código de 6 dígitos recebido por e-mail.");
+            return;
+        }
+
+        const submitButton = otpForm.querySelector("button[type='submit']");
+        submitButton.dataset.defaultHtml = submitButton.innerHTML;
+        setLoading(otpForm, true, "Validando...");
+
+        try {
+            const { response, data } = await fazerRequisicao(`${API}/auth/verificar-codigo`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: emailPendencia, codigo }),
+            });
+
+            if (response.ok && data?.token) {
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("empresa", JSON.stringify(data.empresa || {}));
+                submitButton.innerHTML = '<span>Redirecionando...</span> <i class="fa-solid fa-check"></i>';
+                submitButton.classList.add('success-btn');
+                setTimeout(() => { window.location.href = "/dashboard.html"; }, 600);
+            } else {
+                mostrarErro(data?.erro || "Código inválido ou expirado.");
+            }
+        } catch (err) {
+            console.error(err);
+            mostrarErro("Erro na verificação. Tente novamente.");
+        } finally {
+            setLoading(otpForm, false, "Confirmar Código");
+        }
+    });
+
+    // REENVIAR CÓDIGO
+    btnReenviarCodigo.addEventListener("click", async () => {
+        btnReenviarCodigo.disabled = true;
+        btnReenviarCodigo.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Reenviando...';
+
+        try {
+            const { response, data } = await fazerRequisicao(`${API}/auth/reenviar-codigo`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: emailPendencia }),
+            });
+
+            if (response.ok) {
+                mostrarSucesso(data?.mensagem || "Código reenviado! Confira sua entrada e a pasta de Spam.");
+            } else {
+                mostrarErro(data?.erro || "Erro ao reenviar código.");
+            }
+        } catch (err) {
+            mostrarErro("Não foi possível conectar ao servidor.");
+        } finally {
+            setTimeout(() => {
+                btnReenviarCodigo.disabled = false;
+                btnReenviarCodigo.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Reenviar código por e-mail';
+            }, 3000);
+        }
+    });
+
+    // REGISTRO
+    registroForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById("regNome").value.trim();
+        const email = document.getElementById("regEmail").value.trim();
+        const senha = document.getElementById("regSenha").value;
+        const nicho = document.getElementById("regNicho").value;
+
+        if (!nome || !email || !senha) {
+            mostrarErro("Preencha todos os campos para criar a conta.");
+            return;
+        }
+
+        if (senha.length < 6) {
+            mostrarErro("A senha deve ter pelo menos 6 caracteres.");
+            return;
+        }
+
+        const submitButton = registroForm.querySelector("button[type='submit']");
+        submitButton.dataset.defaultHtml = submitButton.innerHTML;
+        setLoading(registroForm, true, "Criando conta...");
+
+        try {
+            const { response, data } = await fazerRequisicao(`${API}/auth/registro`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nome, email, senha, nicho }),
+            });
+
+            if (response.ok) {
+                registroForm.classList.add("hidden");
+                otpForm.classList.add("hidden");
+                loginForm.classList.remove("hidden");
+                title.textContent = "Conta criada! 🎉";
+                subtitle.textContent = "Tudo pronto! Faça login para começar a usar.";
+                toggleText.textContent = "Ainda não tem conta?";
+                toggleLink.textContent = "Comece grátis →";
+                welcomeIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                modo = "login";
+                registroForm.reset();
+                erro.style.display = "none";
+            } else {
+                mostrarErro(data?.erro || "Erro ao criar a conta. Tente novamente.");
+            }
+        } catch (err) {
+            console.error(err);
+            mostrarErro("Não foi possível conectar ao servidor. Verifique sua conexão.");
+        } finally {
+            setLoading(registroForm, false, "Criar Minha Conta");
+        }
+    });
+
+    // Input focus animations
+    document.querySelectorAll('.input-wrapper input, .input-wrapper select').forEach(input => {
+        input.addEventListener('focus', () => input.closest('.input-wrapper').classList.add('focused'));
+        input.addEventListener('blur', () => input.closest('.input-wrapper').classList.remove('focused'));
+    });
+</script>
+</body>
+</html>

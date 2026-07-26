@@ -1,0 +1,164 @@
+model Empresa {
+  id              Int             @id @default(autoincrement())
+  nome            String
+  email           String          @unique
+  senha           String
+  slug            String?         @unique
+  nicho           String          @default("barbearia")
+  logo            String?
+  telefone        String?
+  instagram       String?
+  codigo_login    String?
+  codigo_expira_em DateTime?
+  plano           String          @default("trial")
+  status_assinatura String        @default("trial")
+  trial_expira_em DateTime?
+  proximo_vencimento DateTime?
+  criado_em       DateTime        @default(now())
+  configuracoes   Configuracao?
+  profissionais   Profissional[]
+  servicos        Servico[]
+  clientes        Cliente[]
+  agendamentos    Agendamento[]
+  lembretes       Lembrete[]
+  horariosFuncionamento HorarioFuncionamento[]
+}
+
+model Configuracao {
+  id                      Int      @id @default(autoincrement())
+  empresa_id              Int      @unique
+  empresa                 Empresa  @relation(fields: [empresa_id], references: [id])
+  nome_profissional       String   @default("Barbeiro")
+  nome_servico            String   @default("Corte")
+  horario_abertura        String   @default("09:00")
+  horario_fechamento      String   @default("19:00")
+  intervalo_minutos       Int      @default(30)
+  dias_funcionamento      String   @default("1,2,3,4,5,6")
+  horarios_disponiveis    String?  
+  lembrete_24h            Boolean  @default(true)
+  lembrete_1h             Boolean  @default(true)
+}
+
+model Profissional {
+  id            Int            @id @default(autoincrement())
+  empresa_id    Int
+  empresa       Empresa        @relation(fields: [empresa_id], references: [id])
+  nome          String
+  email         String?
+  telefone      String?
+  cor_agenda    String         @default("#7AB8D6")
+  ativo         Boolean        @default(true)
+  agendamentos  Agendamento[]
+  folgas        Folga[]
+  comissoes     Float          @default(50)
+  disponibilidades DisponibilidadeProfissional[]
+  servicosDuracao ProfissionalServico[]
+}
+
+model Servico {
+  id          Int            @id @default(autoincrement())
+  empresa_id  Int
+  empresa     Empresa        @relation(fields: [empresa_id], references: [id])
+  nome        String
+  preco       Float
+  duracao_min Int            @default(30)
+  comissao    Float          @default(50)
+  ativo       Boolean        @default(true)
+  agendamentos Agendamento[]
+  profissionaisDuracao ProfissionalServico[]
+}
+
+model Cliente {
+  id            Int            @id @default(autoincrement())
+  empresa_id    Int
+  empresa       Empresa        @relation(fields: [empresa_id], references: [id])
+  nome          String
+  telefone      String
+  email         String?
+  nascimento    DateTime?
+  pontos        Int            @default(0)
+  agendamentos  Agendamento[]
+}
+
+model Agendamento {
+  id              Int          @id @default(autoincrement())
+  empresa_id      Int
+  empresa         Empresa      @relation(fields: [empresa_id], references: [id])
+  cliente_id      Int
+  cliente         Cliente      @relation(fields: [cliente_id], references: [id])
+  profissional_id Int
+  profissional    Profissional @relation(fields: [profissional_id], references: [id])
+  servico_id      Int
+  servico         Servico      @relation(fields: [servico_id], references: [id])
+  data_hora       DateTime
+  status          String       @default("agendado")
+  forma_pagamento String?
+  valor_pago      Float?
+  observacao      String?
+  criado_em       DateTime     @default(now())
+  lembretes       Lembrete[]
+}
+
+model Folga {
+  id              Int          @id @default(autoincrement())
+  profissional_id Int
+  profissional    Profissional @relation(fields: [profissional_id], references: [id])
+  data            DateTime
+  motivo          String?
+}
+
+model Lembrete {
+  id              Int          @id @default(autoincrement())
+  empresa_id      Int
+  empresa         Empresa      @relation(fields: [empresa_id], references: [id])
+  agendamento_id  Int
+  agendamento     Agendamento  @relation(fields: [agendamento_id], references: [id])
+  tipo            String
+  enviado_em      DateTime     @default(now())
+  status          String       @default("enviado")
+}
+
+model HorarioFuncionamento {
+  id              Int      @id @default(autoincrement())
+  empresa_id      Int
+  empresa         Empresa  @relation(fields: [empresa_id], references: [id])
+  dia_semana      Int      // 0=Domingo, 1=Segunda, ..., 6=Sabado
+  hora_abertura   String   @default("09:00")
+  hora_fechamento String   @default("19:00")
+  aberto          Boolean  @default(true)
+
+  @@unique([empresa_id, dia_semana])
+}
+
+model DisponibilidadeProfissional {
+  id              Int          @id @default(autoincrement())
+  profissional_id Int
+  profissional    Profissional @relation(fields: [profissional_id], references: [id])
+  dia_semana      Int          // 0=Domingo, 1=Segunda, ..., 6=Sabado
+  hora_inicio     String       @default("09:00")
+  hora_fim        String       @default("19:00")
+  aberto          Boolean      @default(true)
+
+  @@unique([profissional_id, dia_semana])
+}
+
+model ProfissionalServico {
+  id              Int          @id @default(autoincrement())
+  profissional_id Int
+  profissional    Profissional @relation(fields: [profissional_id], references: [id])
+  servico_id      Int
+  servico         Servico      @relation(fields: [servico_id], references: [id])
+  duracao_min     Int          @default(30)
+  preco           Float?
+
+  @@unique([profissional_id, servico_id])
+}
+
+datasource db {
+  provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}

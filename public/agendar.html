@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agendamento Público</title>
+  <style>
+    :root {
+      --bg: #191919;
+      --surface: #1C1C1C;
+      --text: #FFFFFF;
+      --muted: #B3B3B3;
+      --accent: #CAFF33;
+      --accent-dark: #B8E62E;
+      --border: #262626;
+      --border-light: #333333;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      font-family: Inter, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    .wrap { max-width: 900px; margin: 40px auto; padding: 24px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow); padding: 28px; }
+    h1 { margin-top: 0; color: #FFFFFF; }
+    h3 { color: #FFFFFF; }
+    .muted { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 20px; }
+    .service { 
+      border: 1px solid var(--border); 
+      border-radius: 14px; 
+      padding: 20px; 
+      background: #222222;
+      transition: border-color 0.25s, transform 0.2s;
+    }
+    .service:hover { 
+      border-color: var(--border-light); 
+      transform: translateY(-2px); 
+    }
+    .service h3 { margin: 0 0 10px; font-size: 16px; }
+    .service div { color: #999; font-size: 14px; margin-bottom: 2px; }
+    .service button { 
+      margin-top: 14px; 
+      padding: 10px 20px; 
+      border: none; 
+      border-radius: 50px; 
+      background: var(--accent); 
+      color: #191919; 
+      cursor: pointer; 
+      font-weight: 600; 
+      font-size: 14px;
+      font-family: Inter, Arial, sans-serif;
+      transition: background 0.25s, box-shadow 0.25s;
+    }
+    .service button:hover { 
+      background: var(--accent-dark); 
+      box-shadow: 0 4px 20px rgba(202,255,51,0.25);
+    }
+    .empty { color: var(--muted); padding: 12px 0; }
+    .helper { color: var(--muted); font-size: 14px; margin-top: 6px; }
+    .step-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(202,255,51,0.1);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      border: 1px solid rgba(202,255,51,0.18);
+    }
+    form { display: grid; gap: 14px; margin-top: 20px; }
+    input, select { 
+      padding: 12px 14px; 
+      border: 1px solid var(--border-light); 
+      border-radius: 10px; 
+      background: #262626; 
+      color: #FFFFFF;
+      font-size: 14px;
+      font-family: Inter, Arial, sans-serif;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(202,255,51,0.1);
+    }
+    input::placeholder { color: #666; }
+    select option { background: #262626; color: #fff; }
+    .actions { display: flex; gap: 10px; margin-top: 12px; }
+    .actions button { 
+      padding: 11px 18px; 
+      border: none; 
+      border-radius: 50px; 
+      cursor: pointer; 
+      font-weight: 600;
+      font-family: Inter, Arial, sans-serif;
+      font-size: 14px;
+      transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+    }
+    .btn-primary { 
+      background: var(--accent); 
+      color: #191919; 
+    }
+    .btn-primary:hover { 
+      background: var(--accent-dark); 
+      box-shadow: 0 4px 20px rgba(202,255,51,0.25);
+    }
+    .btn-secondary { 
+      background: #262626; 
+      color: #B3B3B3; 
+      border: 1px solid var(--border-light); 
+    }
+    .btn-secondary:hover { 
+      background: var(--border-light); 
+      color: #FFFFFF; 
+    }
+    .success { color: #34D399; margin-top: 12px; font-weight: 500; }
+    .error { color: #FF6B6B; margin-top: 12px; }
+
+    /* Calendário */
+    .calendario-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .calendario-header button {
+      background: none;
+      border: 1px solid var(--border-light);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: Inter, Arial, sans-serif;
+      transition: background 0.2s;
+    }
+    .calendario-header button:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    .calendario-header span {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .calendario-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .calendario-grid .dia-nome {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      padding: 8px 0;
+      text-transform: uppercase;
+    }
+    .calendario-grid .dia {
+      text-align: center;
+      padding: 10px 4px;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .calendario-grid .dia:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: var(--border-light);
+    }
+    .calendario-grid .dia.disponivel {
+      background: rgba(202,255,51,0.1);
+      color: var(--accent);
+      border-color: rgba(202,255,51,0.2);
+      font-weight: 600;
+    }
+    .calendario-grid .dia.disponivel:hover {
+      background: rgba(202,255,51,0.2);
+      box-shadow: 0 0 12px rgba(202,255,51,0.15);
+    }
+    .calendario-grid .dia.selecionado {
+      background: var(--accent);
+      color: #191919;
+      border-color: var(--accent);
+    }
+    .calendario-grid .dia.outro-mes {
+      opacity: 0.25;
+    }
+    .calendario-grid .dia.passado {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .calendario-grid .dia.indisponivel {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Slots de horário */
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .slot-btn {
+      padding: 10px 6px;
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      background: #222222;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      font-family: Inter, Arial, sans-serif;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .slot-btn:hover {
+      border-color: var(--accent);
+      background: rgba(202,255,51,0.08);
+    }
+    .slot-btn.selecionado {
+      background: var(--accent);
+      color: #191919;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .slot-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .slot-info {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-light);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loading-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      padding: 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="step-pill" id="stepPill">Passo 1 • Escolha um serviço</div>
+      <h1 id="empresaNome">Carregando...</h1>
+      <p id="empresaInfo" class="muted">Aguarde enquanto carregamos os serviços da empresa.</p>
+
+      <!-- Loading -->
+      <div id="loadingScreen" class="loading-text">
+        <div class="spinner"></div>
+        <span>Carregando...</span>
+      </div>
+
+      <!-- Step 1: Serviços -->
+      <div id="servicos" class="grid" style="display:none;"></div>
+
+      <!-- Step 2: Formulário completo -->
+      <div id="formContainer" style="display:none;">
+        <h3>Finalizar agendamento</h3>
+        <p id="servicoResumo" class="helper"></p>
+
+        <!-- Dados do cliente -->
+        <form id="agendamentoForm">
+          <input type="text" id="nome" placeholder="Seu nome" required />
+          <input type="text" id="telefone" placeholder="Seu telefone (WhatsApp)" required />
+          
+          <!-- Seleção de profissional -->
+          <label style="font-size:13px;color:var(--muted);">Escolha o profissional</label>
+          <select id="profissional_id" required></select>
+
+          <!-- Calendário -->
+          <label style="font-size:13px;color:var(--muted);margin-top:8px;">Escolha a data</label>
+          <div class="calendario-header">
+            <button type="button" id="calPrev">◀</button>
+            <span id="calMesAno"></span>
+            <button type="button" id="calNext">▶</button>
+          </div>
+          <div class="calendario-grid" id="calGrid"></div>
+
+          <!-- Horários disponíveis -->
+          <div id="slotContainer" style="display:none;">
+            <label style="font-size:13px;color:var(--muted);">Horários disponíveis</label>
+            <div class="slots-grid" id="slotsGrid"></div>
+            <div id="slotLoading" class="loading-text" style="display:none;">
+              <div class="spinner"></div>
+              <span>Carregando horários...</span>
+            </div>
+            <p id="slotEmpty" class="slot-info" style="display:none;">Nenhum horário disponível para esta data.</p>
+          </div>
+
+          <input type="hidden" id="servico_id" />
+          <input type="hidden" id="data_hora" />
+          <input type="hidden" id="hora_selecionada" />
+
+          <div class="actions" style="margin-top:20px;">
+            <button type="submit" class="btn-primary" id="btnConfirmar" disabled>Confirmar agendamento</button>
+            <button type="button" class="btn-secondary" id="voltarBtn">Voltar</button>
+          </div>
+        </form>
+        <div id="mensagem" class="success"></div>
+        <div id="erro" class="error"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const path = window.location.pathname.split('/').filter(Boolean);
+    const slug = path[path.length - 1] || '';
+    const apiBase = window.location.origin;
+    let empresaData = null;
+    let servicoSelecionado = null;
+    let calDate = new Date();
+    let dataSelecionada = null;
+    let horaSelecionada = null;
+    let slotsDisponiveis = [];
+
+    function mostrarErro(msg) {
+      const el = document.getElementById('erro');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function limparErro() {
+      document.getElementById('erro').textContent = '';
+      document.getElementById('erro').style.display = 'none';
+    }
+
+    function showLoading(show) {
+      document.getElementById('loadingScreen').style.display = show ? 'flex' : 'none';
+    }
+
+    function getDiaSemanaNome(dia) {
+      const nomes = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      return nomes[dia];
+    }
+
+    async function carregarEmpresa() {
+      if (!slug) {
+        document.getElementById('empresaInfo').textContent = 'Link inválido.';
+        showLoading(false);
+        return;
+      }
+
+      showLoading(true);
+      try {
+        const response = await fetch(`${apiBase}/agendar-api/${slug}`);
+        const empresa = await response.json();
+
+        if (!response.ok) {
+          document.getElementById('empresaInfo').textContent = empresa.erro || 'Não foi possível carregar esta empresa.';
+          showLoading(false);
+          return;
+        }
+
+        empresaData = empresa;
+        document.getElementById('empresaNome').textContent = empresa.nome || 'Empresa';
+        document.getElementById('empresaInfo').textContent = empresa.nicho ? `Especialidade: ${empresa.nicho}` : 'Serviços disponíveis';
+        document.getElementById('servicos').style.display = 'grid';
+        showLoading(false);
+
+        const container = document.getElementById('servicos');
+        if (!empresa.servicos || empresa.servicos.length === 0) {
+          container.innerHTML = '<div class="empty">Nenhum serviço disponível no momento.</div>';
+          return;
+        }
+
+        container.innerHTML = empresa.servicos.map(servico => `
+          <div class="service">
+            <h3>${servico.nome}</h3>
+            <div>Preço: R$ ${Number(servico.preco || 0).toFixed(2)}</div>
+            <div>Duração: ${servico.duracao_min || 30} min</div>
+            <button type="button" data-id="${servico.id}">Selecionar</button>
+          </div>
+        `).join('');
+
+        container.querySelectorAll('button').forEach(button => {
+          button.addEventListener('click', () => abrirFormulario(button.dataset.id));
+        });
+      } catch (err) {
+        document.getElementById('empresaInfo').textContent = 'Erro ao carregar os serviços.';
+        showLoading(false);
+      }
+    }
+
+    function abrirFormulario(servicoId) {
+      servicoSelecionado = empresaData?.servicos?.find(item => item.id === Number(servicoId));
+      if (!servicoSelecionado) return;
+
+      const profissionalSelect = document.getElementById('profissional_id');
+      const profissionais = Array.isArray(empresaData?.profissionais) ? empresaData.profissionais : [];
+
+      profissionalSelect.innerHTML = '';
+
+      if (profissionais.length === 0) {
+        profissionalSelect.innerHTML = '<option value="">Nenhum profissional disponível</option>';
+      } else {
+        profissionalSelect.innerHTML = profissionais.map(p => `
+          <option value="${p.id}">${p.nome}</option>
+        `).join('');
+      }
+
+      document.getElementById('servico_id').value = servicoSelecionado.id;
+      document.getElementById('servicoResumo').textContent = `Serviço: ${servicoSelecionado.nome} • R$ ${Number(servicoSelecionado.preco || 0).toFixed(2)} • ${servicoSelecionado.duracao_min || 30} min`;
+      document.getElementById('stepPill').textContent = 'Passo 2 • Escolha profissional, data e horário';
+      document.getElementById('formContainer').style.display = 'block';
+      document.getElementById('servicos').style.display = 'none';
+      
+      limparErro();
+      document.getElementById('mensagem').textContent = '';
+      
+      // Iniciar calendário
+      calDate = new Date();
+      renderCalendario();
+      
+      // Atualizar horários ao mudar profissional
+      profissionalSelect.onchange = () => {
+        horaSelecionada = null;
+        document.getElementById('hora_selecionada').value = '';
+        document.getElementById('data_hora').value = '';
+        document.getElementById('btnConfirmar').disabled = true;
+        if (dataSelecionada) buscarHorarios();
+      };
+    }
+
+    document.getElementById('voltarBtn').addEventListener('click', () => {
+      document.getElementById('formContainer').style.display = 'none';
+      document.getElementById('servicos').style.display = 'grid';
+      document.getElementById('servicoResumo').textContent = '';
+      document.getElementById('stepPill').textContent = 'Passo 1 • Escolha um serviço';
+      limparErro();
+      document.getElementById('mensagem').textContent = '';
+      document.getElementById('agendamentoForm').reset();
+      document.getElementById('slotContainer').style.display = 'none';
+      document.getElementById('btnConfirmar').disabled = true;
+    });
+
+    // Calendário
+    function renderCalendario() {
+      const ano = calDate.getFullYear();
+      const mes = calDate.getMonth();
+      const hoje = new Date();
+      
+      document.getElementById('calMesAno').textContent = 
+        new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(calDate);
+
+      const primeiroDia = new Date(ano, mes, 1);
+      const ultimoDia = new Date(ano, mes + 1, 0);
+      const inicioSemana = primeiroDia.getDay();
+      const diasNoMes = ultimoDia.getDate();
+
+      let html = '';
+      const diasNomes = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      diasNomes.forEach(n => html += `<div class="dia-nome">${n}</div>`);
+
+      // Dias vazios do início
+      for (let i = 0; i < inicioSemana; i++) {
+        html += '<div></div>';
+      }
+
+      for (let dia = 1; dia <= diasNoMes; dia++) {
+        const dataCheck = new Date(ano, mes, dia);
+        const isHoje = dataCheck.toDateString() === hoje.toDateString();
+        const isPassado = dataCheck < new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+        const isDiaDisponivel = verificarDiaDisponivel(dataCheck);
+        
+        let classes = 'dia';
+        if (isPassado) classes += ' passado';
+        else if (isDiaDisponivel) classes += ' disponivel';
+        else classes += ' indisponivel';
+        
+        if (dataSelecionada && dataSelecionada.toDateString() === dataCheck.toDateString()) {
+          classes += ' selecionado';
+        }
+
+        html += `<div class="${classes}" data-dia="${dia}">${dia}</div>`;
+      }
+
+      document.getElementById('calGrid').innerHTML = html;
+
+      // Eventos de clique nos dias disponíveis
+      document.querySelectorAll('#calGrid .dia.disponivel, #calGrid .dia.selecionado').forEach(el => {
+        el.onclick = () => selecionarDia(parseInt(el.dataset.dia));
+      });
+    }
+
+    function verificarDiaDisponivel(data) {
+      const diaSemana = data.getDay();
+      const horarios = empresaData?.horariosFuncionamento || [];
+      const horario = horarios.find(h => h.dia_semana === diaSemana);
+      return horario ? horario.aberto : (diaSemana >= 1 && diaSemana <= 6);
+    }
+
+    function selecionarDia(dia) {
+      const ano = calDate.getFullYear();
+      const mes = calDate.getMonth();
+      dataSelecionada = new Date(ano, mes, dia);
+      horaSelecionada = null;
+      document.getElementById('hora_selecionada').value = '';
+      document.getElementById('data_hora').value = '';
+      document.getElementById('btnConfirmar').disabled = true;
+      renderCalendario();
+      buscarHorarios();
+    }
+
+    async function buscarHorarios() {
+      const profissionalId = document.getElementById('profissional_id').value;
+      const servicoId = document.getElementById('servico_id').value;
+
+      if (!dataSelecionada || !profissionalId || !servicoId) return;
+
+      const slotContainer = document.getElementById('slotContainer');
+      const slotLoading = document.getElementById('slotLoading');
+      const slotsGrid = document.getElementById('slotsGrid');
+      const slotEmpty = document.getElementById('slotEmpty');
+
+      slotContainer.style.display = 'block';
+      slotLoading.style.display = 'flex';
+      slotsGrid.innerHTML = '';
+      slotEmpty.style.display = 'none';
+
+      // Preserva a data escolhida no calendário em qualquer fuso horário.
+      const dataStr = [
+        dataSelecionada.getFullYear(),
+        String(dataSelecionada.getMonth() + 1).padStart(2, '0'),
+        String(dataSelecionada.getDate()).padStart(2, '0')
+      ].join('-');
+
+      try {
+        const response = await fetch(`${apiBase}/agendar-api/${slug}/horarios?data=${dataStr}&profissional_id=${profissionalId}&servico_id=${servicoId}`);
+        const data = await response.json();
+        
+        slotLoading.style.display = 'none';
+
+        if (!response.ok) {
+          slotEmpty.textContent = data.erro || 'Erro ao carregar horários.';
+          slotEmpty.style.display = 'block';
+          return;
+        }
+
+        const slots = data.horarios_disponiveis || [];
+
+        if (slots.length === 0) {
+          slotEmpty.textContent = data.motivo || 'Nenhum horário disponível para esta data.';
+          slotEmpty.style.display = 'block';
+          return;
+        }
+
+        slotsDisponiveis = slots;
+        slotsGrid.innerHTML = slots.map(h => `
+          <button type="button" class="slot-btn" data-horario="${h}">${h}</button>
+        `).join('');
+
+        slotsGrid.querySelectorAll('.slot-btn').forEach(btn => {
+          btn.onclick = () => {
+            slotsGrid.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selecionado'));
+            btn.classList.add('selecionado');
+            horaSelecionada = btn.dataset.horario;
+            
+            const dataHoraStr = `${dataStr}T${horaSelecionada}:00`;
+            document.getElementById('data_hora').value = dataHoraStr;
+            document.getElementById('hora_selecionada').value = horaSelecionada;
+            document.getElementById('btnConfirmar').disabled = false;
+          };
+        });
+      } catch (err) {
+        slotLoading.style.display = 'none';
+        slotEmpty.textContent = 'Erro ao carregar horários. Tente novamente.';
+        slotEmpty.style.display = 'block';
+      }
+    }
+
+    document.getElementById('calPrev').addEventListener('click', () => {
+      calDate.setMonth(calDate.getMonth() - 1);
+      renderCalendario();
+    });
+
+    document.getElementById('calNext').addEventListener('click', () => {
+      calDate.setMonth(calDate.getMonth() + 1);
+      renderCalendario();
+    });
+
+    document.getElementById('agendamentoForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      limparErro();
+      document.getElementById('mensagem').textContent = '';
+
+      const nome = document.getElementById('nome').value.trim();
+      const telefone = document.getElementById('telefone').value.trim();
+      const data_hora = document.getElementById('data_hora').value;
+      const profissional_id = document.getElementById('profissional_id').value;
+      const servico_id = document.getElementById('servico_id').value;
+      const horaSelec = document.getElementById('hora_selecionada').value;
+
+      if (!nome || !telefone || !data_hora || !servico_id) {
+        mostrarErro('Preencha todos os campos obrigatórios.');
+        return;
+      }
+
+      if (!profissional_id) {
+        mostrarErro('Selecione um profissional disponível.');
+        return;
+      }
+
+      if (!horaSelec) {
+        mostrarErro('Selecione um horário disponível no calendário.');
+        return;
+      }
+
+      const btn = document.getElementById('btnConfirmar');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner"></div> Confirmando...';
+
+      try {
+        const response = await fetch(`${apiBase}/agendar-api/${slug}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, telefone, profissional_id, servico_id, data_hora })
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          mostrarErro(data.erro || 'Não foi possível criar o agendamento.');
+          btn.disabled = false;
+          btn.innerHTML = 'Confirmar agendamento';
+          return;
+        }
+
+        document.getElementById('mensagem').textContent = '✅ Agendamento confirmado com sucesso!';
+        document.getElementById('mensagem').style.display = 'block';
+        document.getElementById('agendamentoForm').reset();
+        document.getElementById('servicoResumo').textContent = '';
+        document.getElementById('stepPill').textContent = 'Passo 1 • Escolha um serviço';
+        document.getElementById('slotContainer').style.display = 'none';
+
+        setTimeout(() => {
+          document.getElementById('formContainer').style.display = 'none';
+          document.getElementById('servicos').style.display = 'grid';
+          document.getElementById('mensagem').textContent = '';
+          document.getElementById('mensagem').style.display = 'none';
+          btn.disabled = false;
+          btn.innerHTML = 'Confirmar agendamento';
+        }, 3000);
+      } catch (err) {
+        mostrarErro('Erro ao enviar o agendamento. Verifique sua conexão.');
+        btn.disabled = false;
+        btn.innerHTML = 'Confirmar agendamento';
+      }
+    });
+
+    carregarEmpresa();
+  </script>
+</body>
+</html>
+

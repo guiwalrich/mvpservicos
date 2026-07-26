@@ -1,0 +1,24 @@
+services:
+  # Web Service Node.js (MVP Agenda)
+  - type: web
+    name: mvp-agenda-app
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npx prisma db push && npm run start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mvp-agenda-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_SECRET
+        value: admin_mvp_secret_2025
+
+databases:
+  # Banco de Dados PostgreSQL no Render
+  - name: mvp-agenda-db
+    databaseName: mvpagenda
+    user: mvpuser
+    plan: free
