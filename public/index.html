@@ -3,26 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MVP Agenda | A Plataforma Inteligente de Agendamento Online</title>
-    <meta name="description" content="Automatize seus agendamentos, envie lembretes automáticos pelo WhatsApp e gerencie seu negócio com facilidade. Teste 7 dias grátis!">
+    <title>MVP Agenda | Plataforma Inteligente de Agendamento</title>
+    <meta name="description" content="Automatize agendamentos, envie lembretes e gerencie seu negócio. Teste 7 dias grátis!">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0A0A0A;
-            --surface: #141414;
-            --surface-hover: #1A1A1A;
-            --glass: rgba(255,255,255,0.03);
-            --glass-border: rgba(255,255,255,0.08);
-            --text: #FFFFFF;
-            --text-secondary: #CCCCCC;
-            --text-muted: #888888;
-            --accent: #CAFF33;
-            --accent-dark: #B8E62E;
-            --accent-glow: rgba(202,255,51,0.15);
-            --border: rgba(255,255,255,0.06);
+            --bg: #FAFAFA;
+            --surface: #FFFFFF;
+            --text-main: #111827;
+            --text-secondary: #6B7280;
+            --border: #E5E7EB;
+            --primary: #FF6B35;
+            --primary-hover: #E85D2B;
             --font: 'Inter', -apple-system, sans-serif;
         }
 
@@ -31,42 +26,25 @@
         body {
             font-family: var(--font);
             background: var(--bg);
-            color: var(--text);
+            color: var(--text-main);
             line-height: 1.6;
-            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== BACKGROUND ANIMATION ===== */
-        .bg-gradient-orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(140px);
-            opacity: 0.35;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, var(--accent-glow), transparent); top: -200px; right: -100px; }
-        .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(56,189,248,0.15), transparent); bottom: 10%; left: -150px; }
-
-        /* ===== CONTAINER ===== */
         .container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 0 24px;
-            position: relative;
-            z-index: 1;
         }
 
         /* ===== HEADER ===== */
         header {
-            padding: 24px 0;
+            padding: 20px 0;
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(12px);
             z-index: 100;
         }
 
@@ -81,27 +59,27 @@
             align-items: center;
             gap: 10px;
             text-decoration: none;
-            color: var(--text);
+            color: var(--text-main);
             font-weight: 800;
-            font-size: 20px;
+            font-size: 18px;
+            letter-spacing: -0.02em;
         }
 
         .logo-icon {
-            width: 38px;
-            height: 38px;
-            background: var(--accent-glow);
-            border: 1px solid rgba(202,255,51,0.3);
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            background: var(--text-main);
+            color: var(--surface);
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--accent);
-            font-size: 18px;
+            font-size: 14px;
         }
 
         nav.nav-links {
             display: flex;
-            gap: 28px;
+            gap: 32px;
         }
 
         nav.nav-links a {
@@ -112,91 +90,106 @@
             transition: color 0.2s;
         }
 
-        nav.nav-links a:hover { color: var(--accent); }
+        nav.nav-links a:hover { color: var(--text-main); }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
         }
 
         .btn-outline {
-            padding: 10px 20px;
-            border-radius: 10px;
-            border: 1px solid var(--glass-border);
-            background: var(--glass);
-            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-main);
             text-decoration: none;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             transition: all 0.2s;
         }
 
         .btn-outline:hover {
-            border-color: rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.06);
+            border-color: #D1D5DB;
+            background: #F9FAFB;
         }
 
         .btn-primary {
-            padding: 10px 22px;
-            border-radius: 10px;
-            background: var(--accent);
-            color: #0A0A0A;
+            padding: 8px 18px;
+            border-radius: 6px;
+            background: var(--text-main);
+            color: var(--surface);
             text-decoration: none;
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 500;
             transition: all 0.2s;
-            box-shadow: 0 4px 14px rgba(202,255,51,0.25);
             display: inline-flex;
             align-items: center;
             gap: 8px;
         }
 
         .btn-primary:hover {
-            background: var(--accent-dark);
-            transform: translateY(-1px);
+            background: #000000;
+        }
+
+        .btn-brand {
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-brand:hover {
+            background: var(--primary-hover);
         }
 
         /* ===== HERO SECTION ===== */
         .hero {
-            padding: 80px 0 60px;
+            padding: 100px 0 80px;
             text-align: center;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
         }
 
         .trial-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 18px;
-            border-radius: 50px;
-            background: var(--accent-glow);
-            border: 1px solid rgba(202,255,51,0.3);
-            color: var(--accent);
-            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 100px;
+            background: #FFF7ED;
+            border: 1px solid #FFEDD5;
+            color: var(--primary);
+            font-size: 12px;
             font-weight: 600;
             margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .hero h1 {
-            font-size: 52px;
-            font-weight: 900;
-            line-height: 1.15;
-            letter-spacing: -1px;
-            max-width: 900px;
-            margin: 0 auto 20px;
-        }
-
-        .hero h1 span.gradient {
-            background: linear-gradient(135deg, #CAFF33 0%, #38BDF8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            max-width: 800px;
+            margin: 0 auto 24px;
+            color: var(--text-main);
         }
 
         .hero p {
             font-size: 18px;
             color: var(--text-secondary);
-            max-width: 680px;
-            margin: 0 auto 36px;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.5;
         }
 
         .hero-cta {
@@ -212,186 +205,199 @@
             align-items: center;
             justify-content: center;
             gap: 24px;
-            margin-top: 28px;
+            margin-top: 40px;
             font-size: 13px;
-            color: var(--text-muted);
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .hero-benefits span {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
-        .hero-benefits i { color: var(--accent); }
+        .hero-benefits i { color: var(--primary); font-size: 12px; }
 
         /* ===== FEATURES SECTION ===== */
         .features {
-            padding: 80px 0;
-            border-top: 1px solid var(--border);
+            padding: 100px 0;
+            background: var(--bg);
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 56px;
+            margin-bottom: 64px;
         }
 
         .section-header h2 {
             font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
         }
 
         .section-header p {
-            color: var(--text-muted);
-            font-size: 16px;
+            color: var(--text-secondary);
+            font-size: 18px;
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
         }
 
         .feature-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 32px 24px;
-            transition: all 0.25s ease;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            transition: box-shadow 0.2s;
         }
 
         .feature-card:hover {
-            border-color: rgba(202,255,51,0.3);
-            transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .feature-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--accent-glow);
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            background: #F3F4F6;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            color: var(--accent);
-            margin-bottom: 20px;
+            font-size: 16px;
+            color: var(--text-main);
+            margin-bottom: 24px;
         }
 
         .feature-card h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
         }
 
         .feature-card p {
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         /* ===== PRICING SECTION ===== */
         .pricing {
-            padding: 80px 0;
+            padding: 100px 0;
+            background: var(--surface);
             border-top: 1px solid var(--border);
         }
 
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 28px;
-            max-width: 1060px;
+            gap: 24px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
         .pricing-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 36px 28px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 40px 32px;
             display: flex;
             flex-direction: column;
             position: relative;
-            transition: all 0.25s ease;
         }
 
         .pricing-card.popular {
-            border-color: var(--accent);
-            background: rgba(202, 255, 51, 0.04);
-            box-shadow: 0 0 30px rgba(202,255,51,0.1);
+            border: 2px solid var(--text-main);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
         }
 
         .popular-tag {
             position: absolute;
-            top: -14px;
+            top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--accent);
-            color: #0A0A0A;
+            background: var(--text-main);
+            color: var(--surface);
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 4px 14px;
-            border-radius: 50px;
+            letter-spacing: 0.05em;
+            padding: 4px 12px;
+            border-radius: 100px;
         }
 
         .pricing-card h3 {
-            font-size: 22px;
-            font-weight: 800;
+            font-size: 20px;
+            font-weight: 700;
             margin-bottom: 8px;
+            letter-spacing: -0.01em;
         }
 
         .pricing-card .desc {
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 20px;
-            min-height: 40px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 24px;
+            min-height: 42px;
         }
 
         .price {
-            font-size: 38px;
-            font-weight: 900;
-            color: var(--text);
-            margin-bottom: 24px;
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 32px;
+            letter-spacing: -0.02em;
         }
 
         .price span {
             font-size: 14px;
-            font-weight: 400;
-            color: var(--text-muted);
+            font-weight: 500;
+            color: var(--text-secondary);
         }
 
         .pricing-card ul {
             list-style: none;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
             flex-grow: 1;
         }
 
         .pricing-card ul li {
             font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
+            color: var(--text-main);
+            margin-bottom: 16px;
             display: flex;
-            align-items: center;
-            gap: 10px;
+            align-items: flex-start;
+            gap: 12px;
+            line-height: 1.4;
         }
 
         .pricing-card ul li i {
-            color: var(--accent);
+            color: var(--text-main);
             font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .pricing-card .btn-outline {
+            text-align: center;
+            padding: 12px;
+            display: block;
+            font-weight: 600;
         }
 
         /* ===== FAQ SECTION ===== */
         .faq {
-            padding: 80px 0;
+            padding: 100px 0;
+            background: var(--bg);
             border-top: 1px solid var(--border);
         }
 
         .faq-grid {
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -399,43 +405,44 @@
         }
 
         .faq-item {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 20px 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
         }
 
         .faq-item h4 {
             font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text);
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
         }
 
         .faq-item p {
             font-size: 14px;
-            color: var(--text-muted);
+            color: var(--text-secondary);
+            line-height: 1.6;
         }
 
         /* ===== FOOTER ===== */
         footer {
-            padding: 40px 0;
+            padding: 48px 0;
+            background: var(--surface);
             border-top: 1px solid var(--border);
             text-align: center;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 13px;
         }
 
         @media (max-width: 768px) {
-            .hero h1 { font-size: 34px; }
+            .hero h1 { font-size: 40px; }
             nav.nav-links { display: none; }
+            .pricing-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-
-<div class="bg-gradient-orb orb-1"></div>
-<div class="bg-gradient-orb orb-2"></div>
 
 <header>
     <div class="container header-content">
@@ -453,8 +460,8 @@
         </nav>
 
         <div class="header-actions">
-            <a href="/login.html" class="btn-outline">Entrar</a>
-            <a href="/login.html?modo=registro" class="btn-primary">Testar 7 Dias Grátis</a>
+            <a href="/login.html" class="btn-outline">Login</a>
+            <a href="/login.html?modo=registro" class="btn-primary">Criar Conta</a>
         </div>
     </div>
 </header>
@@ -464,24 +471,24 @@
     <section class="hero">
         <div class="container">
             <div class="trial-badge">
-                <i class="fa-solid fa-bolt"></i> 7 Dias de Teste Grátis — Sem Cartão de Crédito
+                Teste 7 Dias Grátis
             </div>
-            <h1>Transforme a gestão da sua agenda em um <span class="gradient">ímã de resultados</span>.</h1>
-            <p>Automatize agendamentos 24/7, evite faltas com lembretes no WhatsApp e gerencie seus serviços e equipe em uma plataforma completa.</p>
+            <h1>A plataforma inteligente de agendamento</h1>
+            <p>Automatize agendamentos 24/7, evite faltas com lembretes via WhatsApp e centralize a gestão da sua equipe com elegância e simplicidade.</p>
             
             <div class="hero-cta">
-                <a href="/login.html?modo=registro" class="btn-primary" style="padding: 14px 32px; font-size: 16px;">
-                    Começar Teste Grátis de 7 Dias <i class="fa-solid fa-arrow-right"></i>
+                <a href="/login.html?modo=registro" class="btn-brand">
+                    Começar Gratuitamente
                 </a>
-                <a href="#planos" class="btn-outline" style="padding: 14px 28px; font-size: 16px;">
-                    Ver Planos e Preços
+                <a href="#planos" class="btn-outline" style="padding: 12px 24px; font-weight: 600;">
+                    Ver Planos
                 </a>
             </div>
 
             <div class="hero-benefits">
-                <span><i class="fa-solid fa-check"></i> Configuração em 2 minutos</span>
-                <span><i class="fa-solid fa-check"></i> Sem necessidade de cartão</span>
-                <span><i class="fa-solid fa-check"></i> Suporte humanizado</span>
+                <span><i class="fa-solid fa-check"></i> Configuração rápida</span>
+                <span><i class="fa-solid fa-check"></i> Sem cartão de crédito</span>
+                <span><i class="fa-solid fa-check"></i> Suporte premium</span>
             </div>
         </div>
     </section>
@@ -490,45 +497,45 @@
     <section class="features" id="recursos">
         <div class="container">
             <div class="section-header">
-                <h2>Tudo o que seu negócio precisa para crescer</h2>
-                <p>Recursos desenvolvidos sob medida para prestadores de serviços e estabelecimentos.</p>
+                <h2>Projetado para crescimento</h2>
+                <p>Ferramentas de ponta para profissionais e equipes.</p>
             </div>
 
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-solid fa-globe"></i></div>
-                    <h3>Página Pública Exclusiva</h3>
-                    <p>Seus clientes agendam em segundos através de um link exclusivo com sua marca (ex: <code>agendar/sua-empresa</code>).</p>
+                    <h3>Página de Agendamento</h3>
+                    <p>Clientes marcam horários de forma independente em uma página rápida, otimizada para qualquer dispositivo.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-brands fa-whatsapp"></i></div>
-                    <h3>Lembretes no WhatsApp</h3>
-                    <p>Disparo automático de confirmação ao agendar e lembretes prévios (24h e 1h antes) para zerar as faltas dos clientes.</p>
+                    <h3>Lembretes Automáticos</h3>
+                    <p>Reduza faltas a quase zero enviando mensagens de confirmação e lembretes prévios pelo WhatsApp.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-solid fa-users"></i></div>
                     <h3>Gestão de Equipe</h3>
-                    <p>Cadastre seus profissionais com agendas independentes, cor personalizada e ajuste de comissão.</p>
+                    <p>Centralize o controle de profissionais. Cada membro possui sua própria agenda, serviços e regras.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-solid fa-clock"></i></div>
-                    <h3>Duração por Serviço</h3>
-                    <p>Personalize o tempo exato de cada atendimento por profissional e evite sobreposição de horários.</p>
+                    <h3>Controle de Tempo</h3>
+                    <p>Personalize durações específicas para cada serviço e profissional, garantindo organização total.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                    <h3>Segurança com 2FA</h3>
-                    <p>Autenticação segura de conta via código de verificação enviado diretamente por e-mail no login.</p>
+                    <div class="feature-icon"><i class="fa-solid fa-shield-check"></i></div>
+                    <h3>Segurança Reforçada</h3>
+                    <p>Proteção da conta via código no e-mail (2FA), garantindo que apenas os administradores tenham acesso.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-solid fa-qrcode"></i></div>
-                    <h3>Renovação Simplificada PIX</h3>
-                    <p>Gestão transparente de planos sem assinaturas abusivas, liberado mediante comprovante PIX.</p>
+                    <h3>Assinatura Descomplicada</h3>
+                    <p>Pagamento de mensalidades direto via PIX, sem taxas extras ou retenção de cartão de crédito.</p>
                 </div>
             </div>
         </div>
@@ -538,52 +545,52 @@
     <section class="pricing" id="planos">
         <div class="container">
             <div class="section-header">
-                <h2>Planos simples e transparentes</h2>
-                <p>Escolha o plano ideal para o tamanho do seu estabelecimento após os 7 dias grátis.</p>
+                <h2>Preços transparentes</h2>
+                <p>Sem taxas surpresas. Escolha o plano após o período de teste.</p>
             </div>
 
             <div class="pricing-grid">
                 <!-- SOLO -->
                 <div class="pricing-card">
-                    <h3>Plano Solo</h3>
-                    <p class="desc">Ideal para profissionais autônomos que trabalham sós.</p>
-                    <div class="price">R$ 49,90 <span>/mês</span></div>
+                    <h3>Solo</h3>
+                    <p class="desc">Para o profissional autônomo e independente.</p>
+                    <div class="price">R$ 49,90 <span>/ mês</span></div>
                     <ul>
-                        <li><i class="fa-solid fa-check"></i> 1 Profissional cadastrado</li>
+                        <li><i class="fa-solid fa-check"></i> 1 Profissional</li>
                         <li><i class="fa-solid fa-check"></i> Agendamentos ilimitados</li>
-                        <li><i class="fa-solid fa-check"></i> Link público exclusivo</li>
-                        <li><i class="fa-solid fa-check"></i> Confirmação imediata via WhatsApp</li>
+                        <li><i class="fa-solid fa-check"></i> Página pública de agendamento</li>
+                        <li><i class="fa-solid fa-check"></i> Suporte por e-mail</li>
                     </ul>
-                    <a href="/login.html?modo=registro" class="btn-outline" style="text-align:center;">Testar 7 Dias Grátis</a>
+                    <a href="/login.html?modo=registro" class="btn-outline">Iniciar Trial Grátis</a>
                 </div>
 
                 <!-- EQUIPE -->
                 <div class="pricing-card popular">
-                    <div class="popular-tag">Mais Popular</div>
-                    <h3>Plano Equipe</h3>
-                    <p class="desc">Perfeito para barbearias, salões e clínicas com equipe.</p>
-                    <div class="price">R$ 99,90 <span>/mês</span></div>
+                    <div class="popular-tag">Recomendado</div>
+                    <h3>Equipe</h3>
+                    <p class="desc">Para times em crescimento e pequenos negócios.</p>
+                    <div class="price">R$ 99,90 <span>/ mês</span></div>
                     <ul>
-                        <li><i class="fa-solid fa-check"></i> Até 5 Profissionais cadastrados</li>
-                        <li><i class="fa-solid fa-check"></i> <strong>Lembretes WhatsApp (24h e 1h antes)</strong></li>
-                        <li><i class="fa-solid fa-check"></i> Duração personalizada por profissional</li>
-                        <li><i class="fa-solid fa-check"></i> Relatório de comissões</li>
+                        <li><i class="fa-solid fa-check"></i> Até 5 Profissionais</li>
+                        <li><i class="fa-solid fa-check"></i> Lembretes automáticos via WhatsApp</li>
+                        <li><i class="fa-solid fa-check"></i> Duração personalizada de serviços</li>
+                        <li><i class="fa-solid fa-check"></i> Suporte prioritário</li>
                     </ul>
-                    <a href="/login.html?modo=registro" class="btn-primary" style="text-align:center; justify-content:center;">Testar 7 Dias Grátis</a>
+                    <a href="/login.html?modo=registro" class="btn-brand" style="justify-content:center; padding: 12px;">Iniciar Trial Grátis</a>
                 </div>
 
                 <!-- PREMIUM -->
                 <div class="pricing-card">
-                    <h3>Plano Premium</h3>
-                    <p class="desc">Para grandes estabelecimentos e redes sem limites.</p>
-                    <div class="price">R$ 149,90 <span>/mês</span></div>
+                    <h3>Premium</h3>
+                    <p class="desc">Para grandes operações, redes e estúdios robustos.</p>
+                    <div class="price">R$ 149,90 <span>/ mês</span></div>
                     <ul>
-                        <li><i class="fa-solid fa-check"></i> <strong>Profissionais Ilimitados</strong></li>
-                        <li><i class="fa-solid fa-check"></i> Todos os recursos do Plano Equipe</li>
-                        <li><i class="fa-solid fa-check"></i> Múltiplos Administradores</li>
-                        <li><i class="fa-solid fa-check"></i> <strong>Selo Certificado Premium VIP 👑</strong></li>
+                        <li><i class="fa-solid fa-check"></i> Profissionais Ilimitados</li>
+                        <li><i class="fa-solid fa-check"></i> Todos os recursos avançados</li>
+                        <li><i class="fa-solid fa-check"></i> Atendimento via WhatsApp</li>
+                        <li><i class="fa-solid fa-check"></i> Selo de Certificação VIP</li>
                     </ul>
-                    <a href="/login.html?modo=registro" class="btn-outline" style="text-align:center;">Testar 7 Dias Grátis</a>
+                    <a href="/login.html?modo=registro" class="btn-outline">Iniciar Trial Grátis</a>
                 </div>
             </div>
         </div>
@@ -594,23 +601,23 @@
         <div class="container">
             <div class="section-header">
                 <h2>Perguntas Frequentes</h2>
-                <p>Tire suas dúvidas sobre o funcionamento do sistema e o período de testes.</p>
+                <p>Respostas rápidas para você não perder tempo.</p>
             </div>
 
             <div class="faq-grid">
                 <div class="faq-item">
                     <h4>Como funcionam os 7 dias grátis?</h4>
-                    <p>Ao se cadastrar, você ganha acesso total e imediato por 7 dias. Não é necessário informar cartão de crédito ou efetuar nenhum pagamento para testar.</p>
+                    <p>Ao se cadastrar, você tem acesso completo à plataforma. Não exigimos cartão de crédito. É a melhor forma de validar o sistema no seu negócio.</p>
                 </div>
 
                 <div class="faq-item">
-                    <h4>Como é feito o pagamento após o teste?</h4>
-                    <p>Após os 7 dias, você escolhe o plano ideal e faz a transferência via PIX. Basta enviar o comprovante no WhatsApp do suporte para liberar o acesso por +30 dias.</p>
+                    <h4>Como pago a mensalidade depois?</h4>
+                    <p>Os pagamentos são efetuados via PIX, o que torna o processo livre de taxas bancárias abusivas. Você receberá as instruções na própria plataforma.</p>
                 </div>
 
                 <div class="faq-item">
-                    <h4>Meus clientes precisam baixar algum aplicativo?</h4>
-                    <p>Não! Seus clientes agendam direto pelo navegador do celular ou computador, de forma 100% prática e rápida.</p>
+                    <h4>Meus clientes precisam instalar um app?</h4>
+                    <p>Não. A página de agendamento é acessível via link e funciona perfeitamente em qualquer navegador mobile ou desktop.</p>
                 </div>
             </div>
         </div>
@@ -620,6 +627,10 @@
 <footer>
     <div class="container">
         <p>&copy; 2026 MVP Agenda. Todos os direitos reservados.</p>
+        <div style="margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0.6;">
+            <span style="font-size: 12px; font-weight: 500;">Desenvolvido por</span>
+            <img src="/logo-removebg-preview.png" alt="Desenvolvedor" style="height: 24px; filter: brightness(0);">
+        </div>
     </div>
 </footer>
 

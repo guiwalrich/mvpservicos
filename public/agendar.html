@@ -6,30 +6,30 @@
   <title>Agendamento Público</title>
   <style>
     :root {
-      --bg: #191919;
-      --surface: #1C1C1C;
-      --text: #FFFFFF;
-      --muted: #B3B3B3;
-      --accent: #CAFF33;
-      --accent-dark: #B8E62E;
-      --border: #262626;
-      --border-light: #333333;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      --bg: #FAFAFA;
+      --surface: #FFFFFF;
+      --text: #111827;
+      --muted: #6B7280;
+      --accent: #FF6B35;
+      --accent-dark: #E85D2B;
+      --border: #E5E7EB;
+      --border-light: #F3F4F6;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
       font-family: Inter, Arial, sans-serif;
     }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); }
     .wrap { max-width: 900px; margin: 40px auto; padding: 24px; }
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow); padding: 28px; }
-    h1 { margin-top: 0; color: #FFFFFF; }
-    h3 { color: #FFFFFF; }
+    h1 { margin-top: 0; color: var(--text); }
+    h3 { color: var(--text); }
     .muted { color: var(--muted); }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 20px; }
     .service { 
       border: 1px solid var(--border); 
       border-radius: 14px; 
       padding: 20px; 
-      background: #222222;
+      background: #FFFFFF;
       transition: border-color 0.25s, transform 0.2s;
     }
     .service:hover { 
@@ -37,14 +37,14 @@
       transform: translateY(-2px); 
     }
     .service h3 { margin: 0 0 10px; font-size: 16px; }
-    .service div { color: #999; font-size: 14px; margin-bottom: 2px; }
+    .service div { color: var(--muted); font-size: 14px; margin-bottom: 2px; }
     .service button { 
       margin-top: 14px; 
       padding: 10px 20px; 
       border: none; 
       border-radius: 50px; 
       background: var(--accent); 
-      color: #191919; 
+      color: #FFFFFF; 
       cursor: pointer; 
       font-weight: 600; 
       font-size: 14px;
@@ -53,7 +53,7 @@
     }
     .service button:hover { 
       background: var(--accent-dark); 
-      box-shadow: 0 4px 20px rgba(202,255,51,0.25);
+      box-shadow: 0 4px 20px rgba(255,107,53,0.25);
     }
     .empty { color: var(--muted); padding: 12px 0; }
     .helper { color: var(--muted); font-size: 14px; margin-top: 6px; }
@@ -63,20 +63,20 @@
       gap: 8px;
       padding: 7px 12px;
       border-radius: 999px;
-      background: rgba(202,255,51,0.1);
+      background: rgba(255,107,53,0.1);
       color: var(--accent);
       font-size: 12px;
       font-weight: 600;
       margin-bottom: 12px;
-      border: 1px solid rgba(202,255,51,0.18);
+      border: 1px solid rgba(255,107,53,0.18);
     }
     form { display: grid; gap: 14px; margin-top: 20px; }
     input, select { 
       padding: 12px 14px; 
       border: 1px solid var(--border-light); 
       border-radius: 10px; 
-      background: #262626; 
-      color: #FFFFFF;
+      background: #FFFFFF; 
+      color: var(--text);
       font-size: 14px;
       font-family: Inter, Arial, sans-serif;
       outline: none;
@@ -84,10 +84,10 @@
     }
     input:focus, select:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(202,255,51,0.1);
+      box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
     }
     input::placeholder { color: #666; }
-    select option { background: #262626; color: #fff; }
+    select option { background: #FFFFFF; color: var(--text); }
     .actions { display: flex; gap: 10px; margin-top: 12px; }
     .actions button { 
       padding: 11px 18px; 
@@ -101,20 +101,20 @@
     }
     .btn-primary { 
       background: var(--accent); 
-      color: #191919; 
+      color: #FFFFFF; 
     }
     .btn-primary:hover { 
       background: var(--accent-dark); 
-      box-shadow: 0 4px 20px rgba(202,255,51,0.25);
+      box-shadow: 0 4px 20px rgba(255,107,53,0.25);
     }
     .btn-secondary { 
-      background: #262626; 
+      background: #FFFFFF; 
       color: #B3B3B3; 
       border: 1px solid var(--border-light); 
     }
     .btn-secondary:hover { 
       background: var(--border-light); 
-      color: #FFFFFF; 
+      color: var(--text); 
     }
     .success { color: #34D399; margin-top: 12px; font-weight: 500; }
     .error { color: #FF6B6B; margin-top: 12px; }
@@ -137,7 +137,7 @@
       transition: background 0.2s;
     }
     .calendario-header button:hover {
-      background: rgba(255,255,255,0.06);
+      background: var(--border-light);
     }
     .calendario-header span {
       font-weight: 600;
@@ -167,22 +167,22 @@
       border: 1px solid transparent;
     }
     .calendario-grid .dia:hover {
-      background: rgba(255,255,255,0.06);
+      background: var(--border-light);
       border-color: var(--border-light);
     }
     .calendario-grid .dia.disponivel {
-      background: rgba(202,255,51,0.1);
+      background: rgba(255,107,53,0.1);
       color: var(--accent);
-      border-color: rgba(202,255,51,0.2);
+      border-color: rgba(255,107,53,0.2);
       font-weight: 600;
     }
     .calendario-grid .dia.disponivel:hover {
-      background: rgba(202,255,51,0.2);
-      box-shadow: 0 0 12px rgba(202,255,51,0.15);
+      background: rgba(255,107,53,0.2);
+      box-shadow: 0 0 12px rgba(255,107,53,0.15);
     }
     .calendario-grid .dia.selecionado {
       background: var(--accent);
-      color: #191919;
+      color: #FFFFFF;
       border-color: var(--accent);
     }
     .calendario-grid .dia.outro-mes {
@@ -208,7 +208,7 @@
       padding: 10px 6px;
       border-radius: 10px;
       border: 1px solid var(--border-light);
-      background: #222222;
+      background: #FFFFFF;
       color: var(--text);
       font-size: 13px;
       font-weight: 500;
@@ -219,11 +219,11 @@
     }
     .slot-btn:hover {
       border-color: var(--accent);
-      background: rgba(202,255,51,0.08);
+      background: rgba(255,107,53,0.08);
     }
     .slot-btn.selecionado {
       background: var(--accent);
-      color: #191919;
+      color: #FFFFFF;
       border-color: var(--accent);
       font-weight: 700;
     }
@@ -322,6 +322,18 @@
         <div id="erro" class="error"></div>
       </div>
     </div>
+
+  </div>
+  
+  <div style="margin-top: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0.6;">
+      <span style="font-size: 12px; font-weight: 500;">Desenvolvido por</span>
+      <img src="/logo-removebg-preview.png" alt="Desenvolvedor" style="height: 24px; filter: brightness(0);">
+
+  </div>
+  
+  <div style="margin-top: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0.6;">
+      <span style="font-size: 12px; font-weight: 500;">Desenvolvido por</span>
+      <img src="/logo-removebg-preview.png" alt="Desenvolvedor" style="height: 24px; filter: brightness(0);">
   </div>
 
   <script>
