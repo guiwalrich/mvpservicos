@@ -394,7 +394,12 @@
                 toggleText.textContent = "E-mail incorreto?";
                 toggleLink.textContent = "Voltar ao início";
 
-                mostrarSucesso(data?.mensagem || "Código de verificação enviado! Verifique sua caixa de entrada e a pasta de Spam.");
+                if (data.erroEmail) {
+                    mostrarErro(data.mensagem);
+                } else {
+                    mostrarSucesso(data.mensagem || "Código enviado! Verifique sua caixa de entrada e a pasta de Spam.");
+                }
+
                 document.getElementById("otpCodigo").value = "";
                 document.getElementById("otpCodigo").focus();
             } else {
