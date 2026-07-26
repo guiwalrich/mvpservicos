@@ -76,19 +76,15 @@ router.post("/login", async (req: Request, res: Response) => {
     },
   });
 
-  // Enviar e-mail em background
-  enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo);
-
-  const smtpConfigurado = !!process.env.SMTP_HOST && !!process.env.SMTP_USER;
+  // Enviar e-mail de verificação
+  const enviado = await enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo);
 
   res.json({
     requereCodigo: true,
     email: empresa.email,
-    smtpConfigurado,
-    codigoDev: smtpConfigurado ? undefined : codigo,
-    mensagem: smtpConfigurado
+    mensagem: enviado
       ? "Código de verificação enviado para seu e-mail. Verifique a caixa de entrada e a pasta de Spam."
-      : `⚠️ Servidor sem SMTP configurado. Seu código de teste é: ${codigo}`,
+      : "Código gerado com sucesso. Verifique seu e-mail para concluir o acesso.",
   });
 });
 
@@ -166,15 +162,10 @@ router.post("/reenviar-codigo", async (req: Request, res: Response) => {
     },
   });
 
-  enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo);
-
-  const smtpConfigurado = !!process.env.SMTP_HOST && !!process.env.SMTP_USER;
+  await enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo);
 
   res.json({
-    mensagem: smtpConfigurado
-      ? "Novo código enviado com sucesso para seu e-mail."
-      : `⚠️ Servidor sem SMTP configurado. Seu novo código de teste é: ${codigo}`,
-    codigoDev: smtpConfigurado ? undefined : codigo,
+    mensagem: "Novo código enviado com sucesso para seu e-mail. Confira sua caixa de entrada e pasta de Spam.",
   });
 });
 

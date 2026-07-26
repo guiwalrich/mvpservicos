@@ -394,13 +394,8 @@
                 toggleText.textContent = "E-mail incorreto?";
                 toggleLink.textContent = "Voltar ao início";
 
-                if (data.codigoDev) {
-                    document.getElementById("otpCodigo").value = data.codigoDev;
-                    mostrarSucesso(`Modo Teste (Sem SMTP): Código preenchido (${data.codigoDev}). Clique em Confirmar Acesso!`);
-                } else {
-                    mostrarSucesso("Código enviado! Verifique a Caixa de Entrada e a pasta de Spam.");
-                }
-
+                mostrarSucesso(data?.mensagem || "Código de verificação enviado! Verifique sua caixa de entrada e a pasta de Spam.");
+                document.getElementById("otpCodigo").value = "";
                 document.getElementById("otpCodigo").focus();
             } else {
                 mostrarErro(data?.erro || "Email ou senha incorretos. Tente novamente.");
@@ -464,12 +459,8 @@
             });
 
             if (response.ok) {
-                if (data?.codigoDev) {
-                    document.getElementById("otpCodigo").value = data.codigoDev;
-                    mostrarSucesso(`Modo Teste: Novo código (${data.codigoDev}) preenchido!`);
-                } else {
-                    mostrarSucesso(data?.mensagem || "Código reenviado! Confira sua entrada e a pasta de Spam.");
-                }
+                mostrarSucesso(data?.mensagem || "Novo código enviado! Confira sua caixa de entrada e a pasta de Spam.");
+                document.getElementById("otpCodigo").value = "";
             } else {
                 mostrarErro(data?.erro || "Erro ao reenviar código.");
             }
