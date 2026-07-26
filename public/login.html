@@ -256,6 +256,20 @@
     let modo = "login"; // "login", "otp", "registro"
     let emailPendencia = "";
 
+    // Detecta se a URL é de registro e alterna o formulário
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("modo") === "registro" || window.location.pathname.includes("registro")) {
+        modo = "registro";
+        loginForm.classList.add("hidden");
+        otpForm.classList.add("hidden");
+        registroForm.classList.remove("hidden");
+        title.textContent = "Crie sua conta";
+        subtitle.textContent = "Configure seu negócio em menos de 2 minutos.";
+        toggleText.textContent = "Já tem uma conta?";
+        toggleLink.textContent = "Fazer login →";
+        welcomeIcon.innerHTML = '<i class="fa-solid fa-rocket"></i>';
+    }
+
     function setLoading(form, isLoading, text) {
         const button = form.querySelector("button[type='submit']");
         if (!button) return;

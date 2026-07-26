@@ -20,15 +20,25 @@ import { iniciarCronLembretes } from "./services/lembreteCronService";
 dotenv.config();
 
 const app = express();
+app.set("trust proxy", 1); // Necessário para proxies reversos do Render.com e rate-limit
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "..", "public")));
+app.use(express.static(path.join(process.cwd(), "public")));
 
 // Rota Principal: Serve a Landing Page Oficial
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+  res.sendFile(path.join(process.cwd(), "public", "index.html"));
 });
 app.get("/ping", (req, res) => res.json({ status: "online" }));
+
+// Rotas explícitas para Login, Registro e Dashboard (evita Not Found 404 ao digitar URLs sem .html)
+app.get(["/login", "/login.html", "/registro"], (req, res) => {
+  res.sendFile(path.join(process.cwd(), "public", "login.html"));
+});
+
+app.get(["/dashboard", "/dashboard.html"], (req, res) => {
+  res.sendFile(path.join(process.cwd(), "public", "dashboard.html"));
+});
 
 // Rotas com Rate Limit para Proteção contra Força Bruta e Spam
 app.use("/auth", authLimiter, authRoutes);
@@ -44,7 +54,7 @@ app.use("/horarios", authMiddleware, assinaturaMiddleware, horariosRoutes);
 app.use("/disponibilidade", authMiddleware, assinaturaMiddleware, disponibilidadeRoutes);
 
 app.get("/agendar/:slug", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "agendar.html"));
+  res.sendFile(path.join(process.cwd(), "public", "agendar.html"));
 });
 app.use("/agendar-api", publicAgendamentoLimiter, agendapublicaRoutes);
 
