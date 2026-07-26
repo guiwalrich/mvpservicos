@@ -76,15 +76,15 @@ router.post("/login", async (req: Request, res: Response) => {
     },
   });
 
-  // Enviar e-mail de verificação
-  const enviado = await enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo);
+  // Dispara o e-mail assincronamente sem travar a requisição HTTP (ultra fluido)
+  enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo).catch((err) => {
+    console.error("Erro assíncrono no disparo do e-mail:", err);
+  });
 
   res.json({
     requereCodigo: true,
     email: empresa.email,
-    mensagem: enviado
-      ? "Código de verificação enviado para seu e-mail. Verifique a caixa de entrada e a pasta de Spam."
-      : "Código gerado com sucesso. Verifique seu e-mail para concluir o acesso.",
+    mensagem: "Código de verificação enviado! Verifique sua caixa de entrada e a pasta de Spam.",
   });
 });
 
@@ -162,10 +162,13 @@ router.post("/reenviar-codigo", async (req: Request, res: Response) => {
     },
   });
 
-  await enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo);
+  // Dispara o e-mail assincronamente
+  enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo).catch((err) => {
+    console.error("Erro assíncrono no reenvio do e-mail:", err);
+  });
 
   res.json({
-    mensagem: "Novo código enviado com sucesso para seu e-mail. Confira sua caixa de entrada e pasta de Spam.",
+    mensagem: "Novo código enviado com sucesso! Confira sua caixa de entrada e pasta de Spam.",
   });
 });
 

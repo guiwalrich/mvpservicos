@@ -10,41 +10,30 @@ export async function enviarCodigoVerificacaoEmail(
     const smtpPort = parseInt(process.env.SMTP_PORT || "587", 10);
     const smtpUser = process.env.SMTP_USER;
     const smtpPass = process.env.SMTP_PASS;
-    const smtpFrom = process.env.SMTP_FROM || '"MVP Agenda" <nao-responda@mvpagenda.com>';
 
-    let transporter: nodemailer.Transporter;
-
-    if (smtpHost && smtpUser && smtpPass) {
-      transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpPort === 465,
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
-      });
-    } else {
-      // Caso SMTP não esteja configurado no .env, utiliza conta Ethereal de teste
-      // ou simula o envio imprimindo no console em ambiente dev
+    if (!smtpHost || !smtpUser || !smtpPass) {
       console.log(`\n==================================================`);
       console.log(`[EMAIL DEV LOG] Código de Verificação para ${emailDestino}`);
       console.log(`Empresa: ${nomeEmpresa}`);
       console.log(`CÓDIGO OTP: >>> ${codigo} <<<`);
       console.log(`==================================================\n`);
-
-      // Tenta criar conta de testes do Ethereal caso queira testar visualmente
-      const testAccount = await nodemailer.createTestAccount();
-      transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false,
-        auth: {
-          user: testAccount.user,
-          pass: testAccount.pass,
-        },
-      });
+      return true;
     }
+
+    // Se for Gmail, o remetente (FROM) DEVE ser o mesmo e-mail autenticado (smtpUser)
+    const fromAddress = smtpHost.includes("gmail")
+      ? `"MVP Agenda" <${smtpUser}>`
+      : (process.env.SMTP_FROM || `"MVP Agenda" <${smtpUser}>`);
+
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    });
 
     const htmlContent = `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #0f172a; color: #f8fafc; border-radius: 16px; overflow: hidden; border: 1px solid #1e293b;">
@@ -89,17 +78,14 @@ export async function enviarCodigoVerificacaoEmail(
       </div>
     `;
 
-    const info = await transporter.sendMail({
-      from: smtpFrom,
+    await transporter.sendMail({
+      from: fromAddress,
       to: emailDestino,
       subject: `🔑 Seu Código de Acesso: ${codigo} - MVP Agenda`,
       html: htmlContent,
     });
 
-    if (info.messageId && nodemailer.getTestMessageUrl(info)) {
-      console.log(`[ETHEREAL TEST EMAIL URL]: ${nodemailer.getTestMessageUrl(info)}`);
-    }
-
+    console.log(`[SMTP EMAIL ENVIADO] Código enviado com sucesso para ${emailDestino}`);
     return true;
   } catch (error) {
     console.error("Erro ao enviar e-mail de verificação:", error);
