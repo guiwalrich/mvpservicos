@@ -28,7 +28,7 @@ router.post("/registro", async (req: Request, res: Response) => {
     slug = `${slug}-${Math.floor(Math.random() * 1000)}`;
   }
 
-  const trialExpira = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const trialExpira = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
 
   const empresa = await prisma.empresa.create({
     data: {
