@@ -1173,8 +1173,12 @@
             Profissionais
         </button>
         <button class="nav-item tab" data-tab="clientes">
-            <i class="fa-solid fa-address-book"></i>
+            <i class="ph ph-address-book"></i>
             Clientes
+        </button>
+        <button class="nav-item tab" data-tab="cancelamentos">
+            <i class="ph ph-x-circle"></i>
+            Cancelamentos
         </button>
         <div class="nav-label">Configurações</div>
         <button class="nav-item tab" data-tab="horarios">
@@ -1182,11 +1186,11 @@
             Horários
         </button>
         <button class="nav-item tab" data-tab="disponibilidade">
-            <i class="fa-solid fa-user-clock"></i>
+            <i class="ph ph-user-circle"></i>
             Disponibilidade
         </button>
         <button class="nav-item tab" data-tab="duracao">
-            <i class="fa-solid fa-stopwatch"></i>
+            <i class="ph ph-timer"></i>
             Duração por Prof.
         </button>
     </nav>
@@ -1249,6 +1253,7 @@
                         Agendamentos Recentes
                     </div>
                     <div class="table-actions">
+                        <button class="action-btn" id="btnBloquearHorario" style="margin-right: 12px;"><i class="ph ph-prohibit"></i> Bloquear</button>
                         <button class="action-btn primary" id="btnAddAgendamento">
                             <i class="ph ph-plus"></i> Novo Agendamento
                         </button>
@@ -1266,6 +1271,35 @@
                     </thead>
                     <tbody id="tabelaAgenda"></tbody>
                 </table>
+            </div>
+        </div>
+
+        
+        <!-- ABA CANCELAMENTOS -->
+        <div class="tab-content" id="tab-cancelamentos">
+            <div class="section-header-compact">
+                <h1 id="pageTitle">Cancelamentos</h1>
+                <p id="pageSubtitle">Histórico de agendamentos cancelados pelos clientes</p>
+            </div>
+            
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3>Cancelados Recentes</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Serviço</th>
+                                <th>Data/Hora</th>
+                                <th>Profissional</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaCancelamentos"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -1467,6 +1501,7 @@
     // Page titles map
     const pageTitles = {
         agenda: { title: 'Agenda', subtitle: 'Gerencie seus agendamentos' },
+        cancelamentos: { title: 'Cancelamentos', subtitle: 'Histórico de agendamentos cancelados' },
         servicos: { title: 'Serviços', subtitle: 'Configure seus serviços oferecidos' },
         profissionais: { title: 'Profissionais', subtitle: 'Gerencie sua equipe' },
         clientes: { title: 'Clientes', subtitle: 'Acompanhe sua base de clientes' },
@@ -1532,6 +1567,7 @@
             document.getElementById("sidebarOverlay").classList.remove("active");
 
             if (tabName === "agenda") carregarAgenda();
+            if (tabName === "cancelamentos") carregarCancelamentos();
             if (tabName === "servicos") carregarServicos();
             if (tabName === "profissionais") carregarProfissionais();
             if (tabName === "clientes") carregarClientes();
@@ -1637,6 +1673,50 @@
                         <p>Não foi possível carregar os agendamentos.</p>
                     </div>
                 </td></tr>`;
+        }
+    }
+
+    
+    // ===== CANCELAMENTOS =====
+    async function carregarCancelamentos() {
+        try {
+            const data = await fetchAPI("/agendamentos");
+            const agendamentos = Array.isArray(data) ? data : [];
+            const cancelados = agendamentos.filter(a => a.status === 'cancelado');
+            
+            if (cancelados.length === 0) {
+                document.getElementById("tabelaCancelamentos").innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="ph ph-check-circle" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
+                            <p>Nenhum agendamento cancelado.</p>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            document.getElementById("tabelaCancelamentos").innerHTML = cancelados.map(a => `
+                <tr>
+                    <td>
+                        <strong>${a.cliente.nome}</strong><br>
+                        <small style="color: var(--text-muted);"><i class="ph ph-whatsapp-logo"></i> ${a.cliente.telefone}</small>
+                    </td>
+                    <td>${a.servico.nome}</td>
+                    <td>
+                        ${new Date(a.data_hora).toLocaleDateString('pt-BR')} <br>
+                        <strong>${new Date(a.data_hora).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</strong>
+                    </td>
+                    <td>${a.profissional.nome}</td>
+                    <td><span class="badge" style="background: #FEF2F2; color: #EF4444; border: 1px solid #FCA5A5;">Cancelado</span></td>
+                </tr>
+            `).join('');
+        } catch {
+            document.getElementById("tabelaCancelamentos").innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 20px; color: var(--danger);">
+                        <p>Não foi possível carregar os cancelamentos.</p>
+                    </td>
+                </tr>`;
         }
     }
 
@@ -1952,12 +2032,22 @@
             const grade = document.getElementById("gradeDisponibilidade");
 
             grade.innerHTML = disps.map(d => `
-                <div class="settings-row">
-                    <input type="checkbox" data-dia="${d.dia_semana}" class="disp-toggle settings-toggle" ${d.aberto ? 'checked' : ''} />
-                    <span class="settings-day-label" style="color:${d.aberto ? 'var(--text)' : 'var(--text-muted)'};">${DIAS_SEMANA[d.dia_semana]}</span>
-                    <input type="time" class="disp-inicio settings-input" data-dia="${d.dia_semana}" value="${d.hora_inicio}" ${!d.aberto ? 'disabled' : ''} />
-                    <span class="settings-separator">até</span>
-                    <input type="time" class="disp-fim settings-input" data-dia="${d.dia_semana}" value="${d.hora_fim}" ${!d.aberto ? 'disabled' : ''} />
+                <div class="settings-row" style="flex-wrap: wrap; gap: 8px;">
+                    <div style="display:flex; align-items:center; gap: 12px; width: 140px;">
+                        <input type="checkbox" data-dia="${d.dia_semana}" class="disp-toggle settings-toggle" ${d.aberto ? 'checked' : ''} />
+                        <span class="settings-day-label" style="color:${d.aberto ? 'var(--text)' : 'var(--text-muted)'};">${DIAS_SEMANA[d.dia_semana]}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap: 8px;">
+                        <input type="time" class="disp-inicio settings-input" data-dia="${d.dia_semana}" value="${d.hora_inicio}" ${!d.aberto ? 'disabled' : ''} title="Abertura" />
+                        <span class="settings-separator">às</span>
+                        <input type="time" class="disp-fim settings-input" data-dia="${d.dia_semana}" value="${d.hora_fim}" ${!d.aberto ? 'disabled' : ''} title="Fechamento" />
+                    </div>
+                    <div style="display:flex; align-items:center; gap: 8px; border-left: 1px solid var(--border); padding-left: 12px; margin-left: 4px;">
+                        <span style="font-size: 12px; color: var(--text-muted);">Pausa:</span>
+                        <input type="time" class="disp-int-inicio settings-input" data-dia="${d.dia_semana}" value="${d.intervalo_inicio || ''}" ${!d.aberto ? 'disabled' : ''} title="Início do Intervalo" />
+                        <span class="settings-separator">-</span>
+                        <input type="time" class="disp-int-fim settings-input" data-dia="${d.dia_semana}" value="${d.intervalo_fim || ''}" ${!d.aberto ? 'disabled' : ''} title="Fim do Intervalo" />
+                    </div>
                 </div>
             `).join('');
 

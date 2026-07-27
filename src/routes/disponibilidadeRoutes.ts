@@ -57,7 +57,7 @@ router.put("/:profissionalId/:diaSemana", async (req: Request, res: Response) =>
   const diaParam = Array.isArray(req.params.diaSemana) ? req.params.diaSemana[0] : req.params.diaSemana;
   const profissionalId = parseInt(profIdParam || "", 10);
   const diaSemana = parseInt(diaParam || "", 10);
-  const { hora_inicio, hora_fim, aberto } = req.body;
+  const { hora_inicio, hora_fim, intervalo_inicio, intervalo_fim, aberto } = req.body;
 
   if (isNaN(diaSemana) || diaSemana < 0 || diaSemana > 6) {
     return res.status(400).json({ erro: "Dia da semana inválido (0-6)" });
@@ -78,6 +78,8 @@ router.put("/:profissionalId/:diaSemana", async (req: Request, res: Response) =>
     update: {
       hora_inicio: hora_inicio ?? undefined,
       hora_fim: hora_fim ?? undefined,
+      intervalo_inicio: intervalo_inicio !== undefined ? intervalo_inicio : undefined,
+      intervalo_fim: intervalo_fim !== undefined ? intervalo_fim : undefined,
       aberto: aberto ?? undefined,
     },
     create: {
@@ -85,6 +87,8 @@ router.put("/:profissionalId/:diaSemana", async (req: Request, res: Response) =>
       dia_semana: diaSemana,
       hora_inicio: hora_inicio || "09:00",
       hora_fim: hora_fim || "19:00",
+      intervalo_inicio: intervalo_inicio || null,
+      intervalo_fim: intervalo_fim || null,
       aberto: aberto ?? true,
     },
   });

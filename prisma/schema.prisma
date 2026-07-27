@@ -51,9 +51,19 @@ model Profissional {
   ativo         Boolean        @default(true)
   agendamentos  Agendamento[]
   folgas        Folga[]
+  bloqueios     BloqueioAgenda[]
   comissoes     Float          @default(50)
   disponibilidades DisponibilidadeProfissional[]
   servicosDuracao ProfissionalServico[]
+}
+
+model BloqueioAgenda {
+  id              Int          @id @default(autoincrement())
+  profissional_id Int
+  profissional    Profissional @relation(fields: [profissional_id], references: [id])
+  data_hora_inicio DateTime
+  data_hora_fim    DateTime
+  motivo          String?
 }
 
 model Servico {
@@ -96,6 +106,7 @@ model Agendamento {
   forma_pagamento String?
   valor_pago      Float?
   observacao      String?
+  cancel_token    String?      @unique @default(uuid())
   criado_em       DateTime     @default(now())
   lembretes       Lembrete[]
 }
@@ -138,6 +149,8 @@ model DisponibilidadeProfissional {
   dia_semana      Int          // 0=Domingo, 1=Segunda, ..., 6=Sabado
   hora_inicio     String       @default("09:00")
   hora_fim        String       @default("19:00")
+  intervalo_inicio String?     
+  intervalo_fim    String?     
   aberto          Boolean      @default(true)
 
   @@unique([profissional_id, dia_semana])

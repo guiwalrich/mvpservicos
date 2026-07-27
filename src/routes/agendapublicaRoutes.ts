@@ -291,5 +291,52 @@ router.post('/:slug', async (req: Request, res: Response) => {
   res.status(201).json({ mensagem: 'Agendamento realizado', agendamento });
 });
 
+
+
+// GET - Listar agendamentos do cliente pelo telefone (Publico)
+router.get('/:slug/cliente/:telefone', async (req: Request, res: Response) => {
+  const { slug, telefone } = req.params;
+  
+  const empresa = await prisma.empresa.findUnique({ where: { slug } });
+  if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
+
+  const agendamentos = await prisma.agendamento.findMany({
+    where: {
+      empresa_id: empresa.id,
+      cliente: { telefone: telefone },
+      data_hora: { gte: new Date() },
+      status: { not: "cancelado" }
+    },
+    include: {
+      profissional: { select: { nome: true } },
+      servico: { select: { nome: true, preco: true } },
+      cliente: { select: { nome: true } }
+    },
+    orderBy: { data_hora: 'asc' }
+  });
+
+  res.json(agendamentos);
+});
+
+// POST - Cancelar agendamento (Publico)
+router.post('/cancelar/:cancelToken', async (req: Request, res: Response) => {
+  const { cancelToken } = req.params;
+  
+  const agendamento = await prisma.agendamento.findUnique({
+    where: { cancel_token: cancelToken }
+  });
+
+  if (!agendamento) return res.status(404).json({ erro: 'Agendamento não encontrado' });
+  if (agendamento.status === 'cancelado') return res.status(400).json({ erro: 'Agendamento já está cancelado' });
+
+  await prisma.agendamento.update({
+    where: { id: agendamento.id },
+    data: { status: 'cancelado' }
+  });
+
+  res.json({ sucesso: true, mensagem: "Agendamento cancelado com sucesso." });
+});
+
 export default router;
+
 

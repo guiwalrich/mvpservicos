@@ -9,7 +9,70 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Phosphor Icons -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web">
+    // ===== MEUS AGENDAMENTOS =====
+    document.getElementById('btnMeusAgendamentos').addEventListener('click', () => {
+        document.getElementById('modalMeusAgendamentos').classList.add('active');
+        document.getElementById('listaMeusAgendamentos').innerHTML = '';
+        document.getElementById('inputMeusAgendTelefone').value = '';
+    });
+
+    function closeModalMeusAgendamentos() {
+        document.getElementById('modalMeusAgendamentos').classList.remove('active');
+    }
+
+    async function buscarMeusAgendamentos() {
+        const tel = document.getElementById('inputMeusAgendTelefone').value;
+        if(!tel) return alert('Informe o telefone!');
+        
+        try {
+            const res = await fetch(`/api/p/${empresaSlug}/cliente/${encodeURIComponent(tel)}`);
+            const data = await res.json();
+            
+            if (!res.ok) throw new Error(data.erro);
+            
+            if (data.length === 0) {
+                document.getElementById('listaMeusAgendamentos').innerHTML = '<p style="text-align:center; color: var(--muted); font-size: 14px;">Nenhum agendamento futuro encontrado.</p>';
+                return;
+            }
+
+            document.getElementById('listaMeusAgendamentos').innerHTML = data.map(ag => `
+                <div style="border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; background: var(--bg);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                        <div>
+                            <strong style="display: block; font-size: 14px; color: var(--text);">${ag.servico.nome}</strong>
+                            <span style="font-size: 13px; color: var(--muted);">${ag.profissional.nome}</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <strong style="display: block; font-size: 14px; color: var(--text);">${new Date(ag.data_hora).toLocaleDateString('pt-BR')}</strong>
+                            <span style="font-size: 13px; color: var(--muted);">${new Date(ag.data_hora).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</span>
+                        </div>
+                    </div>
+                    <button onclick="cancelarAgendamento('${ag.cancel_token}')" style="width: 100%; padding: 8px; border: 1px solid #FCA5A5; background: #FEF2F2; color: #EF4444; border-radius: var(--radius); cursor: pointer; font-size: 13px; font-weight: 600;">Cancelar Agendamento</button>
+                </div>
+            `).join('');
+
+        } catch (e) {
+            alert('Erro: ' + e.message);
+        }
+    }
+
+    async function cancelarAgendamento(token) {
+        if(!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
+        
+        try {
+            const res = await fetch('/api/p/cancelar/' + token, { method: 'POST' });
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.erro);
+            
+            alert('Agendamento cancelado com sucesso!');
+            buscarMeusAgendamentos(); // recarrega a lista
+        } catch (e) {
+            alert('Erro: ' + e.message);
+        }
+    }
+
+</script>
   <style>
     :root {
       --bg: #FAFAFA;
@@ -688,6 +751,27 @@
 
     carregarEmpresa();
   </script>
+
+<!-- MODAL MEUS AGENDAMENTOS -->
+<div class="modal-overlay" id="modalMeusAgendamentos">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Meus Agendamentos</h3>
+            <button class="modal-close" onclick="closeModalMeusAgendamentos()"><i class="ph ph-x"></i></button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 14px; color: var(--muted); margin-bottom: 16px;">Informe seu telefone para consultar seus agendamentos e cancelá-los se necessário.</p>
+            <div class="form-group">
+                <label>Seu Telefone (WhatsApp)</label>
+                <input type="text" id="inputMeusAgendTelefone" placeholder="(11) 99999-9999">
+            </div>
+            <button class="btn" style="width: 100%; margin-bottom: 24px;" onclick="buscarMeusAgendamentos()">Buscar Agendamentos</button>
+            
+            <div id="listaMeusAgendamentos" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
 
