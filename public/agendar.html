@@ -295,12 +295,14 @@
     .btn:hover { background: var(--accent-dark); }
 
 </style>
-</head>
 <body>
   <div class="wrap">
     <div class="card">
       <div class="step-pill" id="stepPill">Passo 1 • Escolha um serviço</div>
-      <h1 id="empresaNome">Carregando...</h1>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:4px;">
+        <h1 id="empresaNome" style="margin:0;">Carregando...</h1>
+        <button id="btnMeusAgendamentos" onclick="abrirModalMeusAgendamentos()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:var(--radius);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;"><i class="ph ph-calendar-blank"></i> Meus Agendamentos</button>
+      </div>
       <p id="empresaInfo" class="muted">Aguarde enquanto carregamos os serviços da empresa.</p>
 
       <!-- Loading -->
@@ -717,32 +719,48 @@
   </script>
 
 <!-- MODAL MEUS AGENDAMENTOS -->
-<div class="modal-overlay" id="modalMeusAgendamentos">
+<div class="modal-overlay" id="modalMeusAgendamentos" onclick="fecharSeClicarFora(event)">
     <div class="modal">
         <div class="modal-header">
-            <h3>Meus Agendamentos</h3>
+            <h3><i class="ph ph-calendar-check" style="margin-right:8px;"></i>Meus Agendamentos</h3>
             <button class="modal-close" onclick="closeModalMeusAgendamentos()"><i class="ph ph-x"></i></button>
         </div>
         <div class="modal-body">
-            <p style="font-size: 14px; color: var(--muted); margin-bottom: 16px;">Informe seu telefone para consultar seus agendamentos e cancelá-los se necessário.</p>
-            <div class="form-group">
-                <label>Seu Telefone (WhatsApp)</label>
-                <input type="text" id="inputMeusAgendTelefone" placeholder="(11) 99999-9999">
+            <div style="display:flex; gap:8px; margin-bottom:16px;">
+                <input type="text" id="inputMeusAgendTelefone" placeholder="Seu telefone (WhatsApp)" style="flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; outline:none;" onkeydown="if(event.key==='Enter') buscarMeusAgendamentos()">
+                <button onclick="buscarMeusAgendamentos()" style="padding:10px 14px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;"><i class="ph ph-magnifying-glass"></i></button>
             </div>
-            <button class="btn" style="width: 100%; margin-bottom: 24px;" onclick="buscarMeusAgendamentos()">Buscar Agendamentos</button>
-            
-            <div id="listaMeusAgendamentos" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            <div id="listaMeusAgendamentos" style="display:flex;flex-direction:column;gap:12px;"></div>
         </div>
     </div>
 </div>
 
 <script>
     // ===== MEUS AGENDAMENTOS =====
-    document.getElementById('btnMeusAgendamentos').addEventListener('click', () => {
-        document.getElementById('modalMeusAgendamentos').classList.add('active');
-        document.getElementById('listaMeusAgendamentos').innerHTML = '';
-        document.getElementById('inputMeusAgendTelefone').value = '';
-    });
+    function abrirModalMeusAgendamentos() {
+        const modal = document.getElementById('modalMeusAgendamentos');
+        const lista = document.getElementById('listaMeusAgendamentos');
+        const input = document.getElementById('inputMeusAgendTelefone');
+        
+        modal.classList.add('active');
+        lista.innerHTML = '';
+        
+        // Pre-preenche com o telefone já digitado no formulário, se houver
+        const telForm = document.getElementById('telefone');
+        if (telForm && telForm.value.trim()) {
+            input.value = telForm.value.trim();
+            buscarMeusAgendamentos(); // carrega automaticamente
+        } else {
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    function fecharSeClicarFora(e) {
+        if (e.target === document.getElementById('modalMeusAgendamentos')) {
+            closeModalMeusAgendamentos();
+        }
+    }
 
     function closeModalMeusAgendamentos() {
         document.getElementById('modalMeusAgendamentos').classList.remove('active');
