@@ -295,7 +295,8 @@ router.post('/:slug', async (req: Request, res: Response) => {
 
 // GET - Listar agendamentos do cliente pelo telefone (Publico)
 router.get('/:slug/cliente/:telefone', async (req: Request, res: Response) => {
-  const { slug, telefone } = req.params;
+  const slug = req.params.slug as string;
+  const telefone = req.params.telefone as string;
   
   const empresa = await prisma.empresa.findUnique({ where: { slug } });
   if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
@@ -320,7 +321,7 @@ router.get('/:slug/cliente/:telefone', async (req: Request, res: Response) => {
 
 // POST - Cancelar agendamento (Publico)
 router.post('/cancelar/:cancelToken', async (req: Request, res: Response) => {
-  const { cancelToken } = req.params;
+  const cancelToken = req.params.cancelToken as string;
   
   const agendamento = await prisma.agendamento.findUnique({
     where: { cancel_token: cancelToken }
