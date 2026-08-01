@@ -110,15 +110,20 @@ export default function Landing() {
             </div>
             Agende.yo
           </Link>
-          <div className="flex items-center gap-4 sm:gap-6">
-            <Link to="/dashboard" className="text-xs sm:text-sm font-medium text-neutral-400 hover:text-white transition-colors">
-              Painel Dashboard
+
+          <div className="hidden md:flex items-center gap-8 text-xs font-medium text-neutral-400">
+            <a href="#recursos" className="hover:text-white transition-colors">Recursos</a>
+            <a href="#como-funciona" className="hover:text-white transition-colors">Como Funciona</a>
+            <a href="#demonstracao" className="hover:text-white transition-colors">Demonstração</a>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link to="/login" className="text-xs sm:text-sm font-medium text-neutral-300 hover:text-white px-4 py-2 rounded-xl border border-white/10 hover:bg-white/5 transition-all">
+              Entrar no Painel
             </Link>
-            <Link to="/agendar/studio-demo" className="text-xs sm:text-sm font-medium text-neutral-400 hover:text-white transition-colors flex items-center gap-1">
-              Visão do Cliente <ExternalLink size={12} />
-            </Link>
-            <Link to="/login" className="text-xs sm:text-sm font-medium bg-white text-black px-4 py-2 rounded-md hover:bg-neutral-200 transition-colors">
-              Entrar / Login
+            <Link to="/agendar/studio-agende-yo" target="_blank" className="text-xs sm:text-sm font-bold bg-white text-black px-4 py-2 rounded-xl hover:bg-neutral-200 transition-all flex items-center gap-1.5 shadow-sm">
+              <span>Testar Página Pública</span>
+              <ExternalLink size={13} />
             </Link>
           </div>
         </div>
@@ -132,20 +137,20 @@ export default function Landing() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-xs font-medium text-neutral-300 backdrop-blur-sm hover:bg-white/10 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-xs font-semibold text-neutral-300 backdrop-blur-sm"
           >
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-40"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            Sistema Oficial Lançado
+            Plataforma Comercial de Agendamento Online & Gestão
           </motion.div>
           
           <motion.h1 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl md:text-[5.5rem] font-medium tracking-tighter text-white max-w-5xl mx-auto leading-[1.05]"
+            className="text-5xl md:text-[5.5rem] font-bold tracking-tighter text-white max-w-5xl mx-auto leading-[1.05]"
           >
             Sua agenda operando no <br className="hidden md:block" />
             <span className="animate-[shimmer_3s_linear_infinite] bg-[linear-gradient(110deg,#a3a3a3,45%,#ffffff,55%,#a3a3a3)] bg-[length:200%_100%] bg-clip-text text-transparent">piloto automático.</span>
@@ -155,9 +160,9 @@ export default function Landing() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed"
+            className="text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed"
           >
-            A plataforma definitiva para profissionais que exigem excelência. Agendamentos online, lembretes via WhatsApp e controle financeiro absoluto.
+            A solução completa para barbearias, estúdios, salões de beleza e profissionais autônomos. Agendamentos 24 horas no celular, lembretes via WhatsApp e controle financeiro total.
           </motion.p>
 
           <motion.div 
@@ -166,14 +171,11 @@ export default function Landing() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
           >
-            <ShimmerButton href="/login">
-              Acessar Tela de Login <ArrowRight size={16} />
+            <ShimmerButton href="/agendar/studio-agende-yo">
+              Testar Agendamento de Cliente <ExternalLink size={16} />
             </ShimmerButton>
-            <Link to="/dashboard" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-transparent border border-white/10 text-white px-8 py-3.5 rounded-md font-medium hover:bg-white/5 transition-colors">
-              Ver o Dashboard Interno
-            </Link>
-            <Link to="/agendar/studio-demo" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-neutral-300 px-6 py-3.5 rounded-md text-sm font-medium hover:text-white hover:bg-white/10 transition-colors">
-              Página do Cliente <ExternalLink size={14} />
+            <Link to="/login" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-transparent border border-white/10 text-white px-8 py-3.5 rounded-xl text-sm font-semibold hover:bg-white/5 transition-all">
+              Acessar Painel do Estabelecimento <ArrowRight size={16} />
             </Link>
           </motion.div>
         </section>
