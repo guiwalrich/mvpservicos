@@ -87,8 +87,8 @@ app.use("/agendar-api", publicAgendamentoLimiter, agendapublicaRoutes);
 
 // Mantém os erros da API em JSON e torna indisponibilidade do banco explícita
 // para o frontend, em vez de devolver a página HTML de erro do Express.
-app.use((error: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("Erro não tratado:", error);
+app.use((error: any, req: Request, res: Response, _next: NextFunction) => {
+  console.error(`Erro não tratado na rota [${req.method}] ${req.url}:`, error);
 
   if (error?.code === "P1001" || error?.name === "PrismaClientInitializationError") {
     return res.status(503).json({

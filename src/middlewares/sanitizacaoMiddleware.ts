@@ -35,14 +35,28 @@ function sanitizarValor(valor: any): any {
 }
 
 export function sanitizacaoMiddleware(req: Request, _res: Response, next: NextFunction) {
-  if (req.body) {
-    req.body = sanitizarValor(req.body);
-  }
-  if (req.query) {
-    req.query = sanitizarValor(req.query);
-  }
-  if (req.params) {
-    req.params = sanitizarValor(req.params);
+  try {
+    if (req.body && typeof req.body === "object") {
+      for (const key of Object.keys(req.body)) {
+        req.body[key] = sanitizarValor(req.body[key]);
+      }
+    }
+    if (req.query && typeof req.query === "object") {
+      for (const key of Object.keys(req.query)) {
+        try {
+          req.query[key] = sanitizarValor(req.query[key]);
+        } catch (_) {}
+      }
+    }
+    if (req.params && typeof req.params === "object") {
+      for (const key of Object.keys(req.params)) {
+        try {
+          req.params[key] = sanitizarValor(req.params[key]);
+        } catch (_) {}
+      }
+    }
+  } catch (err) {
+    console.error("Erro seguro na sanitização:", err);
   }
   next();
 }
