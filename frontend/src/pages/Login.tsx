@@ -187,7 +187,14 @@ export default function Login() {
     setIsLoading(true);
     setErrorMessage('');
 
-    const googleClientId = "1048392817264-agendeyo.apps.googleusercontent.com";
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    
+    if (!googleClientId) {
+      setErrorMessage("Configuração incompleta: O Client ID do Google não foi definido. Adicione VITE_GOOGLE_CLIENT_ID no seu .env para habilitar o login real.");
+      setIsLoading(false);
+      return;
+    }
+
     const redirectUri = encodeURIComponent(window.location.origin + '/login');
     const scope = encodeURIComponent('openid email profile');
     
