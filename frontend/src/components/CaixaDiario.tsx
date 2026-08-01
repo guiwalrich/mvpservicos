@@ -29,7 +29,7 @@ export interface LancamentoCaixa {
   horario: string;
 }
 
-const LANCAMENTOS_DEMO: LancamentoCaixa[] = [
+export const DEMO_LANCAMENTOS: LancamentoCaixa[] = [
   {
     id: 'l1',
     descricao: 'Corte + Barba Premium',
@@ -84,18 +84,30 @@ export default function CaixaDiario() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
-  // State
-  const [lancamentos, setLancamentos] = useState<LancamentoCaixa[]>(LANCAMENTOS_DEMO);
+  // Identifica a Conta Ativa do Usuário Logado
+  const empresaLogada = JSON.parse(localStorage.getItem('empresa') || '{}');
+  const userAccountKey = empresaLogada.email ? empresaLogada.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
+
+  // State: Caixa isolado e limpo por conta de usuário
+  const [lancamentos, setLancamentos] = useState<LancamentoCaixa[]>(() => {
+    const saved = localStorage.getItem(`caixa_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [metodoFilter, setMetodoFilter] = useState<string>('todos');
 
+  // Atualiza persistência por conta
+  React.useEffect(() => {
+    localStorage.setItem(`caixa_${userAccountKey}`, JSON.stringify(lancamentos));
+  }, [lancamentos, userAccountKey]);
+
   // Carregar lançamentos vindos de agendamentos concluídos na Agenda
   React.useEffect(() => {
-    const armazenados = JSON.parse(localStorage.getItem('novos_lancamentos_caixa') || '[]');
+    const armazenados = JSON.parse(localStorage.getItem(`novos_lancamentos_caixa_${userAccountKey}`) || '[]');
     if (armazenados && Array.isArray(armazenados) && armazenados.length > 0) {
-      setLancamentos([...armazenados, ...LANCAMENTOS_DEMO]);
+      setLancamentos(prev => [...armazenados, ...prev]);
     }
-  }, []);
+  }, [userAccountKey]);
 
   // Modais
   const [isNovoLancamentoModalOpen, setIsNovoLancamentoModalOpen] = useState(false);

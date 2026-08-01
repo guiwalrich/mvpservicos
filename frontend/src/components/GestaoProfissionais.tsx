@@ -42,7 +42,7 @@ export interface ProfissionalCompleto {
   totalAtendimentos: number;
 }
 
-const PROFISSIONAIS_DEMO: ProfissionalCompleto[] = [
+export const DEMO_PROFISSIONAIS: ProfissionalCompleto[] = [
   {
     id: 'p1',
     nome: 'Carlos Silva',
@@ -116,10 +116,22 @@ export default function GestaoProfissionais() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
-  // State
-  const [profissionais, setProfissionais] = useState<ProfissionalCompleto[]>(PROFISSIONAIS_DEMO);
+  // Identifica a Conta Ativa do Usuário Logado
+  const empresaLogada = JSON.parse(localStorage.getItem('empresa') || '{}');
+  const userAccountKey = empresaLogada.email ? empresaLogada.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
+
+  // State: Profissionais isolados e limpos por conta de usuário
+  const [profissionais, setProfissionais] = useState<ProfissionalCompleto[]>(() => {
+    const saved = localStorage.getItem(`profissionais_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'todos' | 'ativos' | 'ferias'>('todos');
+
+  // Atualiza persistência por conta
+  React.useEffect(() => {
+    localStorage.setItem(`profissionais_${userAccountKey}`, JSON.stringify(profissionais));
+  }, [profissionais, userAccountKey]);
 
   // Modais
   const [isNovoProfModalOpen, setIsNovoProfModalOpen] = useState(false);

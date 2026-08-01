@@ -54,7 +54,7 @@ export interface BloqueioItem {
   profissionalId?: string;
 }
 
-const PROFISSIONAIS_DEMO: Profissional[] = [
+export const DEMO_AGENDA_PROFISSIONAIS: Profissional[] = [
   { id: '1', nome: 'Carlos Silva', especialidade: 'Barbeiro Lead', avatar: 'CS', fotoUrl: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=150&auto=format&fit=crop&q=80' },
   { id: '2', nome: 'Ana Souza', especialidade: 'Esteticista & Design', avatar: 'AS', fotoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80' },
   { id: '3', nome: 'Juliana Lima', especialidade: 'Tatuadora & Artist', avatar: 'JL', fotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80' },
@@ -91,28 +91,43 @@ export default function AgendaInteligente({
   const [displayType, setDisplayType] = useState<'calendar' | 'timeline'>('timeline');
   const [selectedProf, setSelectedProf] = useState<string>('all');
 
-  // Dados da Agenda
-  const [agendamentos, setAgendamentos] = useState<AgendamentoItem[]>([
-    { id: '1', cliente: 'Carlos Silva', telefone: '(11) 98765-4321', servico: 'Corte + Barba Premium', valor: 'R$ 80,00', data: '2026-07-31', horario: '09:00', duracaoMin: 50, profissionalId: '1', profissionalNome: 'Carlos Silva', sala: 'Cadeira 01', status: 'Confirmado' },
-    { id: '2', cliente: 'Ana Souza', telefone: '(11) 97654-3210', servico: 'Avaliação Estética', valor: 'R$ 150,00', data: '2026-07-31', horario: '10:00', duracaoMin: 60, profissionalId: '2', profissionalNome: 'Ana Souza', sala: 'Sala VIP Estética', status: 'Em Atendimento' },
-    { id: '3', cliente: 'Lucas Mendes', telefone: '(11) 96543-2109', servico: 'Tatuagem Blackwork 10cm', valor: 'R$ 350,00', data: '2026-07-31', horario: '14:00', duracaoMin: 120, profissionalId: '3', profissionalNome: 'Juliana Lima', sala: 'Estúdio 02', status: 'Pendente' },
-    { id: '4', cliente: 'Mariana Lima', telefone: '(11) 95432-1098', servico: 'Limpeza de Pele', valor: 'R$ 120,00', data: '2026-07-31', horario: '16:00', duracaoMin: 45, profissionalId: '2', profissionalNome: 'Ana Souza', sala: 'Sala VIP Estética', status: 'Finalizado' },
-  ]);
+  // Identifica a Conta Ativa do Usuário Logado
+  const empresaLogada = JSON.parse(localStorage.getItem('empresa') || '{}');
+  const userAccountKey = empresaLogada.email ? empresaLogada.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
 
-  const [bloqueios, setBloqueios] = useState<BloqueioItem[]>([
-    { id: 'b1', motivo: 'Horário de Almoço', horarioInicio: '12:00', horarioFim: '13:00' },
-  ]);
+  // Dados da Agenda (Inicializados limpos para cada nova conta de usuário)
+  const [agendamentos, setAgendamentos] = useState<AgendamentoItem[]>(() => {
+    const saved = localStorage.getItem(`agendamentos_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  // Profissionais dinâmicos da empresa
-  const [profissionais, setProfissionais] = useState<Profissional[]>(PROFISSIONAIS_DEMO);
+  const [bloqueios, setBloqueios] = useState<BloqueioItem[]>(() => {
+    const saved = localStorage.getItem(`bloqueios_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Profissionais dinâmicos da empresa (Inicializados limpos para nova conta)
+  const [profissionais, setProfissionais] = useState<Profissional[]>(() => {
+    const saved = localStorage.getItem(`profissionais_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Salvar alterações por conta
+  React.useEffect(() => {
+    localStorage.setItem(`agendamentos_${userAccountKey}`, JSON.stringify(agendamentos));
+  }, [agendamentos, userAccountKey]);
+
+  React.useEffect(() => {
+    localStorage.setItem(`bloqueios_${userAccountKey}`, JSON.stringify(bloqueios));
+  }, [bloqueios, userAccountKey]);
 
   // Carregar agendamentos vindos da Página Pública /agendar/:slug
   React.useEffect(() => {
-    const armazenados = JSON.parse(localStorage.getItem('novos_agendamentos_publicos') || '[]');
+    const armazenados = JSON.parse(localStorage.getItem(`novos_agendamentos_publicos_${userAccountKey}`) || '[]');
     if (armazenados && Array.isArray(armazenados) && armazenados.length > 0) {
       setAgendamentos(prev => [...armazenados, ...prev]);
     }
-  }, []);
+  }, [userAccountKey]);
 
   // Modais de Controle
   const [selectedAppointment, setSelectedAppointment] = useState<AgendamentoItem | null>(null);

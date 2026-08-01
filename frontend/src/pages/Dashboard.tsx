@@ -52,21 +52,21 @@ const INITIAL_NOTIFICATIONS = [
   { id: '3', title: 'Sistema Operacional', desc: 'Prisma ORM e rotas REST ativas na versão 1.0.0.', time: 'Há 1 hora', read: true },
 ];
 
-const INITIAL_APPOINTMENTS = [
+export const DEMO_APPOINTMENTS = [
   { id: '1', client: 'Carlos Silva', service: 'Corte + Barba Premium', time: '09:00', date: '2026-07-31', price: 'R$ 80,00', status: 'Confirmado', phone: '(11) 98765-4321' },
   { id: '2', client: 'Ana Souza', service: 'Avaliação Estética', time: '10:30', date: '2026-07-31', price: 'R$ 150,00', status: 'Confirmado', phone: '(11) 97654-3210' },
   { id: '3', client: 'Lucas Mendes', service: 'Design de Sobrancelha', time: '14:00', date: '2026-07-31', price: 'R$ 45,00', status: 'Pendente', phone: '(11) 96543-2109' },
   { id: '4', client: 'Mariana Lima', service: 'Limpeza de Pele', time: '16:00', date: '2026-07-31', price: 'R$ 120,00', status: 'Confirmado', phone: '(11) 95432-1098' },
 ];
 
-const INITIAL_SERVICES = [
+export const DEMO_SERVICES = [
   { id: '1', name: 'Corte + Barba Premium', duration: '50 min', price: '80,00', active: true },
   { id: '2', name: 'Avaliação Estética', duration: '30 min', price: '150,00', active: true },
   { id: '3', name: 'Design de Sobrancelha', duration: '20 min', price: '45,00', active: true },
   { id: '4', name: 'Limpeza de Pele Profunda', duration: '60 min', price: '120,00', active: true },
 ];
 
-const INITIAL_CLIENTS = [
+export const DEMO_CLIENTS = [
   { id: '1', name: 'Carlos Silva', phone: '(11) 98765-4321', email: 'carlos@email.com', totalVisits: 8, lastVisit: '15/07/2026' },
   { id: '2', name: 'Ana Souza', phone: '(11) 97654-3210', email: 'ana@email.com', totalVisits: 3, lastVisit: '20/07/2026' },
   { id: '3', name: 'Lucas Mendes', phone: '(11) 96543-2109', email: 'lucas@email.com', totalVisits: 12, lastVisit: '28/07/2026' },
@@ -99,21 +99,38 @@ export default function Dashboard() {
   const [userRole, setUserRole] = useState<'DONO' | 'PROFISSIONAL'>('DONO');
   const [activeProfissionalId] = useState<string>('1'); // Carlos Silva
 
-  // Estado da Empresa em Configurações
-  const [empresaNome, setEmpresaNome] = useState('Studio Agende.yo');
-  const [empresaSlug, setEmpresaSlug] = useState('studio-agende-yo');
-  const [empresaEndereco, setEmpresaEndereco] = useState('Av. Paulista, 1000 - Bela Vista, São Paulo - SP');
-  const [empresaTelefone, setEmpresaTelefone] = useState('(11) 98765-4321');
-  const [empresaFotoUrl, setEmpresaFotoUrl] = useState<string>(() => localStorage.getItem('empresa_logo_url') || '');
+  // Identifica a Conta Ativa do Usuário Logado
+  const empresaLogada = JSON.parse(localStorage.getItem('empresa') || '{}');
+  const userAccountKey = empresaLogada.email ? empresaLogada.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
+
+  // Estado da Empresa em Configurações (Preenchido com a Conta Real do Usuário)
+  const [empresaNome, setEmpresaNome] = useState(empresaLogada.nome || 'Meu Estabelecimento');
+  const [empresaSlug, setEmpresaSlug] = useState(empresaLogada.slug || 'meu-estabelecimento');
+  const [empresaEndereco, setEmpresaEndereco] = useState(localStorage.getItem(`empresa_endereco_${userAccountKey}`) || 'Cadastre seu endereço no mapa');
+  const [empresaTelefone, setEmpresaTelefone] = useState(empresaLogada.whatsapp || '(00) 00000-0000');
+  const [empresaFotoUrl, setEmpresaFotoUrl] = useState<string>(() => localStorage.getItem(`empresa_logo_url_${userAccountKey}`) || '');
   const [configSalvaToast, setConfigSalvaToast] = useState(false);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
   
-  // State
+  // State: Listas de Dados Dinâmicos da Empresa (Começam 100% LIMPOS/ZERADOS para Novos Usuários)
   const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
   const [isNewServiceOpen, setIsNewServiceOpen] = useState(false);
-  const [appointments, setAppointments] = useState(INITIAL_APPOINTMENTS);
-  const [services, setServices] = useState(INITIAL_SERVICES);
-  const [clients, setClients] = useState(INITIAL_CLIENTS);
+  
+  const [appointments, setAppointments] = useState<any[]>(() => {
+    const saved = localStorage.getItem(`agendamentos_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [services, setServices] = useState<any[]>(() => {
+    const saved = localStorage.getItem(`servicos_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [clients, setClients] = useState<any[]>(() => {
+    const saved = localStorage.getItem(`clientes_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // State: UX & Onboarding
@@ -122,7 +139,7 @@ export default function Dashboard() {
 
   // New Appointment Form
   const [newClient, setNewClient] = useState('');
-  const [newService, setNewService] = useState(INITIAL_SERVICES[0].name);
+  const [newService, setNewService] = useState('');
   const [newTime, setNewTime] = useState('11:00');
 
   // New Service Form
@@ -136,6 +153,19 @@ export default function Dashboard() {
   const markAllNotificationsRead = () => {
     setNotifications(notifications.map(n => ({ ...n, read: true })));
   };
+
+  // Atualiza persistência por conta de usuário
+  useEffect(() => {
+    localStorage.setItem(`agendamentos_${userAccountKey}`, JSON.stringify(appointments));
+  }, [appointments, userAccountKey]);
+
+  useEffect(() => {
+    localStorage.setItem(`servicos_${userAccountKey}`, JSON.stringify(services));
+  }, [services, userAccountKey]);
+
+  useEffect(() => {
+    localStorage.setItem(`clientes_${userAccountKey}`, JSON.stringify(clients));
+  }, [clients, userAccountKey]);
 
   useEffect(() => {
     async function loadDashboardData() {
