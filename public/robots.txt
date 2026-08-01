@@ -1,0 +1,16 @@
+# robots.txt - Diretrizes de Segurança e Indexação do SaaS Agende.yo
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /agendar/
+
+# Proibir indexação de páginas administrativas, APIs privadas e painel interno
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth/
+Disallow: /agendar-api/
+Disallow: /servicos/
+Disallow: /profissionais/
+Disallow: /clientes/
+Disallow: /agendamentos/
+Disallow: /configuracoes/

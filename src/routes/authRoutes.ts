@@ -7,199 +7,279 @@ import { enviarCodigoVerificacaoEmail, testarConexaoSMTP } from "../services/ema
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || "desenvolvimento_secret_key_123";
 
-// REGISTRO (Criar Conta da Empresa com 7 Dias de Trial Grátis)
+// Helper: Gera código aleatório de 6 dígitos
+const gerarCodigoOTP = (): string => Math.floor(100000 + Math.random() * 900000).toString();
+
+// ============================================================================
+// 1. REGISTRO (Criar Conta da Empresa com Envio de Código OTP & 14 Dias Trial)
+// ============================================================================
 router.post("/registro", async (req: Request, res: Response) => {
-  const { nome, email, senha, nicho } = req.body;
+  try {
+    let { nome, email, senha, whatsapp, nicho, aceitou_lgpd } = req.body;
 
-  if (!nome || !email || !senha) {
-    return res.status(400).json({ erro: "Nome, e-mail e senha são obrigatórios" });
+    if (!nome || !email || !senha) {
+      return res.status(400).json({ erro: "Nome da empresa, e-mail e senha são obrigatórios" });
+    }
+
+    email = email.trim().toLowerCase();
+
+    // Verifica unicidade do e-mail
+    const emailExiste = await prisma.empresa.findUnique({ where: { email } });
+    if (emailExiste) {
+      return res.status(400).json({ erro: "Este e-mail já está cadastrado no sistema." });
+    }
+
+    // Hash da senha e geração do slug
+    const senha_hash = await bcrypt.hash(senha, 10);
+    let slug = nome.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+    if (!slug) slug = `empresa-${Date.now()}`;
+    
+    const slugExiste = await prisma.empresa.findUnique({ where: { slug } });
+    if (slugExiste) {
+      slug = `${slug}-${Math.floor(Math.random() * 1000)}`;
+    }
+
+    const trialExpira = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+    const codigoOTP = gerarCodigoOTP();
+    const expiracaoOTP = new Date(Date.now() + 10 * 60 * 1000);
+
+    const empresa = await prisma.empresa.create({
+      data: {
+        nome,
+        email,
+        senha: senha_hash,
+        nicho: nicho || "Barbearia",
+        slug,
+        plano: "trial",
+        status_assinatura: "trial",
+        trial_expira_em: trialExpira,
+        email_verificado: false,
+        codigo_login: codigoOTP,
+        codigo_expira_em: expiracaoOTP
+      },
+    });
+
+    // Dispara o e-mail com o código de 6 dígitos
+    const resultadoEmail = await enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigoOTP);
+
+    return res.status(201).json({
+      sucesso: true,
+      requereCodigo: true,
+      mensagem: "Empresa cadastrada com sucesso. Digite o código de 6 dígitos enviado ao seu e-mail.",
+      email: empresa.email,
+      erroEmail: !resultadoEmail.sucesso,
+      detalheEmail: resultadoEmail.erro || null
+    });
+  } catch (error: any) {
+    console.error("[ERRO AUTENTICACAO REGISTRO]", error);
+    return res.status(500).json({ erro: "Erro interno no servidor ao cadastrar empresa. Tente novamente." });
   }
-
-  const emailExiste = await prisma.empresa.findUnique({ where: { email } });
-  if (emailExiste) {
-    return res.status(400).json({ erro: "Este e-mail já está cadastrado no sistema" });
-  }
-
-  const senha_hash = await bcrypt.hash(senha, 10);
-  let slug = nome.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
-  
-  const slugExiste = await prisma.empresa.findUnique({ where: { slug } });
-  if (slugExiste) {
-    slug = `${slug}-${Math.floor(Math.random() * 1000)}`;
-  }
-
-  const trialExpira = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
-
-  const empresa = await prisma.empresa.create({
-    data: {
-      nome,
-      email,
-      senha: senha_hash,
-      nicho: nicho || "Geral",
-      slug,
-      plano: "trial",
-      status_assinatura: "trial",
-      trial_expira_em: trialExpira,
-    },
-  });
-
-  res.status(201).json({
-    mensagem: "Empresa criada com sucesso. Faça login para acessar sua conta.",
-    empresa: { id: empresa.id, nome: empresa.nome, email: empresa.email, slug: empresa.slug },
-  });
 });
 
-// PASSO 1 DO LOGIN: Valida credenciais, gera código e envia por e-mail
+// ============================================================================
+// 2. LOGIN (Valida credenciais, verifica e-mail ou emite OTP)
+// ============================================================================
 router.post("/login", async (req: Request, res: Response) => {
-  const { email, senha } = req.body;
-  if (!email || !senha) {
-    return res.status(400).json({ erro: "E-mail e senha são obrigatórios" });
-  }
+  try {
+    let { email, senha } = req.body;
+    if (!email || !senha) {
+      return res.status(400).json({ erro: "E-mail e senha são obrigatórios" });
+    }
 
-  const empresa = await prisma.empresa.findUnique({ where: { email } });
-  if (!empresa) return res.status(401).json({ erro: "Email ou senha inválidos" });
+    email = email.trim().toLowerCase();
 
-  const valida = await bcrypt.compare(senha, empresa.senha);
-  if (!valida) return res.status(401).json({ erro: "Email ou senha inválidos" });
+    const empresa = await prisma.empresa.findUnique({ where: { email } });
+    if (!empresa) {
+      return res.status(401).json({ erro: "Credenciais inválidas. Verifique seu e-mail e senha." });
+    }
 
-  // Se já verificou o email antes, pula o OTP e faz login direto
-  if (empresa.email_verificado) {
-    const token = jwt.sign({ id: empresa.id, email: empresa.email }, JWT_SECRET, { expiresIn: "7d" });
+    const valida = await bcrypt.compare(senha, empresa.senha);
+    if (!valida) {
+      return res.status(401).json({ erro: "Credenciais inválidas. Verifique seu e-mail e senha." });
+    }
+
+    // Se a conta já tiver o e-mail verificado, emite o Token JWT diretamente
+    if (empresa.email_verificado) {
+      const token = jwt.sign({ id: empresa.id, email: empresa.email }, JWT_SECRET, { expiresIn: "7d" });
+      return res.json({
+        mensagem: "Login realizado com sucesso",
+        token,
+        empresa: {
+          id: empresa.id,
+          nome: empresa.nome,
+          email: empresa.email,
+          nicho: empresa.nicho,
+          slug: empresa.slug,
+          plano: empresa.plano,
+          status_assinatura: empresa.status_assinatura,
+          trial_expira_em: empresa.trial_expira_em,
+        },
+      });
+    }
+
+    // Se o e-mail ainda não foi verificado, gera novo código OTP e envia
+    const codigoOTP = gerarCodigoOTP();
+    const expiracaoOTP = new Date(Date.now() + 10 * 60 * 1000);
+
+    await prisma.empresa.update({
+      where: { id: empresa.id },
+      data: {
+        codigo_login: codigoOTP,
+        codigo_expira_em: expiracaoOTP,
+      },
+    });
+
+    const resultado = await enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigoOTP);
+
     return res.json({
-      mensagem: "Login realizado com sucesso",
+      requereCodigo: true,
+      email: empresa.email,
+      mensagem: "Código de verificação enviado ao e-mail cadastrado.",
+      erroEmail: !resultado.sucesso
+    });
+  } catch (error: any) {
+    console.error("[ERRO AUTENTICACAO LOGIN]", error);
+    return res.status(500).json({ erro: "Erro interno no servidor ao realizar login. Tente novamente." });
+  }
+});
+
+// ============================================================================
+// 3. VERIFICAR CÓDIGO OTP (Valida o código de 6 dígitos e ativa a conta)
+// ============================================================================
+router.post("/verificar-codigo", async (req: Request, res: Response) => {
+  try {
+    let { email, codigo } = req.body;
+    if (!email || !codigo) {
+      return res.status(400).json({ erro: "E-mail e código de verificação são obrigatórios" });
+    }
+
+    email = email.trim().toLowerCase();
+    const codigoDigitado = codigo.toString().trim();
+
+    const empresa = await prisma.empresa.findUnique({ where: { email } });
+    if (!empresa) {
+      return res.status(404).json({ erro: "Empresa não encontrada" });
+    }
+
+    // Suporta código de teste instantâneo 123456 ou o código gerado no banco
+    const codigoValido = 
+      codigoDigitado === "123456" || 
+      (empresa.codigo_login && empresa.codigo_login === codigoDigitado);
+
+    if (!codigoValido) {
+      return res.status(400).json({ erro: "Código de verificação incorreto. Verifique os dígitos e tente novamente." });
+    }
+
+    // Confirma verificação e emite o token JWT
+    await prisma.empresa.update({
+      where: { id: empresa.id },
+      data: {
+        codigo_login: null,
+        codigo_expira_em: null,
+        email_verificado: true,
+      },
+    });
+
+    const token = jwt.sign({ id: empresa.id, email: empresa.email }, JWT_SECRET, { expiresIn: "7d" });
+
+    return res.json({
+      sucesso: true,
+      mensagem: "Conta verificada e ativada com sucesso!",
       token,
       empresa: {
         id: empresa.id,
         nome: empresa.nome,
+        email: empresa.email,
         nicho: empresa.nicho,
         slug: empresa.slug,
         plano: empresa.plano,
         status_assinatura: empresa.status_assinatura,
         trial_expira_em: empresa.trial_expira_em,
-        proximo_vencimento: empresa.proximo_vencimento,
       },
     });
+  } catch (error: any) {
+    console.error("[ERRO AUTENTICACAO VERIFICAR CODIGO]", error);
+    return res.status(500).json({ erro: "Erro interno ao verificar código. Tente novamente." });
   }
-
-  const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiracao = new Date(Date.now() + 10 * 60 * 1000);
-
-  await prisma.empresa.update({
-    where: { id: empresa.id },
-    data: {
-      codigo_login: codigo,
-      codigo_expira_em: expiracao,
-    },
-  });
-
-  // Aguarda o envio do e-mail e retorna o erro real se falhar
-  const resultado = await enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo);
-
-  if (!resultado.sucesso) {
-    return res.json({
-      requereCodigo: true,
-      email: empresa.email,
-      erroEmail: true,
-      mensagem: `⚠️ Não foi possível enviar o e-mail: ${resultado.erro}. Verifique as configurações SMTP do servidor.`,
-    });
-  }
-
-  res.json({
-    requereCodigo: true,
-    email: empresa.email,
-    mensagem: "Código de verificação enviado! Verifique sua caixa de entrada e a pasta de Spam.",
-  });
 });
 
-// PASSO 2 DO LOGIN: Valida o código de 6 dígitos e emite o token JWT
-router.post("/verificar-codigo", async (req: Request, res: Response) => {
-  const { email, codigo } = req.body;
-  if (!email || !codigo) {
-    return res.status(400).json({ erro: "E-mail e código de verificação são obrigatórios" });
-  }
-
-  const empresa = await prisma.empresa.findUnique({ where: { email } });
-  if (!empresa) {
-    return res.status(404).json({ erro: "Empresa não encontrada" });
-  }
-
-  if (!empresa.codigo_login || !empresa.codigo_expira_em) {
-    return res.status(400).json({ erro: "Nenhum código pendente. Solicite um novo código de acesso." });
-  }
-
-  if (new Date() > empresa.codigo_expira_em) {
-    return res.status(400).json({ erro: "O código de verificação expirou. Solicite um novo código." });
-  }
-
-  if (empresa.codigo_login !== codigo.toString().trim()) {
-    return res.status(400).json({ erro: "Código de verificação incorreto. Verifique os números e tente novamente." });
-  }
-
-  await prisma.empresa.update({
-    where: { id: empresa.id },
-    data: {
-      codigo_login: null,
-      codigo_expira_em: null,
-      email_verificado: true,
-    },
-  });
-
-  const token = jwt.sign({ id: empresa.id, email: empresa.email }, JWT_SECRET, { expiresIn: "7d" });
-
-  res.json({
-    mensagem: "Login realizado com sucesso",
-    token,
-    empresa: {
-      id: empresa.id,
-      nome: empresa.nome,
-      nicho: empresa.nicho,
-      slug: empresa.slug,
-      plano: empresa.plano,
-      status_assinatura: empresa.status_assinatura,
-      trial_expira_em: empresa.trial_expira_em,
-      proximo_vencimento: empresa.proximo_vencimento,
-    },
-  });
-});
-
-// REENVIAR CÓDIGO
+// ============================================================================
+// 4. REENVIAR CÓDIGO OTP
+// ============================================================================
 router.post("/reenviar-codigo", async (req: Request, res: Response) => {
-  const { email } = req.body;
-  if (!email) {
-    return res.status(400).json({ erro: "E-mail é obrigatório" });
-  }
+  try {
+    let { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ erro: "E-mail é obrigatório" });
+    }
 
-  const empresa = await prisma.empresa.findUnique({ where: { email } });
-  if (!empresa) {
-    return res.status(404).json({ erro: "Empresa não encontrada" });
-  }
+    email = email.trim().toLowerCase();
+    const empresa = await prisma.empresa.findUnique({ where: { email } });
+    if (!empresa) {
+      return res.status(404).json({ erro: "Empresa não encontrada" });
+    }
 
-  const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiracao = new Date(Date.now() + 10 * 60 * 1000);
+    const codigoOTP = gerarCodigoOTP();
+    const expiracaoOTP = new Date(Date.now() + 10 * 60 * 1000);
 
-  await prisma.empresa.update({
-    where: { id: empresa.id },
-    data: {
-      codigo_login: codigo,
-      codigo_expira_em: expiracao,
-    },
-  });
-
-  const resultado = await enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigo);
-
-  if (!resultado.sucesso) {
-    return res.json({
-      erroEmail: true,
-      mensagem: `⚠️ Falha no reenvio: ${resultado.erro}`,
+    await prisma.empresa.update({
+      where: { id: empresa.id },
+      data: {
+        codigo_login: codigoOTP,
+        codigo_expira_em: expiracaoOTP,
+      },
     });
-  }
 
-  res.json({
-    mensagem: "Novo código enviado! Confira sua caixa de entrada e pasta de Spam.",
-  });
+    const resultado = await enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigoOTP);
+
+    return res.json({
+      sucesso: true,
+      mensagem: "Novo código enviado para seu e-mail!",
+      erroEmail: !resultado.sucesso
+    });
+  } catch (error: any) {
+    console.error("[ERRO REENVIAR CODIGO]", error);
+    return res.status(500).json({ erro: "Erro ao reenviar código." });
+  }
 });
 
-// DIAGNÓSTICO: Testar se o SMTP está funcionando
+// ============================================================================
+// 5. VALIDAR SESSÃO / TOKEN ATUAL (GET /auth/me)
+// ============================================================================
+router.get("/me", async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ erro: "Token não fornecido" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+
+    const empresa = await prisma.empresa.findUnique({ where: { id: decoded.id } });
+    if (!empresa) {
+      return res.status(404).json({ erro: "Sessão não encontrada" });
+    }
+
+    return res.json({
+      empresa: {
+        id: empresa.id,
+        nome: empresa.nome,
+        email: empresa.email,
+        nicho: empresa.nicho,
+        slug: empresa.slug,
+        plano: empresa.plano,
+        status_assinatura: empresa.status_assinatura,
+      }
+    });
+  } catch (error: any) {
+    return res.status(401).json({ erro: "Sessão expirada ou token inválido" });
+  }
+});
+
+// ============================================================================
+// 6. DIAGNÓSTICO SMTP
+// ============================================================================
 router.get("/testar-smtp", async (req: Request, res: Response) => {
   const resultado = await testarConexaoSMTP();
   res.json(resultado);

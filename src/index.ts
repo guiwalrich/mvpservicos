@@ -17,28 +17,58 @@ import assinaturaMiddleware from "./middlewares/assinaturaMiddleware";
 import { authLimiter, publicAgendamentoLimiter } from "./middlewares/rateLimitMiddleware";
 import { iniciarCronLembretes } from "./services/lembreteCronService";
 
+import { sanitizacaoMiddleware } from "./middlewares/sanitizacaoMiddleware";
+
 dotenv.config();
 
 const app = express();
 app.set("trust proxy", 1); // Necessário para proxies reversos do Render.com e rate-limit
 app.use(cors());
 app.use(express.json());
+
+// Cabeçalhos de Segurança HTTP de Produção (Security Headers)
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  next();
+});
+
+// Middleware de Sanitização Profunda (Anti-XSS e Anti-SQL Injection)
+app.use(sanitizacaoMiddleware);
+
+const frontendDistPath = path.join(process.cwd(), "frontend", "dist");
+const hasFrontendBuild = require("fs").existsSync(frontendDistPath);
+
+if (hasFrontendBuild) {
+  app.use(express.static(frontendDistPath));
+}
 app.use(express.static(path.join(process.cwd(), "public")));
 
-// Rota Principal: Serve a Landing Page Oficial
-app.get("/", (req, res) => {
-  res.sendFile(path.join(process.cwd(), "public", "index.html"));
-});
-app.get("/ping", (req, res) => res.json({ status: "online" }));
+app.get("/ping", (_req, res) => res.json({ status: "online" }));
+app.get("/robots.txt", (_req, res) => res.sendFile(path.join(process.cwd(), "public", "robots.txt")));
 
-// Rotas explícitas para Login, Registro e Dashboard (evita Not Found 404 ao digitar URLs sem .html)
-app.get(["/login", "/login.html", "/registro"], (req, res) => {
-  res.sendFile(path.join(process.cwd(), "public", "login.html"));
-});
-
-app.get(["/dashboard", "/dashboard.html"], (req, res) => {
-  res.sendFile(path.join(process.cwd(), "public", "dashboard.html"));
-});
+// Servir o Frontend React (Vite) para as rotas SPA
+if (hasFrontendBuild) {
+  app.get(["/", "/login", "/registro", "/dashboard", "/agendar/:slug"], (req, res) => {
+    res.sendFile(path.join(frontendDistPath, "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.sendFile(path.join(process.cwd(), "public", "index.html"));
+  });
+  app.get(["/login", "/login.html", "/registro"], (req, res) => {
+    res.sendFile(path.join(process.cwd(), "public", "login.html"));
+  });
+  app.get(["/dashboard", "/dashboard.html"], (req, res) => {
+    res.sendFile(path.join(process.cwd(), "public", "dashboard.html"));
+  });
+  app.get("/agendar/:slug", (req, res) => {
+    res.sendFile(path.join(process.cwd(), "public", "index.html"));
+  });
+}
 
 // Rotas com Rate Limit para Proteção contra Força Bruta e Spam
 app.use("/auth", authLimiter, authRoutes);
@@ -53,9 +83,6 @@ app.use("/configuracoes", authMiddleware, assinaturaMiddleware, configuracoesRou
 app.use("/horarios", authMiddleware, assinaturaMiddleware, horariosRoutes);
 app.use("/disponibilidade", authMiddleware, assinaturaMiddleware, disponibilidadeRoutes);
 
-app.get("/agendar/:slug", (req, res) => {
-  res.sendFile(path.join(process.cwd(), "public", "agendar.html"));
-});
 app.use("/agendar-api", publicAgendamentoLimiter, agendapublicaRoutes);
 
 // Mantém os erros da API em JSON e torna indisponibilidade do banco explícita
