@@ -8,7 +8,19 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      // Usando import.meta.dirname conforme recomendado pelo Vite mais recente
+      "@": path.resolve(import.meta.dirname || __dirname, "./src"),
+    },
+  },
+  build: {
+    // Aumenta o limite de aviso do chunk para 1000kb (1MB)
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'framer-motion', 'lucide-react', 'react-router-dom'],
+        },
+      },
     },
   },
 })
