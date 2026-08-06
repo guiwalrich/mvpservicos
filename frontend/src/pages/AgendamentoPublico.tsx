@@ -87,7 +87,13 @@ export default function AgendamentoPublico() {
     if (!slug) return;
 
     // Prefill imediato do localStorage se a empresa corresponder ao slug
-    const empLocal = JSON.parse(localStorage.getItem('empresa') || '{}');
+    const empLocal = (() => {
+      try {
+        const stored = localStorage.getItem('empresa');
+        if (stored && stored !== 'undefined') return JSON.parse(stored) || {};
+      } catch (e) {}
+      return {};
+    })();
     const userAccountKey = empLocal.email ? empLocal.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
     
     if (empLocal.slug === slug || slug === 'meu-estabelecimento' || slug === 'studio-demo' || slug === empLocal.nome?.toLowerCase().replace(/[^a-z0-9]/g, '-')) {
@@ -96,7 +102,13 @@ export default function AgendamentoPublico() {
       if (empLocal.endereco) setEmpresaEndereco(empLocal.endereco);
       if (empLocal.telefone || empLocal.whatsapp) setEmpresaTelefone(empLocal.telefone || empLocal.whatsapp);
 
-      const servsLocais = JSON.parse(localStorage.getItem(`servicos_${userAccountKey}`) || '[]');
+      const servsLocais = (() => {
+        try {
+          return JSON.parse(localStorage.getItem(`servicos_${userAccountKey}`) || '[]');
+        } catch (e) {
+          return [];
+        }
+      })();
       if (servsLocais.length > 0) {
         setServicos(servsLocais.map((s: any) => ({
           id: String(s.id),
@@ -109,7 +121,13 @@ export default function AgendamentoPublico() {
         })));
       }
 
-      const profsLocais = JSON.parse(localStorage.getItem(`profissionais_${userAccountKey}`) || '[]');
+      const profsLocais = (() => {
+        try {
+          return JSON.parse(localStorage.getItem(`profissionais_${userAccountKey}`) || '[]');
+        } catch (e) {
+          return [];
+        }
+      })();
       if (profsLocais.length > 0) {
         setProfissionais([FALLBACK_PROF, ...profsLocais.map((p: any) => ({
           id: String(p.id),

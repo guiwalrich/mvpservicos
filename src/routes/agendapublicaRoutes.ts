@@ -26,32 +26,52 @@ router.get("/", (req: Request, res: Response) => {
 });
 
 router.get('/:slug', async (req: Request, res: Response) => {
-  const slug = req.params.slug as string;
+  try {
+    const slug = req.params.slug as string;
 
-  const empresa = await prisma.empresa.findUnique({
-    where: { slug },
-    select: {
-      id: true,
-      nome: true,
-      slug: true,
-      nicho: true,
-      logo: true,
-      iconUrl: true,
-      telefone: true,
-      endereco: true,
-      latitude: true,
-      longitude: true,
-      instagram: true,
-      configuracoes: true,
-      profissionais: { where: { ativo: true } },
-      servicos: { where: { ativo: true } },
-      horariosFuncionamento: { orderBy: { dia_semana: "asc" } },
-    },
-  });
+    const empresa = await prisma.empresa.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        nome: true,
+        slug: true,
+        nicho: true,
+        logo: true,
+        iconUrl: true,
+        telefone: true,
+        endereco: true,
+        latitude: true,
+        longitude: true,
+        instagram: true,
+        configuracoes: true,
+        profissionais: { 
+          where: { ativo: true },
+          select: {
+            id: true,
+            nome: true,
+            cor_agenda: true
+          }
+        },
+        servicos: { 
+          where: { ativo: true },
+          select: {
+            id: true,
+            nome: true,
+            preco: true,
+            duracao_min: true
+          }
+        },
+        horariosFuncionamento: { orderBy: { dia_semana: "asc" } },
+      },
+    });
 
-  if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
+    if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
 
-  res.json(empresa);
+    res.json(empresa);
+  } catch (error: any) {
+    console.error("[ERRO GET AGENDA PUBLICA DETAIL]", error);
+    res.status(500).json({ erro: "Erro ao buscar dados públicos do estabelecimento" });
+  }
 });
 
 // GET - Buscar horários disponíveis para um profissional em uma data específica

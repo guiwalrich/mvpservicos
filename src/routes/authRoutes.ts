@@ -5,7 +5,7 @@ import prisma from "../config/prisma";
 import { enviarCodigoVerificacaoEmail, testarConexaoSMTP } from "../services/emailService";
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || "desenvolvimento_secret_key_123";
+const JWT_SECRET = process.env.JWT_SECRET || "mvp_agendamento_2025_seguro_abc123";
 
 // Helper: Gera código aleatório de 6 dígitos
 const gerarCodigoOTP = (): string => Math.floor(100000 + Math.random() * 900000).toString();
@@ -161,10 +161,12 @@ router.post("/verificar-codigo", async (req: Request, res: Response) => {
       return res.status(404).json({ erro: "Empresa não encontrada" });
     }
 
-    // Suporta código de teste instantâneo 123456 ou o código gerado no banco
-    const codigoValido = 
-      codigoDigitado === "123456" || 
-      (empresa.codigo_login && empresa.codigo_login === codigoDigitado);
+    // Verifica se o código expirou
+    if (empresa.codigo_expira_em && new Date() > empresa.codigo_expira_em) {
+      return res.status(400).json({ erro: "O código de verificação expirou. Por favor, solicite um novo envio." });
+    }
+
+    const codigoValido = empresa.codigo_login && empresa.codigo_login === codigoDigitado;
 
     if (!codigoValido) {
       return res.status(400).json({ erro: "Código de verificação incorreto. Verifique os dígitos e tente novamente." });

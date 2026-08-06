@@ -77,8 +77,18 @@ export default function Dashboard() {
   const [userRole, setUserRole] = useState<'DONO' | 'PROFISSIONAL'>('DONO');
   const [activeProfissionalId] = useState<string>('1'); // Carlos Silva
 
-  // Identifica a Conta Ativa do Usuário Logado
-  const empresaLogada = JSON.parse(localStorage.getItem('empresa') || '{}');
+  // Identifica a Conta Ativa do Usuário Logado de forma segura contra corrupção de localStorage
+  const empresaLogada = (() => {
+    try {
+      const stored = localStorage.getItem('empresa');
+      if (stored && stored !== 'undefined') {
+        return JSON.parse(stored) || {};
+      }
+    } catch (e) {
+      console.error("Erro ao analisar dados da empresa do localStorage:", e);
+    }
+    return {};
+  })();
   const userAccountKey = empresaLogada.email ? empresaLogada.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
 
   // Estado da Empresa em Configurações (Preenchido com a Conta Real do Usuário)
@@ -400,7 +410,7 @@ export default function Dashboard() {
                 <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-500/20 text-emerald-400">ADMIN</span>
               </div>
             </div>
-            <Link to="/login" onClick={() => localStorage.clear()} className="opacity-60 hover:opacity-100 text-xs font-medium">
+            <Link to="/login" onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('empresa'); }} className="opacity-60 hover:opacity-100 text-xs font-medium">
               Sair
             </Link>
           </div>

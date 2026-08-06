@@ -58,10 +58,7 @@ export default function Login() {
     e.preventDefault();
     if (!email) return;
 
-    if (!acceptedLgpd) {
-      setErrorMessage('Você precisa aceitar os Termos de Privacidade e LGPD para continuar.');
-      return;
-    }
+
 
     setIsLoading(true);
     setErrorMessage('');
@@ -180,14 +177,35 @@ export default function Login() {
 
   // OTP Input Change
   const handleOtpInputChange = (index: number, value: string) => {
-    if (value.length > 1) value = value[value.length - 1];
+    // Apenas dígitos numéricos
+    const cleanValue = value.replace(/\D/g, '');
+    if (!cleanValue) return;
+
     const newOtp = [...otpCode];
-    newOtp[index] = value;
+    newOtp[index] = cleanValue.charAt(cleanValue.length - 1);
     setOtpCode(newOtp);
 
-    if (value && index < 5) {
+    if (index < 5) {
       const nextInput = document.getElementById(`otp-${index + 1}`);
       if (nextInput) nextInput.focus();
+    }
+  };
+
+  // OTP Backspace Key Navigation
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace') {
+      const newOtp = [...otpCode];
+      if (!otpCode[index] && index > 0) {
+        newOtp[index - 1] = '';
+        setOtpCode(newOtp);
+        const prevInput = document.getElementById(`otp-${index - 1}`);
+        if (prevInput) {
+          prevInput.focus();
+        }
+      } else {
+        newOtp[index] = '';
+        setOtpCode(newOtp);
+      }
     }
   };
 
@@ -232,60 +250,80 @@ export default function Login() {
   };
 
   // Processa o retorno oficial do hash do Google (#access_token=...)
+  // 1. Detecta o hash do Google dentro do Popup e envia de volta para a janela mãe
   React.useEffect(() => {
     const hash = window.location.hash;
     if (hash && hash.includes('access_token')) {
       const params = new URLSearchParams(hash.replace('#', '?'));
       const accessToken = params.get('access_token');
-
       if (accessToken) {
-        setIsLoading(true);
-        // Busca os dados reais do perfil diretamente da API oficial do Google
-        fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        })
-          .then(res => res.json())
-          .then(async googleUser => {
-            if (googleUser?.email) {
-              // Envia dados ao backend para buscar ou criar registro RASCUNHO da empresa
-              const authRes = await apiFetch('/auth/google-auth', {
-                method: 'POST',
-                body: JSON.stringify({
-                  email: googleUser.email,
-                  name: googleUser.name,
-                  picture: googleUser.picture,
-                  sub: googleUser.sub,
-                }),
-              });
-
-              if (authRes.data && authRes.data.sucesso && authRes.data.token) {
-                localStorage.setItem('token', authRes.data.token);
-                localStorage.setItem('empresa', JSON.stringify(authRes.data.empresa));
-                setIsSuccess(true);
-
-                setTimeout(() => {
-                  const emp = authRes.data.empresa || {};
-                  const precisaCompletar = authRes.data.isNewUser || !emp.telefone || emp.nome === 'Meu Estabelecimento';
-
-                  if (precisaCompletar) {
-                    // Novo usuário ou cadastro incompleto: direciona para o perfil para completar os dados
-                    navigate('/dashboard?tab=configuracoes&novoRascunho=true');
-                  } else {
-                    navigate('/dashboard');
-                  }
-                }, 800);
-              } else {
-                setErrorMessage(authRes.error || 'Falha ao autenticar empresa via Google.');
-              }
-            }
-          })
-          .catch(err => {
-            console.error("Erro na autenticação do Google:", err);
-            setErrorMessage("Não foi possível concluir a autenticação com o Google.");
-          })
-          .finally(() => setIsLoading(false));
+        if (window.opener) {
+          window.opener.postMessage({ type: 'GOOGLE_OAUTH_TOKEN', accessToken }, window.location.origin);
+          window.close();
+        }
       }
     }
+  }, []);
+
+  // 2. Escuta os dados do token vindos do popup e realiza o login
+  React.useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type === 'GOOGLE_OAUTH_TOKEN') {
+        const { accessToken } = event.data;
+        setIsLoading(true);
+        setErrorMessage('');
+        
+        try {
+          const googleRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          const googleUser = await googleRes.json();
+          
+          if (googleUser?.email) {
+            const authRes = await apiFetch('/auth/google-auth', {
+              method: 'POST',
+              body: JSON.stringify({
+                email: googleUser.email,
+                name: googleUser.name,
+                picture: googleUser.picture,
+                sub: googleUser.sub,
+              }),
+            });
+
+            if (authRes.data && authRes.data.sucesso && authRes.data.token) {
+              localStorage.setItem('token', authRes.data.token);
+              localStorage.setItem('empresa', JSON.stringify(authRes.data.empresa));
+              setIsSuccess(true);
+
+              setTimeout(() => {
+                const emp = authRes.data.empresa || {};
+                const precisaCompletar = authRes.data.isNewUser || !emp.telefone || emp.nome === 'Meu Estabelecimento';
+
+                if (precisaCompletar) {
+                  navigate('/dashboard?tab=configuracoes&novoRascunho=true');
+                } else {
+                  navigate('/dashboard');
+                }
+              }, 800);
+            } else {
+              setErrorMessage(authRes.error || 'Falha ao autenticar empresa via Google.');
+              setIsLoading(false);
+            }
+          } else {
+            setErrorMessage('Não foi possível obter dados do e-mail do Google.');
+            setIsLoading(false);
+          }
+        } catch (err) {
+          console.error("Erro na autenticação do Google:", err);
+          setErrorMessage("Não foi possível concluir a autenticação com o Google.");
+          setIsLoading(false);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, [navigate]);
 
   // Password Reset Handler
@@ -526,25 +564,27 @@ export default function Login() {
                   )}
 
                   {/* LGPD Checkbox */}
-                  <div className="flex items-start gap-2.5 my-1">
-                    <input
-                      id="lgpd"
-                      type="checkbox"
-                      checked={acceptedLgpd}
-                      onChange={(e) => setAcceptedLgpd(e.target.checked)}
-                      className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#1c1c20] text-white focus:ring-0 focus:ring-offset-0 cursor-pointer"
-                    />
-                    <label htmlFor="lgpd" className="text-[11px] text-[#8e8e93] leading-tight cursor-pointer">
-                      Concordo com o tratamento de dados (LGPD) e aceito os{' '}
-                      <button 
-                        type="button" 
-                        onClick={() => setIsTermsModalOpen(true)}
-                        className="text-white underline underline-offset-2 hover:opacity-80"
-                      >
-                        Termos de Privacidade
-                      </button>.
-                    </label>
-                  </div>
+                  {mode === 'register' && (
+                    <div className="flex items-start gap-2.5 my-1">
+                      <input
+                        id="lgpd"
+                        type="checkbox"
+                        checked={acceptedLgpd}
+                        onChange={(e) => setAcceptedLgpd(e.target.checked)}
+                        className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#1c1c20] text-white focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      />
+                      <label htmlFor="lgpd" className="text-[11px] text-[#8e8e93] leading-tight cursor-pointer">
+                        Concordo com o tratamento de dados (LGPD) e aceito os{' '}
+                        <button 
+                          type="button" 
+                          onClick={() => setIsTermsModalOpen(true)}
+                          className="text-white underline underline-offset-2 hover:opacity-80"
+                        >
+                          Termos de Privacidade
+                        </button>.
+                      </label>
+                    </div>
+                  )}
 
                   {/* Primary Button */}
                   <button
@@ -637,6 +677,7 @@ export default function Login() {
                           maxLength={1}
                           value={digit}
                           onChange={(e) => handleOtpInputChange(idx, e.target.value)}
+                          onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                           className="w-11 h-12 bg-[#1c1c20] border border-white/10 focus:border-white/40 rounded-xl text-center text-lg font-bold text-white focus:outline-none transition-all"
                         />
                       ))}

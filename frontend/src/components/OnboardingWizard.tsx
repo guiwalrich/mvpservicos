@@ -38,7 +38,15 @@ export default function OnboardingWizard({
   const [isExpanded, setIsExpanded] = useState(true);
   const [isVisible, setIsVisible] = useState(true);
 
-  const slugReal = empresaSlug || JSON.parse(localStorage.getItem('empresa') || '{}').slug || 'meu-estabelecimento';
+  const slugReal = empresaSlug || (() => {
+    try {
+      const stored = localStorage.getItem('empresa');
+      if (stored && stored !== 'undefined') {
+        return JSON.parse(stored)?.slug || 'meu-estabelecimento';
+      }
+    } catch (e) {}
+    return 'meu-estabelecimento';
+  })();
 
   // Passos do Onboarding Rápido com rotas semânticas
   const steps = [
