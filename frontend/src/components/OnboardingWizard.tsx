@@ -175,7 +175,7 @@ export default function OnboardingWizard({
 
                 {step.isPublicLink ? (
                   <Link
-                    to="/agendar/studio-agende-yo"
+                    to={`/agendar/${JSON.parse(localStorage.getItem('empresa') || '{}').slug || 'meu-estabelecimento'}`}
                     target="_blank"
                     className="w-full h-9 rounded-xl bg-emerald-500 text-black font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-emerald-400 transition-colors shadow-sm mt-2"
                   >

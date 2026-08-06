@@ -121,7 +121,7 @@ export default function Landing() {
             <Link to="/login" className="text-xs sm:text-sm font-medium text-neutral-300 hover:text-white px-4 py-2 rounded-xl border border-white/10 hover:bg-white/5 transition-all">
               Entrar no Painel
             </Link>
-            <Link to="/agendar/studio-agende-yo" target="_blank" className="text-xs sm:text-sm font-bold bg-white text-black px-4 py-2 rounded-xl hover:bg-neutral-200 transition-all flex items-center gap-1.5 shadow-sm">
+            <Link to="/agendar" target="_blank" className="text-xs sm:text-sm font-bold bg-white text-black px-4 py-2 rounded-xl hover:bg-neutral-200 transition-all flex items-center gap-1.5 shadow-sm">
               <span>Testar Página Pública</span>
               <ExternalLink size={13} />
             </Link>
