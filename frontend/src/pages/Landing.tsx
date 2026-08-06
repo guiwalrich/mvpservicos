@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowRight, ExternalLink, ShieldCheck, Check, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -15,23 +15,98 @@ const Logo = ({ className = "w-7 h-7" }) => (
 export default function Landing() {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [isBooked, setIsBooked] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const demoSlots = ['09:00', '10:30', '14:00', '16:30'];
+
+  // Captura posição do mouse para efeito magnético sutil
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth - 0.5) * 20,
+        y: (e.clientY / window.innerHeight - 0.5) * 20,
+      });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Partículas dinâmicas e determinísticas em React + Framer Motion
+  const particles = Array.from({ length: 18 }).map((_, i) => ({
+    id: i,
+    size: (i % 3) * 2 + 2,
+    x: (i * 7) % 100,
+    y: (i * 11) % 100,
+    duration: 12 + (i % 5) * 4,
+    delay: (i % 4) * 1.5,
+  }));
 
   return (
     <div className="min-h-screen bg-[#09090b] text-neutral-300 font-sans selection:bg-white/20 overflow-x-hidden relative flex flex-col justify-between">
       
-      {/* Volumetric ambient background light */}
+      {/* 21st.dev Grid Background Overlay */}
+      <div className="absolute inset-0 z-0 h-full w-full bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+
+      {/* Volumetric ambient background light with smooth float animation */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[60%] rounded-full bg-gradient-to-br from-white/[0.04] to-transparent blur-[120px]" />
-        <div className="absolute top-[20%] -right-[20%] w-[60%] h-[50%] rounded-full bg-gradient-to-bl from-white/[0.02] to-transparent blur-[100px]" />
+        <motion.div
+          animate={{
+            x: [0, 40, -20, 0],
+            y: [0, -30, 20, 0],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute -top-[30%] -left-[10%] w-[70%] h-[60%] rounded-full bg-gradient-to-br from-white/[0.04] to-transparent blur-[130px]"
+        />
+        <motion.div
+          animate={{
+            x: [0, -30, 30, 0],
+            y: [0, 40, -30, 0],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-[30%] -right-[20%] w-[60%] h-[50%] rounded-full bg-gradient-to-bl from-white/[0.02] to-transparent blur-[110px]"
+        />
+      </div>
+
+      {/* 21st.dev Style Floating Particles */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {particles.map((p) => (
+          <motion.div
+            key={p.id}
+            className="absolute rounded-full bg-white/[0.07] pointer-events-none"
+            style={{
+              width: p.size,
+              height: p.size,
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+            }}
+            animate={{
+              y: ['0px', '-100px', '0px'],
+              x: ['0px', '25px', '0px'],
+              opacity: [0.15, 0.6, 0.15],
+            }}
+            transition={{
+              duration: p.duration,
+              repeat: Infinity,
+              delay: p.delay,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
       </div>
 
       {/* Navigation */}
       <motion.nav 
-        initial={{ opacity: 0, y: -10 }}
+        initial={{ opacity: 0, y: -15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="relative z-10 w-full"
       >
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -50,7 +125,7 @@ export default function Landing() {
             >
               Entrar
             </Link>
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link 
                 to="/login?tab=registro" 
                 className="text-xs font-bold bg-white text-black px-4.5 py-2.5 rounded-full hover:bg-neutral-200 transition-all shadow-sm"
@@ -63,26 +138,32 @@ export default function Landing() {
       </motion.nav>
 
       {/* Main Section */}
-      <main className="relative z-10 max-w-7xl w-full mx-auto px-6 py-8 lg:py-16 my-auto space-y-24">
+      <main className="relative z-10 max-w-7xl w-full mx-auto px-6 py-6 lg:py-14 my-auto space-y-24">
         
         {/* Hero Area */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center">
           
           {/* Left Column: Typographic Focus */}
           <motion.div 
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-7 space-y-8"
           >
             <div className="space-y-4">
-              <span className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-neutral-500">
-                DISCOVER AGENDE.YO
-              </span>
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-white/[0.06] bg-white/[0.03] text-[10px] font-extrabold uppercase tracking-widest text-neutral-400 backdrop-blur-sm"
+              >
+                <Sparkles size={11} className="text-white animate-pulse" />
+                <span>DESCUBRA O FUTURO DA AGENDA</span>
+              </motion.div>
               
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-light text-white tracking-tight leading-[1.05]">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-light text-white tracking-tight leading-[1.05]">
                 Agendamento <br/>
-                <span className="font-semibold">Descomplicado</span>
+                <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">Descomplicado</span>
                 <span className="text-neutral-500 text-xs sm:text-sm font-medium align-super ml-2 uppercase tracking-wider block sm:inline">
                   Online 24h
                 </span>
@@ -101,7 +182,7 @@ export default function Landing() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
                 <Link 
                   to="/agendar/demo" 
                   target="_blank" 
@@ -112,7 +193,7 @@ export default function Landing() {
                 </Link>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
                 <Link 
                   to="/login" 
                   className="px-6 py-3.5 bg-white text-black hover:bg-neutral-200 rounded-full text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-lg w-full"
@@ -124,15 +205,35 @@ export default function Landing() {
             </div>
           </motion.div>
 
-          {/* Right Column: Premium Minimalist Live Mockup */}
+          {/* Right Column: Premium Minimalist Live Mockup (Magnetic Hover Effect) */}
           <motion.div 
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 flex justify-center"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ 
+              opacity: 1, 
+              x: 0,
+              rotateX: mousePosition.y * 0.3,
+              rotateY: -mousePosition.x * 0.3 
+            }}
+            transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5 flex justify-center perspective-1000"
           >
-            <div className="relative w-full max-w-[360px] rounded-[32px] p-[1px] bg-gradient-to-b from-white/15 to-transparent shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
-              <div className="rounded-[31px] bg-[#121215]/80 backdrop-blur-3xl p-6 border border-white/[0.04]">
+            <div className="relative w-full max-w-[360px] rounded-[32px] p-[1px] bg-gradient-to-b from-white/20 via-white/5 to-transparent shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+              {/* Border Beam light ray styling */}
+              <div className="absolute inset-0 rounded-[32px] overflow-hidden pointer-events-none">
+                <motion.div
+                  animate={{
+                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                  className="absolute -inset-px opacity-30 bg-[linear-gradient(90deg,transparent,#ffffff,transparent)] bg-[length:200%_100%]"
+                />
+              </div>
+
+              <div className="rounded-[31px] bg-[#121215]/85 backdrop-blur-3xl p-6 border border-white/[0.04]">
                 
                 {/* Header Widget */}
                 <div className="flex items-center gap-3 pb-5 border-b border-white/5 mb-5">
@@ -218,12 +319,12 @@ export default function Landing() {
           </motion.div>
         </div>
 
-        {/* Pricing / Plan Section */}
+        {/* Pricing / Plan Section (Scroll Reveal) */}
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="border-t border-white/5 pt-16 space-y-12"
         >
           <div className="text-center space-y-3">
@@ -240,7 +341,10 @@ export default function Landing() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* Card 1: Trial */}
-            <div className="p-6 rounded-[28px] border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] transition-all flex flex-col justify-between space-y-6">
+            <motion.div 
+              whileHover={{ y: -4 }}
+              className="p-6 rounded-[28px] border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] transition-all flex flex-col justify-between space-y-6"
+            >
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-xs font-bold text-neutral-400">Plano de Teste</span>
@@ -270,10 +374,13 @@ export default function Landing() {
               >
                 Experimentar Grátis
               </Link>
-            </div>
+            </motion.div>
 
             {/* Card 2: Premium */}
-            <div className="p-6 rounded-[28px] border border-emerald-500/20 bg-white/[0.02] hover:bg-white/[0.03] transition-all flex flex-col justify-between space-y-6 relative overflow-hidden">
+            <motion.div 
+              whileHover={{ y: -4 }}
+              className="p-6 rounded-[28px] border border-emerald-500/20 bg-white/[0.02] hover:bg-white/[0.03] transition-all flex flex-col justify-between space-y-6 relative overflow-hidden"
+            >
               <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
               
               <div className="space-y-4">
@@ -313,7 +420,7 @@ export default function Landing() {
                   Começar com Plano Completo
                 </Link>
               </motion.div>
-            </div>
+            </motion.div>
           </div>
         </motion.div>
 
