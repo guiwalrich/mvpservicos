@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, CheckCircle2, Loader2, ShieldCheck, X, KeyRound, Mail, Building2, Lock, Tag, Info, Phone, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Loader2, ShieldCheck, X, KeyRound, Mail, Building2, Lock, Tag, Phone, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../lib/api';
 
@@ -33,7 +33,7 @@ export default function Login() {
 
   // OTP Verification Modal State
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
-  const [otpCode, setOtpCode] = useState(['1', '2', '3', '4', '5', '6']);
+  const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
   const [otpError, setOtpError] = useState('');
   const [isOtpLoading, setIsOtpLoading] = useState(false);
 
@@ -68,72 +68,77 @@ export default function Login() {
 
     const res = await apiFetch('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, senha: password || '123456' }),
+      body: JSON.stringify({ email, senha: password }),
     });
 
     setIsLoading(false);
 
     if (res.data?.requereCodigo) {
+      setOtpCode(['', '', '', '', '', '']);
+      setOtpError('');
       setIsOtpModalOpen(true);
     } else if (res.data?.token) {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('empresa', JSON.stringify(res.data.empresa));
       setIsSuccess(true);
-      setTimeout(() => navigate('/dashboard'), 1000);
-    } else if (res.error) {
-      setIsOtpModalOpen(true);
+      
+      const emp = res.data.empresa || {};
+      const precisaCompletar = !emp.telefone || emp.nome === 'Meu Estabelecimento';
+
+      setTimeout(() => {
+        if (precisaCompletar) {
+          navigate('/dashboard?tab=configuracoes&novoRascunho=true');
+        } else {
+          navigate('/dashboard');
+        }
+      }, 1000);
     } else {
-      localStorage.setItem('token', 'demo-jwt-token-lgpd-ok');
-      localStorage.setItem('empresa', JSON.stringify({ nome: 'Studio Agende.yo', slug: 'studio-demo' }));
-      setIsSuccess(true);
-      setTimeout(() => navigate('/dashboard'), 1000);
+      setErrorMessage(res.error || 'Falha ao realizar login. Verifique seu e-mail e senha.');
     }
   };
 
-  // Handle Register Submit with Password Confirmation & WhatsApp
+  // Handle Register Submit
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nomeEmpresa || !email || !password || !confirmPassword || !whatsapp) {
-      setErrorMessage('Por favor, preencha todos os campos obrigatórios (Empresa, E-mail, WhatsApp e Senhas).');
-      return;
-    }
-
-    // Password Inconsistency Validation
-    if (password !== confirmPassword) {
-      setErrorMessage('As senhas digitadas não coincidem. Por favor, verifique a digitação.');
-      return;
-    }
-
-    if (password.length < 6) {
-      setErrorMessage('A senha deve conter no mínimo 6 caracteres.');
-      return;
-    }
+    if (!email || !nomeEmpresa) return;
 
     if (!acceptedLgpd) {
-      setErrorMessage('Você precisa concordar com os Termos e a LGPD para cadastrar sua empresa.');
+      setErrorMessage('Você precisa aceitar os Termos de Privacidade e LGPD para continuar.');
       return;
     }
 
     setIsLoading(true);
     setErrorMessage('');
 
-    await apiFetch('/auth/registro', {
+    const res = await apiFetch('/auth/registro', {
       method: 'POST',
       body: JSON.stringify({
-        nome: nomeEmpresa,
         email,
-        whatsapp,
+        nome: nomeEmpresa,
         senha: password,
+        whatsapp,
         nicho,
-        aceitou_lgpd: true
+        aceitou_lgpd: acceptedLgpd,
       }),
     });
 
     setIsLoading(false);
-    setIsOtpModalOpen(true);
+
+    if (res.data?.requereCodigo) {
+      setOtpCode(['', '', '', '', '', '']);
+      setOtpError('');
+      setIsOtpModalOpen(true);
+    } else if (res.data?.token) {
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('empresa', JSON.stringify(res.data.empresa));
+      setIsSuccess(true);
+      setTimeout(() => navigate('/dashboard?tab=configuracoes&novoRascunho=true'), 1000);
+    } else {
+      setErrorMessage(res.error || 'Não foi possível concluir o cadastro.');
+    }
   };
 
-  // Handle OTP Submit
+  // Handle Verify OTP
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     const codeString = otpCode.join('');
@@ -157,15 +162,19 @@ export default function Login() {
       localStorage.setItem('empresa', JSON.stringify(res.data.empresa));
       setIsOtpModalOpen(false);
       setIsSuccess(true);
-      setTimeout(() => navigate('/dashboard'), 1000);
-    } else if (codeString === '123456' || res.status === 200 || !res.error) {
-      localStorage.setItem('token', 'jwt-token-verified-ok');
-      localStorage.setItem('empresa', JSON.stringify({ nome: nomeEmpresa || 'Studio Agende.yo', slug: 'studio-demo', email, whatsapp }));
-      setIsOtpModalOpen(false);
-      setIsSuccess(true);
-      setTimeout(() => navigate('/dashboard'), 1000);
+
+      const emp = res.data.empresa || {};
+      const precisaCompletar = res.data.isNewUser || !emp.telefone || emp.nome === 'Meu Estabelecimento';
+
+      setTimeout(() => {
+        if (precisaCompletar) {
+          navigate('/dashboard?tab=configuracoes&novoRascunho=true');
+        } else {
+          navigate('/dashboard');
+        }
+      }, 1000);
     } else {
-      setOtpError(res.error || 'Código incorreto. Tente usar 123456 para validação de teste.');
+      setOtpError(res.error || 'Código incorreto ou expirado. Verifique o código enviado ao seu e-mail.');
     }
   };
 
@@ -310,9 +319,9 @@ export default function Login() {
       {/* Top Left Navigation Link */}
       <Link 
         to="/" 
-        className="fixed top-6 left-6 z-50 inline-flex items-center gap-2 text-xs font-medium text-[#8e8e93] hover:text-white transition-colors bg-[#121215]/80 hover:bg-white/10 px-4 py-2.5 rounded-xl border border-white/10 backdrop-blur-md shadow-xl"
+        className="fixed top-3 left-3 sm:top-6 sm:left-6 z-50 inline-flex items-center gap-1.5 text-xs font-medium text-[#8e8e93] hover:text-white transition-colors bg-[#121215]/90 hover:bg-white/10 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-white/10 backdrop-blur-md shadow-xl"
       >
-        <ArrowLeft size={14} /> Voltar ao início
+        <ArrowLeft size={14} /> <span className="hidden sm:inline">Voltar ao início</span><span className="sm:hidden">Voltar</span>
       </Link>
 
       {/* Glassmorphic Card Container */}
@@ -323,7 +332,7 @@ export default function Login() {
         className="relative z-10 w-full max-w-[430px]"
       >
         <div className="relative rounded-[28px] p-[1px] bg-gradient-to-b from-white/35 via-white/10 to-white/[0.03] shadow-[0_25px_80px_rgba(0,0,0,0.95)]">
-          <div className="rounded-[27px] bg-[#121215]/90 backdrop-blur-3xl p-7 sm:p-8 flex flex-col">
+          <div className="rounded-[27px] bg-[#121215]/90 backdrop-blur-3xl p-5 sm:p-8 flex flex-col">
             
             {/* Header */}
             <div className="flex flex-col items-center text-center">
@@ -607,17 +616,10 @@ export default function Login() {
                   </div>
 
                   <h3 className="text-xl font-semibold text-white mb-1">Verificação de E-mail</h3>
-                  <p className="text-xs text-[#8e8e93] mb-4 leading-relaxed">
+                  <p className="text-xs text-[#8e8e93] mb-6 leading-relaxed">
                     Digite o código de 6 dígitos enviado para:<br/>
                     <span className="font-semibold text-white">{email || 'seu.email@empresa.com'}</span>
                   </p>
-
-                  <div className="mb-5 p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-2.5 text-left">
-                    <Info size={16} className="text-blue-400 shrink-0 mt-0.5" />
-                    <p className="text-[11px] text-neutral-300 leading-tight">
-                      Para testes locais sem SMTP no <code className="text-white bg-black/50 px-1 py-0.5 rounded">.env</code>, use o código de teste <strong className="text-white">123456</strong> para ativar no mesmo segundo!
-                    </p>
-                  </div>
 
                   {otpError && (
                     <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400">

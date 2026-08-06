@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom';
 
 interface OnboardingWizardProps {
   onNavigateTab: (tab: string) => void;
+  empresaSlug?: string;
   isPerfilConcluido?: boolean;
   isServicoConcluido?: boolean;
   isProfissionalConcluido?: boolean;
@@ -25,9 +26,10 @@ interface OnboardingWizardProps {
 
 export default function OnboardingWizard({
   onNavigateTab,
-  isPerfilConcluido = true,
-  isServicoConcluido = true,
-  isProfissionalConcluido = true,
+  empresaSlug,
+  isPerfilConcluido = false,
+  isServicoConcluido = false,
+  isProfissionalConcluido = false,
   isAgendamentoTestado = false
 }: OnboardingWizardProps) {
   const { theme } = useTheme();
@@ -36,46 +38,52 @@ export default function OnboardingWizard({
   const [isExpanded, setIsExpanded] = useState(true);
   const [isVisible, setIsVisible] = useState(true);
 
-  // Passos de onboarding
+  const slugReal = empresaSlug || JSON.parse(localStorage.getItem('empresa') || '{}').slug || 'meu-estabelecimento';
+
+  // Passos do Onboarding Rápido com rotas semânticas
   const steps = [
     {
       id: 'perfil',
       num: 1,
-      title: 'Configurar Empresa & Foto de Perfil',
-      desc: 'Informe o nome do estabelecimento, endereço no mapa, telefone e foto/logo.',
+      title: '1. Perfil & Dados da Empresa',
+      desc: 'Informe o nome do estabelecimento, telefone WhatsApp, foto/logo e endereço.',
       completed: isPerfilConcluido,
-      actionLabel: 'Configurar Empresa',
+      actionLabel: 'Configurar Perfil',
       tab: 'configuracoes',
+      route: '/dashboard?tab=configuracoes',
       icon: Building
     },
     {
       id: 'servicos',
       num: 2,
-      title: 'Cadastrar o Primeiro Serviço',
-      desc: 'Adicione serviços com preço (R$), tempo de duração e categoria.',
+      title: '2. Tabela de Serviços & Preços',
+      desc: 'Cadastre os serviços prestados com valor (R$), tempo de duração e categoria.',
       completed: isServicoConcluido,
       actionLabel: 'Cadastrar Serviços',
       tab: 'servicos',
+      route: '/dashboard?tab=servicos',
       icon: Sparkles
     },
     {
       id: 'profissionais',
       num: 3,
-      title: 'Cadastrar Equipe & Comissões',
-      desc: 'Adicione profissionais da equipe com e-mail/senha e fotos de perfil.',
+      title: '3. Equipe & Comissões',
+      desc: 'Adicione os profissionais da equipe, fotos e comissão individual (%).',
       completed: isProfissionalConcluido,
       actionLabel: 'Gerenciar Equipe',
       tab: 'profissionais',
+      route: '/dashboard?tab=profissionais',
       icon: Users
     },
     {
       id: 'agendamento',
       num: 4,
-      title: 'Testar Página Pública de Agendamento',
+      title: '4. Testar Agendamento Online',
       desc: 'Abra a sua página pública no celular e faça um agendamento de teste.',
       completed: isAgendamentoTestado,
       actionLabel: 'Abrir Página Pública',
       isPublicLink: true,
+      publicUrl: `/agendar/${slugReal}`,
       icon: Calendar
     }
   ];
@@ -86,24 +94,24 @@ export default function OnboardingWizard({
   if (!isVisible) return null;
 
   return (
-    <div className={`p-6 rounded-[28px] border relative overflow-hidden transition-all duration-300 shadow-xl ${
+    <div className={`p-4 sm:p-6 rounded-[24px] sm:rounded-[28px] border relative overflow-hidden transition-all duration-300 shadow-xl ${
       isDark ? 'bg-[#121215]/95 border-white/10' : 'bg-white border-neutral-200 shadow-md'
     }`}>
       
       {/* Header do Guia de Onboarding */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-sm shrink-0">
             {progressPct}%
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold">Guia de Configuração Rápida (&lt; 10 min)</h2>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-sm sm:text-base font-bold">Passo a Passo de Configuração (&lt; 5 min)</h2>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-400">
                 {completedCount} de {steps.length} Concluídos
               </span>
             </div>
-            <p className="text-xs opacity-60 mt-0.5">Siga os 4 passos abaixo para colocar a sua agenda pública no ar imediatamente.</p>
+            <p className="text-xs opacity-60 mt-0.5">Siga as 4 etapas para colocar sua agenda pública de agendamento no ar.</p>
           </div>
         </div>
 
@@ -138,7 +146,7 @@ export default function OnboardingWizard({
 
       {/* Grid com os 4 Passos de Configuração */}
       {isExpanded && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 pt-4 border-t border-white/10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-5 pt-4 border-t border-white/10">
           {steps.map((step) => {
             const Icon = step.icon;
             return (
@@ -155,7 +163,7 @@ export default function OnboardingWizard({
                     <span className={`text-[10px] font-extrabold uppercase tracking-wider ${
                       step.completed ? 'text-emerald-400' : 'opacity-60'
                     }`}>
-                      Passo 0{step.num}
+                      Etapa 0{step.num}
                     </span>
 
                     {step.completed ? (
@@ -166,7 +174,7 @@ export default function OnboardingWizard({
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Icon size={16} className={step.completed ? 'text-emerald-400' : 'opacity-70'} />
+                    <Icon size={16} className={step.completed ? 'text-emerald-400 shrink-0' : 'opacity-70 shrink-0'} />
                     <h3 className="text-xs font-bold leading-tight">{step.title}</h3>
                   </div>
 
@@ -175,7 +183,7 @@ export default function OnboardingWizard({
 
                 {step.isPublicLink ? (
                   <Link
-                    to={`/agendar/${JSON.parse(localStorage.getItem('empresa') || '{}').slug || 'meu-estabelecimento'}`}
+                    to={step.publicUrl}
                     target="_blank"
                     className="w-full h-9 rounded-xl bg-emerald-500 text-black font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-emerald-400 transition-colors shadow-sm mt-2"
                   >
@@ -184,7 +192,10 @@ export default function OnboardingWizard({
                   </Link>
                 ) : (
                   <button
-                    onClick={() => onNavigateTab(step.tab || 'agenda')}
+                    onClick={() => {
+                      onNavigateTab(step.tab || 'agenda');
+                      window.history.pushState(null, '', step.route);
+                    }}
                     className={`w-full h-9 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all mt-2 ${
                       step.completed
                         ? (isDark ? 'bg-white/10 border-white/10 text-white hover:bg-white/20' : 'bg-neutral-200 border-neutral-300 text-black hover:bg-neutral-300')

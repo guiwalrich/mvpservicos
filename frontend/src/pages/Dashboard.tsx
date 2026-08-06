@@ -24,7 +24,7 @@ import {
   Search,
   BarChart3
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../lib/api';
 import { useTheme } from '../context/ThemeContext';
 import AgendaInteligente from '../components/AgendaInteligente';
@@ -97,15 +97,16 @@ export default function Dashboard() {
   const [configSalvaToast, setConfigSalvaToast] = useState(false);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
 
-  // Checa URL para parametro tab=configuracoes ou novoRascunho
+  const [searchParams] = useSearchParams();
+
+  // Checa URL para parâmetro tab=configuracoes ou novoRascunho
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tabParam = params.get('tab');
-    const rascunhoParam = params.get('novoRascunho');
+    const tabParam = searchParams.get('tab');
+    const rascunhoParam = searchParams.get('novoRascunho');
     if (tabParam === 'configuracoes' || rascunhoParam === 'true') {
       setActiveTab('configuracoes');
     }
-  }, []);
+  }, [searchParams]);
 
   // Sincroniza dados reais do perfil da Empresa via Backend
   useEffect(() => {
@@ -407,12 +408,12 @@ export default function Dashboard() {
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto z-10">
         
         {/* Top Navbar */}
-        <header className={`h-16 border-b px-6 flex items-center justify-between sticky top-0 z-30 backdrop-blur-2xl ${
+        <header className={`h-16 border-b px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 backdrop-blur-2xl ${
           isDark ? 'bg-[#0c0c0e]/80 border-white/10' : 'bg-white/80 border-neutral-200'
         }`}>
           
-          <div className="flex items-center gap-4">
-            <button onClick={() => setSidebarOpen(true)} className="md:hidden opacity-60 hover:opacity-100">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button onClick={() => setSidebarOpen(true)} className="md:hidden opacity-60 hover:opacity-100 p-1">
               <Menu size={20} />
             </button>
             
@@ -434,15 +435,15 @@ export default function Dashboard() {
             </div>
 
             {/* RECURSO UX 1: Busca Global Universal */}
-            <div className="relative flex-1 max-w-xs ml-2 sm:ml-4">
+            <div className="relative flex-1 max-w-[140px] sm:max-w-xs ml-1 sm:ml-4">
               <div className="relative">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50" />
                 <input
                   type="text"
                   value={globalSearchQuery}
                   onChange={(e) => setGlobalSearchQuery(e.target.value)}
-                  placeholder="Busca global (cliente, serviço...)"
-                  className={`w-full h-9 border rounded-xl pl-9 pr-3 text-xs focus:outline-none transition-all ${
+                  placeholder="Busca..."
+                  className={`w-full h-9 border rounded-xl pl-8 sm:pl-9 pr-2 sm:pr-3 text-xs focus:outline-none transition-all ${
                     isDark ? 'bg-[#1c1c20] border-white/[0.06] text-white placeholder-[#6e6e73]' : 'bg-neutral-100 border-neutral-300 text-black'
                   }`}
                 />
@@ -489,42 +490,42 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             
             {/* Seletor de Perfil RBAC (FASE 11) */}
-            <div className={`flex items-center border rounded-xl p-1 text-xs ${
+            <div className={`flex items-center border rounded-xl p-0.5 text-xs ${
               isDark ? 'bg-[#1c1c20] border-white/10' : 'bg-neutral-100 border-neutral-200'
             }`}>
               <button
                 onClick={() => setUserRole('DONO')}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                className={`px-2 py-1 rounded-lg font-bold text-[11px] sm:text-xs transition-all ${
                   userRole === 'DONO'
                     ? (isDark ? 'bg-white text-black shadow-sm' : 'bg-black text-white shadow-sm')
                     : 'opacity-60 hover:opacity-100'
                 }`}
               >
-                Visão Dono
+                Dono
               </button>
               <button
                 onClick={() => { setUserRole('PROFISSIONAL'); setActiveTab('agenda'); }}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                className={`px-2 py-1 rounded-lg font-bold text-[11px] sm:text-xs transition-all ${
                   userRole === 'PROFISSIONAL'
                     ? (isDark ? 'bg-white text-black shadow-sm' : 'bg-black text-white shadow-sm')
                     : 'opacity-60 hover:opacity-100'
                 }`}
               >
-                Visão Equipe
+                Equipe
               </button>
             </div>
             <div className="relative">
               <button
                 onClick={() => setIsQuickActionsOpen(!isQuickActionsOpen)}
-                className={`h-9 px-3.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
+                className={`h-9 px-2.5 sm:px-3.5 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-all shadow-sm ${
                   isDark ? 'bg-white text-black hover:bg-neutral-200 border-white' : 'bg-black text-white hover:bg-neutral-800 border-black'
                 }`}
               >
                 <Plus size={14} />
-                <span>Criar Novo</span>
+                <span className="hidden sm:inline">Criar Novo</span>
               </button>
 
               {/* Menu Suspenso de Atalhos Rápidos */}
@@ -573,7 +574,7 @@ export default function Dashboard() {
             <Link
               to={`/agendar/${empresaSlug || 'meu-estabelecimento'}`}
               target="_blank"
-              className={`h-9 px-3.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
+              className={`h-9 px-2.5 sm:px-3.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
                 isDark ? 'bg-[#1c1c20] border-white/10 text-white hover:bg-white/10' : 'bg-neutral-100 border-neutral-300 text-black hover:bg-neutral-200'
               }`}
             >
@@ -585,57 +586,67 @@ export default function Dashboard() {
             <button 
               onClick={toggleTheme}
               title={isDark ? "Mudar para Tema Claro" : "Mudar para Tema Escuro"}
-              className={`p-2.5 rounded-xl border transition-all ${
+              className={`p-2 rounded-xl border transition-all ${
                 isDark 
                   ? 'bg-[#1c1c20] border-white/[0.06] text-[#8e8e93] hover:text-white' 
                   : 'bg-neutral-100 border-neutral-200 text-neutral-600 hover:text-black'
               }`}
             >
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+              {isDark ? <Sun size={15} /> : <Moon size={15} />}
             </button>
 
             {/* Internal Notifications Bell Dropdown */}
             <div className="relative">
               <button 
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className={`p-2.5 rounded-xl border transition-all relative ${
-                  isDark 
-                    ? 'bg-[#1c1c20] border-white/[0.06] text-[#8e8e93] hover:text-white' 
-                    : 'bg-neutral-100 border-neutral-200 text-neutral-600 hover:text-black'
+                className={`p-2 rounded-xl border relative transition-all ${
+                  isDark ? 'bg-[#1c1c20] border-white/[0.06] text-[#8e8e93] hover:text-white' : 'bg-neutral-100 border-neutral-200 text-neutral-600 hover:text-black'
                 }`}
               >
-                <Bell size={16} />
+                <Bell size={15} />
                 {unreadNotificationsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-black text-[9px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 text-black font-extrabold text-[9px] flex items-center justify-center">
                     {unreadNotificationsCount}
                   </span>
                 )}
               </button>
 
-              {/* Notifications Dropdown Panel */}
               <AnimatePresence>
                 {notificationsOpen && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className={`absolute right-0 mt-2 w-80 rounded-2xl border p-4 shadow-2xl z-50 ${
-                      isDark ? 'bg-[#121215] border-white/10 text-white' : 'bg-white border-neutral-200 text-neutral-900'
+                    className={`absolute right-0 top-12 w-80 rounded-2xl border p-4 shadow-2xl z-50 space-y-3 ${
+                      isDark ? 'bg-[#121215] border-white/10 text-white' : 'bg-white border-neutral-300 text-black'
                     }`}
                   >
-                    <div className="flex items-center justify-between border-b pb-3 mb-3 border-white/10">
-                      <h4 className="text-xs font-semibold">Notificações do Sistema</h4>
-                      <button onClick={markAllNotificationsRead} className="text-[10px] opacity-60 hover:opacity-100 flex items-center gap-1">
-                        <CheckCheck size={12} /> Marcar lidas
-                      </button>
+                    <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <Bell size={14} className="text-emerald-400" />
+                        <h4 className="font-bold text-xs">Notificações da Empresa</h4>
+                      </div>
+                      {unreadNotificationsCount > 0 && (
+                        <button onClick={markAllNotificationsRead} className="text-[10px] text-emerald-400 hover:underline flex items-center gap-1">
+                          <CheckCheck size={12} /> Marcar lidas
+                        </button>
+                      )}
                     </div>
 
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {notifications.map(n => (
-                        <div key={n.id} className={`p-2.5 rounded-xl border text-left ${
-                          n.read ? 'opacity-50 border-transparent' : (isDark ? 'bg-white/5 border-white/10' : 'bg-neutral-100 border-neutral-200')
-                        }`}>
-                          <p className="text-xs font-medium mb-0.5">{n.title}</p>
+                    <div className="space-y-2 max-h-64 overflow-y-auto no-scrollbar">
+                      {notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          className={`p-2.5 rounded-xl border text-xs transition-all ${
+                            !n.read
+                              ? (isDark ? 'bg-white/5 border-emerald-500/30' : 'bg-emerald-50/50 border-emerald-200')
+                              : (isDark ? 'bg-transparent border-white/5 opacity-60' : 'bg-neutral-50 border-neutral-100 opacity-60')
+                          }`}
+                        >
+                          <div className="flex items-center justify-between font-bold mb-1">
+                            <span>{n.title}</span>
+                            {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+                          </div>
                           <p className="text-[11px] opacity-70 leading-tight">{n.desc}</p>
                           <span className="text-[9px] opacity-50 block mt-1">{n.time}</span>
                         </div>
@@ -649,10 +660,20 @@ export default function Dashboard() {
         </header>
 
         {/* Main Content Area */}
-        <main className="p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
+        <main className="p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 max-w-7xl w-full mx-auto">
 
-          {/* RECURSO UX: Guia de Onboarding & Configuração Rápida (< 10 min) FASE 14 */}
-          <OnboardingWizard onNavigateTab={(tab) => setActiveTab(tab as any)} />
+          {/* RECURSO UX: Guia de Onboarding & Configuração Rápida (< 5 min) FASE 14 */}
+          <OnboardingWizard
+            onNavigateTab={(tab) => {
+              setActiveTab(tab as any);
+              window.history.pushState(null, '', `/dashboard?tab=${tab}`);
+            }}
+            empresaSlug={empresaSlug}
+            isPerfilConcluido={!!(empresaNome && empresaNome !== 'Meu Estabelecimento' && empresaTelefone && empresaEndereco)}
+            isServicoConcluido={services.length > 0}
+            isProfissionalConcluido={JSON.parse(localStorage.getItem(`profissionais_${userAccountKey}`) || '[]').length > 0}
+            isAgendamentoTestado={appointments.length > 0}
+          />
 
           {/* TAB 1: VISÃO GERAL */}
           {activeTab === 'overview' && (

@@ -234,13 +234,13 @@ export default function AgendamentoPublico() {
           <Link to="/" className="flex items-center gap-2.5 font-semibold tracking-tight">
             <Logo className="w-7 h-7" />
             <span className="text-lg font-bold">Agende.yo</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-white/10 border border-white/10 opacity-70">
+            <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-white/10 border border-white/10 opacity-70">
               Agendamento Online
             </span>
           </Link>
 
           {/* Ações do Topo */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-xl border transition-all ${
@@ -252,7 +252,7 @@ export default function AgendamentoPublico() {
 
             <Link
               to="/login"
-              className={`px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
                 isDark ? 'bg-white text-black hover:bg-neutral-200 border-white' : 'bg-black text-white hover:bg-neutral-800 border-black'
               }`}
             >
@@ -264,11 +264,11 @@ export default function AgendamentoPublico() {
       </header>
 
       {/* --- CONTEÚDO PRINCIPAL CENTRALIZADO --- */}
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6 pb-20">
+      <main className="max-w-3xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-20">
 
         {/* --- CARD DA EMPRESA & LOCALIZAÇÃO --- */}
         {step < 5 && (
-          <div className={`p-6 sm:p-8 rounded-[28px] border relative overflow-hidden space-y-5 ${
+          <div className={`p-4 sm:p-8 rounded-[24px] sm:rounded-[28px] border relative overflow-hidden space-y-4 sm:space-y-5 ${
             isDark ? 'bg-[#121215]/90 border-white/10 shadow-2xl' : 'bg-white border-neutral-200 shadow-md'
           }`}>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
