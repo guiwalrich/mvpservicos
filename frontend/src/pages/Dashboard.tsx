@@ -58,16 +58,12 @@ export const DEMO_CLIENTS: any[] = [];
 function GlassCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const { theme } = useTheme();
   return (
-    <div className={`relative rounded-2xl p-[1px] ${
+    <div className={`relative rounded-[24px] overflow-hidden transition-all duration-300 border backdrop-blur-xl ${
       theme === 'dark' 
-        ? 'bg-gradient-to-b from-white/30 via-white/10 to-white/[0.02] shadow-[0_20px_60px_rgba(0,0,0,0.8)]' 
-        : 'bg-neutral-200 border border-neutral-300 shadow-sm'
+        ? 'bg-white/[0.03] border-white/[0.08] hover:border-white/[0.12] hover:bg-white/[0.05] shadow-[0_12px_40px_rgba(0,0,0,0.5)]' 
+        : 'bg-white/70 border-black/[0.06] hover:bg-white/80 shadow-[0_12px_30px_rgba(0,0,0,0.03)]'
     } ${className}`}>
-      <div className={`rounded-[15px] h-full w-full ${
-        theme === 'dark' ? 'bg-[#121215]/90 backdrop-blur-3xl' : 'bg-white'
-      }`}>
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
@@ -97,14 +93,21 @@ export default function Dashboard() {
   const [configSalvaToast, setConfigSalvaToast] = useState(false);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Checa URL para parâmetro tab=configuracoes ou novoRascunho
+  // Sincroniza a aba ativa com os parâmetros da URL de forma reativa
   useEffect(() => {
     const tabParam = searchParams.get('tab');
     const rascunhoParam = searchParams.get('novoRascunho');
-    if (tabParam === 'configuracoes' || rascunhoParam === 'true') {
+    
+    if (rascunhoParam === 'true') {
       setActiveTab('configuracoes');
+      return;
+    }
+
+    const validTabs = ['overview', 'agenda', 'servicos', 'profissionais', 'clientes', 'caixa', 'comunicacao', 'relatorios', 'configuracoes'];
+    if (tabParam && validTabs.includes(tabParam)) {
+      setActiveTab(tabParam as any);
     }
   }, [searchParams]);
 
@@ -308,7 +311,7 @@ export default function Dashboard() {
 
   return (
     <div className={`relative min-h-screen font-sans flex overflow-hidden selection:bg-white/20 ${
-      isDark ? 'bg-[#000000] text-white' : 'bg-neutral-50 text-neutral-900'
+      isDark ? 'bg-[#09090b] text-white' : 'bg-[#f4f4f5] text-neutral-900'
     }`}>
       
       {/* Volumetric Spotlight Ray (Dark Mode) */}
@@ -327,7 +330,7 @@ export default function Dashboard() {
 
       {/* --- FASE 1: Sidebar Navigation --- */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 border-r flex flex-col justify-between transition-transform duration-300 md:static md:translate-x-0 ${
-        isDark ? 'bg-[#0c0c0e]/95 border-white/10' : 'bg-white border-neutral-200 shadow-sm'
+        isDark ? 'bg-[#09090b]/80 backdrop-blur-md border-white/10' : 'bg-white/80 backdrop-blur-md border-neutral-200 shadow-sm'
       } ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         
         <div>
@@ -362,7 +365,7 @@ export default function Dashboard() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => { setActiveTab(tab.id as any); setSidebarOpen(false); }}
+                  onClick={() => { setSearchParams({ tab: tab.id }); setSidebarOpen(false); }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-medium transition-all ${
                     isActive 
                       ? (isDark ? 'bg-white text-black font-semibold shadow-md' : 'bg-black text-white font-semibold shadow-md')
@@ -409,7 +412,7 @@ export default function Dashboard() {
         
         {/* Top Navbar */}
         <header className={`h-16 border-b px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 backdrop-blur-2xl ${
-          isDark ? 'bg-[#0c0c0e]/80 border-white/10' : 'bg-white/80 border-neutral-200'
+          isDark ? 'bg-[#09090b]/80 border-white/10' : 'bg-white/80 border-neutral-200'
         }`}>
           
           <div className="flex items-center gap-2 sm:gap-4">
@@ -665,8 +668,7 @@ export default function Dashboard() {
           {/* RECURSO UX: Guia de Onboarding & Configuração Rápida (< 5 min) FASE 14 */}
           <OnboardingWizard
             onNavigateTab={(tab) => {
-              setActiveTab(tab as any);
-              window.history.pushState(null, '', `/dashboard?tab=${tab}`);
+              setSearchParams({ tab });
             }}
             empresaSlug={empresaSlug}
             isPerfilConcluido={!!(empresaNome && empresaNome !== 'Meu Estabelecimento' && empresaTelefone && empresaEndereco)}

@@ -95,7 +95,9 @@ export default function OnboardingWizard({
 
   return (
     <div className={`p-4 sm:p-6 rounded-[24px] sm:rounded-[28px] border relative overflow-hidden transition-all duration-300 shadow-xl ${
-      isDark ? 'bg-[#121215]/95 border-white/10' : 'bg-white border-neutral-200 shadow-md'
+      isDark 
+        ? 'bg-white/[0.03] border-white/[0.08] backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.5)]' 
+        : 'bg-white/70 border-black/[0.06] backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.03)]'
     }`}>
       
       {/* Header do Guia de Onboarding */}
@@ -155,7 +157,7 @@ export default function OnboardingWizard({
                 className={`p-4 rounded-2xl border flex flex-col justify-between space-y-3 transition-all ${
                   step.completed
                     ? (isDark ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200')
-                    : (isDark ? 'bg-[#1c1c20] border-white/10' : 'bg-neutral-100 border-neutral-200')
+                    : (isDark ? 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04]' : 'bg-black/[0.02] border-black/[0.04] hover:bg-black/[0.04]')
                 }`}
               >
                 <div className="space-y-2">
