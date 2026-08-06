@@ -106,19 +106,25 @@ router.put("/empresa", async (req: Request, res: Response) => {
       logo,
     } = req.body;
 
+    const safeNumber = (val: any) => {
+      if (val === null || val === undefined || val === '') return null;
+      const num = typeof val === 'number' ? val : parseFloat(val);
+      return isNaN(num) ? null : num;
+    };
+
     const empresaAtualizada = await prisma.empresa.update({
       where: { id: empresaId },
       data: {
         ...(nome && { nome }),
         ...(slug && { slug }),
         ...(nicho && { nicho }),
-        ...(telefone !== undefined && { telefone }),
-        ...(endereco !== undefined && { endereco }),
-        ...(latitude !== undefined && { latitude: latitude ? parseFloat(latitude) : null }),
-        ...(longitude !== undefined && { longitude: longitude ? parseFloat(longitude) : null }),
-        ...(instagram !== undefined && { instagram }),
-        ...(iconUrl !== undefined && { iconUrl }),
-        ...(logo !== undefined && { logo }),
+        ...(telefone !== undefined && { telefone: telefone || null }),
+        ...(endereco !== undefined && { endereco: endereco || null }),
+        ...(latitude !== undefined && { latitude: safeNumber(latitude) }),
+        ...(longitude !== undefined && { longitude: safeNumber(longitude) }),
+        ...(instagram !== undefined && { instagram: instagram || null }),
+        ...(iconUrl !== undefined && { iconUrl: iconUrl || null }),
+        ...(logo !== undefined && { logo: logo || null }),
       },
     });
 

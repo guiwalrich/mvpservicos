@@ -68,108 +68,24 @@ export interface ClienteCRM {
   anotacoesInternas: string[];
 }
 
-const CLIENTES_DEMO: ClienteCRM[] = [
-  {
-    id: 'c1',
-    nome: 'Carlos Silva',
-    telefone: '(11) 98765-4321',
-    whatsapp: '11987654321',
-    email: 'carlos.silva@gmail.com',
-    cpf: '123.456.789-00',
-    dataNascimento: '15/05/1990',
-    endereco: 'Rua Augusta, 450 - SP',
-    observacoes: 'Preferência por degradê navalhado. Café sem açúcar.',
-    tags: ['VIP', 'Frequente', 'Corte Premium'],
-    origem: 'Instagram',
-    favorito: true,
-    inativo: false,
-    dataCadastro: '10/01/2026',
-    ultimaVisita: '28/07/2026',
-    totalAgendamentos: 12,
-    totalGastoLtv: 'R$ 960,00',
-    historicoAgendamentos: [
-      { id: 'h1', servico: 'Corte + Barba Premium', data: '28/07/2026', horario: '14:00', valor: 'R$ 80,00', profissional: 'Carlos Silva', status: 'Finalizado' },
-      { id: 'h2', servico: 'Corte + Barba Premium', data: '14/07/2026', horario: '15:00', valor: 'R$ 80,00', profissional: 'Carlos Silva', status: 'Finalizado' }
-    ],
-    historicoFinanceiro: [
-      { id: 'f1', data: '28/07/2026', descricao: 'Atendimento Corte + Barba', valor: 'R$ 80,00', metodo: 'PIX' },
-      { id: 'f2', data: '14/07/2026', descricao: 'Atendimento Corte + Barba', valor: 'R$ 80,00', metodo: 'Cartão de Crédito' }
-    ],
-    historicoMensagens: [
-      { id: 'm1', data: '28/07/2026 13:00', canal: 'WhatsApp', texto: 'Lembrete: Seu agendamento é hoje às 14:00.' }
-    ],
-    anotacoesInternas: [
-      'Cliente pontual, gosta de alinhar a barba com toalha quente.'
-    ]
-  },
-  {
-    id: 'c2',
-    nome: 'Ana Souza',
-    telefone: '(11) 97654-3210',
-    whatsapp: '11976543210',
-    email: 'ana.souza@outlook.com',
-    cpf: '987.654.321-11',
-    dataNascimento: '22/08/1995',
-    endereco: 'Av. Paulista, 1000 - SP',
-    observacoes: 'Pele sensível. Utilizar produtos hipoalergênicos.',
-    tags: ['Estética', 'VIP'],
-    origem: 'Google Meu Negócio',
-    favorito: true,
-    inativo: false,
-    dataCadastro: '05/02/2026',
-    ultimaVisita: '20/07/2026',
-    totalAgendamentos: 5,
-    totalGastoLtv: 'R$ 750,00',
-    historicoAgendamentos: [
-      { id: 'h3', servico: 'Avaliação Estética & Limpeza', data: '20/07/2026', horario: '10:30', valor: 'R$ 150,00', profissional: 'Ana Souza', status: 'Finalizado' }
-    ],
-    historicoFinanceiro: [
-      { id: 'f3', data: '20/07/2026', descricao: 'Limpeza de Pele Profunda', valor: 'R$ 150,00', metodo: 'PIX' }
-    ],
-    historicoMensagens: [
-      { id: 'm2', data: '20/07/2026 09:30', canal: 'WhatsApp', texto: 'Confirmação de atendimento recebida.' }
-    ],
-    anotacoesInternas: [
-      'Recomendar retorno em 30 dias para sessão de manutenção.'
-    ]
-  },
-  {
-    id: 'c3',
-    nome: 'Lucas Mendes',
-    telefone: '(11) 96543-2109',
-    whatsapp: '11965432109',
-    email: 'lucas.mendes@yahoo.com',
-    cpf: '456.789.123-22',
-    dataNascimento: '11/03/1988',
-    endereco: 'Rua Oscar Freire, 120 - SP',
-    observacoes: 'Tatuagem no antebraço esquerdo.',
-    tags: ['Tatuagem', 'Em Risco'],
-    origem: 'Indicação',
-    favorito: false,
-    inativo: true,
-    dataCadastro: '15/03/2026',
-    ultimaVisita: '10/05/2026',
-    totalAgendamentos: 2,
-    totalGastoLtv: 'R$ 500,00',
-    historicoAgendamentos: [
-      { id: 'h4', servico: 'Tatuagem Blackwork 10cm', data: '10/05/2026', horario: '15:00', valor: 'R$ 350,00', profissional: 'Juliana Lima', status: 'Finalizado' }
-    ],
-    historicoFinanceiro: [
-      { id: 'f4', data: '10/05/2026', descricao: 'Sessão Tatuagem Blackwork', valor: 'R$ 350,00', metodo: 'Cartão de Débito' }
-    ],
-    historicoMensagens: [],
-    anotacoesInternas: [
-      'Cliente inativo há mais de 60 dias. Enviar cupom de retorno.'
-    ]
-  }
-];
+export const CLIENTES_DEMO: ClienteCRM[] = [];
 
 export default function CrmClientes() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
+  const empresaLogada = JSON.parse(localStorage.getItem('empresa') || '{}');
+  const userAccountKey = empresaLogada.email ? empresaLogada.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
+
   // State
-  const [clientes, setClientes] = useState<ClienteCRM[]>(CLIENTES_DEMO);
+  const [clientes, setClientes] = useState<ClienteCRM[]>(() => {
+    const saved = localStorage.getItem(`clientes_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem(`clientes_${userAccountKey}`, JSON.stringify(clientes));
+  }, [clientes, userAccountKey]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'todos' | 'mais_rentaveis' | 'inativos'>('todos');
 

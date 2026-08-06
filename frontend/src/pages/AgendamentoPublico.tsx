@@ -44,42 +44,7 @@ export interface ProfissionalPublico {
   avaliacao?: number;
 }
 
-const SERVICOS_PUBLICOS: ServicoPublico[] = [
-  {
-    id: 's1',
-    nome: 'Corte Fade + Barba Terapia Premium',
-    preco: 80.00,
-    duracaoMin: 45,
-    categoria: 'Barbearia',
-    descricao: 'Corte moderno com degradê técnico, alinhamento tesoura/navalha e barba desenhada com toalha quente.',
-    popular: true
-  },
-  {
-    id: 's2',
-    nome: 'Avaliação Estética & Limpeza de Pele Facial',
-    preco: 150.00,
-    duracaoMin: 60,
-    categoria: 'Estética',
-    descricao: 'Higienização profunda com extração, esfoliação ultrassônica e máscara de hidratação com fototerapia.',
-    popular: true
-  },
-  {
-    id: 's3',
-    nome: 'Tatuagem Flash Autoral (Até 10cm)',
-    preco: 350.00,
-    duracaoMin: 90,
-    categoria: 'Tatuagem',
-    descricao: 'Sessão individual para artes autorais exclusivas em pigmento preto com material 100% descartável.'
-  },
-  {
-    id: 's4',
-    nome: 'Corte Masculino Tradicional & Visagismo',
-    preco: 50.00,
-    duracaoMin: 30,
-    categoria: 'Barbearia',
-    descricao: 'Corte clássico adaptado às linhas de formato do rosto com lavatório e finalização com pomada.'
-  }
-];
+const SERVICOS_PUBLICOS: ServicoPublico[] = [];
 
 const PROFISSIONAIS_PUBLICOS: ProfissionalPublico[] = [
   {
@@ -88,27 +53,6 @@ const PROFISSIONAIS_PUBLICOS: ProfissionalPublico[] = [
     especialidade: 'Atendimento imediato',
     fotoUrl: '',
     avaliacao: 5.0
-  },
-  {
-    id: 'p1',
-    nome: 'Carlos Silva',
-    especialidade: 'Master Barber & Visagista',
-    fotoUrl: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=200&auto=format&fit=crop&q=80',
-    avaliacao: 4.9
-  },
-  {
-    id: 'p2',
-    nome: 'Ana Souza',
-    especialidade: 'Esteticista & Design Facial',
-    fotoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80',
-    avaliacao: 5.0
-  },
-  {
-    id: 'p3',
-    nome: 'Juliana Lima',
-    especialidade: 'Tatuadora Blackwork Autoral',
-    fotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-    avaliacao: 4.98
   }
 ];
 

@@ -25,78 +25,7 @@ export interface ServicoItem {
   totalAgendamentos: number;
 }
 
-const SERVICOS_DEMO: ServicoItem[] = [
-  {
-    id: 's1',
-    nome: 'Corte Fade Navalhado',
-    categoria: 'Barbearia',
-    preco: 50.00,
-    duracaoMin: 35,
-    comissaoPct: 50,
-    corHex: '#3B82F6', // Blue
-    descricao: 'Degradê perfeito com acabamento na navalha e finalização com pomada matte.',
-    observacoesTecnicas: 'Utilizar lâmina descartável e higienizar couro cabeludo.',
-    ativo: true,
-    maisVendido: true,
-    totalAgendamentos: 142
-  },
-  {
-    id: 's2',
-    nome: 'Barba Terapia Completa',
-    categoria: 'Barbearia',
-    preco: 40.00,
-    duracaoMin: 30,
-    comissaoPct: 45,
-    corHex: '#EAB308', // Yellow
-    descricao: 'Modelagem de barba com toalha quente, óleos essenciais e balm hidratante.',
-    observacoesTecnicas: 'Toalha aquecida a 45°C. Verificar sensibilidade do cliente.',
-    ativo: true,
-    maisVendido: false,
-    totalAgendamentos: 88
-  },
-  {
-    id: 's3',
-    nome: 'Tatuagem Blackwork 10cm',
-    categoria: 'Tatuagem',
-    preco: 350.00,
-    duracaoMin: 120,
-    comissaoPct: 60,
-    corHex: '#A855F7', // Purple
-    descricao: 'Sessão de tatuagem autoral estilo Blackwork de até 10cm com agulhas mágnum.',
-    observacoesTecnicas: 'Exige decalque impresso prévio e biossegurança completa.',
-    ativo: true,
-    maisVendido: true,
-    totalAgendamentos: 64
-  },
-  {
-    id: 's4',
-    nome: 'Limpeza de Pele Profunda',
-    categoria: 'Estética',
-    preco: 150.00,
-    duracaoMin: 60,
-    comissaoPct: 40,
-    corHex: '#22C55E', // Green
-    descricao: 'Higienização, esfoliação, extração de cravos, máscara calmante e LED terapia.',
-    observacoesTecnicas: 'Não aplicar ácido se o cliente for se expor ao sol.',
-    ativo: true,
-    maisVendido: false,
-    totalAgendamentos: 45
-  },
-  {
-    id: 's5',
-    nome: 'Coloração & Escova',
-    categoria: 'Salão de Beleza',
-    preco: 180.00,
-    duracaoMin: 90,
-    comissaoPct: 45,
-    corHex: '#EC4899', // Pink
-    descricao: 'Aplicação de tintura profissional com matização e escova modeladora.',
-    observacoesTecnicas: 'Teste de mecha obrigatório 24h antes.',
-    ativo: true,
-    maisVendido: false,
-    totalAgendamentos: 39
-  }
-];
+export const SERVICOS_DEMO: ServicoItem[] = [];
 
 const PRESETS_CORES = [
   '#3B82F6', '#A855F7', '#22C55E', '#EAB308', '#EC4899', '#EF4444', '#6366F1', '#14B8A6'
@@ -106,8 +35,19 @@ export default function GestaoServicos() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
+  const empresaLogada = JSON.parse(localStorage.getItem('empresa') || '{}');
+  const userAccountKey = empresaLogada.email ? empresaLogada.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
+
   // State
-  const [servicos, setServicos] = useState<ServicoItem[]>(SERVICOS_DEMO);
+  const [servicos, setServicos] = useState<ServicoItem[]>(() => {
+    const saved = localStorage.getItem(`servicos_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem(`servicos_${userAccountKey}`, JSON.stringify(servicos));
+  }, [servicos, userAccountKey]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoria, setSelectedCategoria] = useState<string>('todas');
   const [sortBy, setSortBy] = useState<'relevancia' | 'preco_desc' | 'preco_asc' | 'duracao'>('relevancia');

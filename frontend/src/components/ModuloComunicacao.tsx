@@ -94,52 +94,7 @@ const AUTOMACOES_INITIAL: AutomacaoRegra[] = [
   }
 ];
 
-const HISTORICO_INITIAL: HistoricoEnvio[] = [
-  {
-    id: 'h-1',
-    data: '31/07/2026 14:15',
-    cliente: 'Carlos Silva',
-    telefone: '(11) 98765-4321',
-    whatsapp: '11987654321',
-    tipoNotificacao: 'Lembrete Pré-Atendimento (24h)',
-    mensagemFormatada: 'Passando para lembrar do seu atendimento amanhã (01/08/2026) às 15:00 para Corte + Barba com Carlos Silva.',
-    status: 'Lido',
-    canal: 'WhatsApp'
-  },
-  {
-    id: 'h-2',
-    data: '31/07/2026 11:30',
-    cliente: 'Ana Souza',
-    telefone: '(11) 97654-3210',
-    whatsapp: '11976543210',
-    tipoNotificacao: 'Confirmação de Agendamento',
-    mensagemFormatada: 'Olá Ana Souza! Seu agendamento para Avaliação Estética com Ana Souza foi confirmado para 02/08/2026 às 10:00.',
-    status: 'Entregue',
-    canal: 'WhatsApp'
-  },
-  {
-    id: 'h-3',
-    data: '31/07/2026 09:00',
-    cliente: 'Lucas Mendes',
-    telefone: '(11) 96543-2109',
-    whatsapp: '11965432109',
-    tipoNotificacao: 'Pesquisa de Satisfação (NPS)',
-    mensagemFormatada: 'Olá Lucas Mendes, como foi sua experiência no atendimento com Juliana Lima? Responda de 1 a 10.',
-    status: 'Lido',
-    canal: 'WhatsApp'
-  },
-  {
-    id: 'h-4',
-    data: '30/07/2026 18:45',
-    cliente: 'Gabriel Monteiro',
-    telefone: '(11) 95432-1098',
-    whatsapp: '11954321098',
-    tipoNotificacao: 'Reativação de Clientes Inativos',
-    mensagemFormatada: 'Faz um tempo que não nos vemos, Gabriel Monteiro! Que tal renovar seu visual? Acesse nosso link de agendamento.',
-    status: 'Enviado',
-    canal: 'WhatsApp'
-  }
-];
+const HISTORICO_INITIAL: HistoricoEnvio[] = [];
 
 export default function ModuloComunicacao() {
   const { theme } = useTheme();

@@ -54,11 +54,7 @@ export interface BloqueioItem {
   profissionalId?: string;
 }
 
-export const DEMO_AGENDA_PROFISSIONAIS: Profissional[] = [
-  { id: '1', nome: 'Carlos Silva', especialidade: 'Barbeiro Lead', avatar: 'CS', fotoUrl: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=150&auto=format&fit=crop&q=80' },
-  { id: '2', nome: 'Ana Souza', especialidade: 'Esteticista & Design', avatar: 'AS', fotoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80' },
-  { id: '3', nome: 'Juliana Lima', especialidade: 'Tatuadora & Artist', avatar: 'JL', fotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80' },
-];
+export const DEMO_AGENDA_PROFISSIONAIS: Profissional[] = [];
 
 const HORARIOS_DIA = [
   '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', 

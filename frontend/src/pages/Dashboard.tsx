@@ -48,31 +48,12 @@ const Logo = ({ className = "w-6 h-6" }) => (
 
 // FASE 1 Internal Notifications
 const INITIAL_NOTIFICATIONS = [
-  { id: '1', title: 'Boas-vindas ao Agende.yo', desc: 'Sua conta multi-tenant foi inicializada com sucesso.', time: 'Há 5 min', read: false },
-  { id: '2', title: 'Segurança & LGPD', desc: 'Os termos de proteção de dados foram aceitos pelo proprietário.', time: 'Há 12 min', read: false },
-  { id: '3', title: 'Sistema Operacional', desc: 'Prisma ORM e rotas REST ativas na versão 1.0.0.', time: 'Há 1 hora', read: true },
+  { id: '1', title: 'Boas-vindas ao Agende.yo', desc: 'Sua conta foi inicializada com sucesso.', time: 'Agora', read: false },
 ];
 
-export const DEMO_APPOINTMENTS = [
-  { id: '1', client: 'Carlos Silva', service: 'Corte + Barba Premium', time: '09:00', date: '2026-07-31', price: 'R$ 80,00', status: 'Confirmado', phone: '(11) 98765-4321' },
-  { id: '2', client: 'Ana Souza', service: 'Avaliação Estética', time: '10:30', date: '2026-07-31', price: 'R$ 150,00', status: 'Confirmado', phone: '(11) 97654-3210' },
-  { id: '3', client: 'Lucas Mendes', service: 'Design de Sobrancelha', time: '14:00', date: '2026-07-31', price: 'R$ 45,00', status: 'Pendente', phone: '(11) 96543-2109' },
-  { id: '4', client: 'Mariana Lima', service: 'Limpeza de Pele', time: '16:00', date: '2026-07-31', price: 'R$ 120,00', status: 'Confirmado', phone: '(11) 95432-1098' },
-];
-
-export const DEMO_SERVICES = [
-  { id: '1', name: 'Corte + Barba Premium', duration: '50 min', price: '80,00', active: true },
-  { id: '2', name: 'Avaliação Estética', duration: '30 min', price: '150,00', active: true },
-  { id: '3', name: 'Design de Sobrancelha', duration: '20 min', price: '45,00', active: true },
-  { id: '4', name: 'Limpeza de Pele Profunda', duration: '60 min', price: '120,00', active: true },
-];
-
-export const DEMO_CLIENTS = [
-  { id: '1', name: 'Carlos Silva', phone: '(11) 98765-4321', email: 'carlos@email.com', totalVisits: 8, lastVisit: '15/07/2026' },
-  { id: '2', name: 'Ana Souza', phone: '(11) 97654-3210', email: 'ana@email.com', totalVisits: 3, lastVisit: '20/07/2026' },
-  { id: '3', name: 'Lucas Mendes', phone: '(11) 96543-2109', email: 'lucas@email.com', totalVisits: 12, lastVisit: '28/07/2026' },
-  { id: '4', name: 'Mariana Lima', phone: '(11) 95432-1098', email: 'mariana@email.com', totalVisits: 5, lastVisit: '10/07/2026' },
-];
+export const DEMO_APPOINTMENTS: any[] = [];
+export const DEMO_SERVICES: any[] = [];
+export const DEMO_CLIENTS: any[] = [];
 
 function GlassCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const { theme } = useTheme();

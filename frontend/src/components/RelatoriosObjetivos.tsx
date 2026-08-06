@@ -31,76 +31,25 @@ export interface DesempenhoServico {
   percentualDoTotal: number;
 }
 
-const PROFISSIONAIS_RELATORIO: DesempenhoProfissional[] = [
-  {
-    id: 'p1',
-    nome: 'Carlos Silva',
-    especialidade: 'Barbeiro Lead',
-    atendimentos: 112,
-    faturamentoGerado: 8960.00,
-    comissaoRepassada: 4480.00,
-    taxaOcupacaoPct: 88.5
-  },
-  {
-    id: 'p2',
-    nome: 'Ana Souza',
-    especialidade: 'Esteticista & Design',
-    atendimentos: 78,
-    faturamentoGerado: 9360.00,
-    comissaoRepassada: 4212.00,
-    taxaOcupacaoPct: 75.0
-  },
-  {
-    id: 'p3',
-    nome: 'Juliana Lima',
-    especialidade: 'Tatuadora & Artist',
-    atendimentos: 24,
-    faturamentoGerado: 7170.00,
-    comissaoRepassada: 4302.00,
-    taxaOcupacaoPct: 68.0
-  }
-];
-
-const SERVICOS_RELATORIO: DesempenhoServico[] = [
-  {
-    id: 's1',
-    nome: 'Corte Fade + Barba Terapia',
-    categoria: 'Barbearia',
-    atendimentosCount: 145,
-    receitaTotal: 11600.00,
-    percentualDoTotal: 45.5
-  },
-  {
-    id: 's2',
-    nome: 'Avaliação Estética & Limpeza',
-    categoria: 'Estética',
-    atendimentosCount: 62,
-    receitaTotal: 9300.00,
-    percentualDoTotal: 36.5
-  },
-  {
-    id: 's3',
-    nome: 'Tatuagem Blackwork Autoral',
-    categoria: 'Tatuagem',
-    atendimentosCount: 18,
-    receitaTotal: 4590.00,
-    percentualDoTotal: 18.0
-  }
-];
+const PROFISSIONAIS_RELATORIO: DesempenhoProfissional[] = [];
+const SERVICOS_RELATORIO: DesempenhoServico[] = [];
 
 export default function RelatoriosObjetivos() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
   const [periodo, setPeriodo] = useState<PeriodoFiltro>('mes');
-
-  // Multiplicadores baseados no período selecionado
   const mult = periodo === 'hoje' ? 0.05 : periodo === 'semana' ? 0.25 : periodo === 'ano' ? 12 : 1;
 
-  const faturamentoTotal = 25490.00 * mult;
-  const comissoesTotal = 12994.00 * mult;
-  const lucroCasa = faturamentoTotal - comissoesTotal;
-  const totalAtendimentos = Math.round(214 * mult);
+  const empresaLogada = JSON.parse(localStorage.getItem('empresa') || '{}');
+  const userAccountKey = empresaLogada.email ? empresaLogada.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
+
+  const lancamentos: any[] = JSON.parse(localStorage.getItem(`caixa_${userAccountKey}`) || '[]');
+
+  const faturamentoTotal = lancamentos.reduce((acc, l) => acc + (parseFloat(l.valor) || 0), 0) * mult;
+  const comissoesPagas = lancamentos.reduce((acc, l) => acc + (parseFloat(l.valorComissao) || 0), 0) * mult;
+  const lucroCasa = faturamentoTotal - comissoesPagas;
+  const totalAtendimentos = Math.round(lancamentos.length * mult);
   const taxaOcupacaoMedia = 77.2;
 
   // Exportar dados para CSV

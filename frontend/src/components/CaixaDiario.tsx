@@ -29,56 +29,7 @@ export interface LancamentoCaixa {
   horario: string;
 }
 
-export const DEMO_LANCAMENTOS: LancamentoCaixa[] = [
-  {
-    id: 'l1',
-    descricao: 'Corte + Barba Premium',
-    cliente: 'Carlos Silva',
-    profissional: 'Carlos Silva',
-    valor: 80.00,
-    metodo: 'PIX',
-    comissaoPct: 50,
-    valorComissao: 40.00,
-    valorCasa: 40.00,
-    horario: '09:45'
-  },
-  {
-    id: 'l2',
-    descricao: 'Avaliação Estética & Limpeza',
-    cliente: 'Ana Souza',
-    profissional: 'Ana Souza',
-    valor: 150.00,
-    metodo: 'Cartão de Crédito',
-    comissaoPct: 45,
-    valorComissao: 67.50,
-    valorCasa: 82.50,
-    horario: '11:20'
-  },
-  {
-    id: 'l3',
-    descricao: 'Tatuagem Blackwork 10cm',
-    cliente: 'Lucas Mendes',
-    profissional: 'Juliana Lima',
-    valor: 350.00,
-    metodo: 'PIX',
-    comissaoPct: 60,
-    valorComissao: 210.00,
-    valorCasa: 140.00,
-    horario: '14:30'
-  },
-  {
-    id: 'l4',
-    descricao: 'Corte Fade Navalhado',
-    cliente: 'Gabriel Monteiro',
-    profissional: 'Carlos Silva',
-    valor: 50.00,
-    metodo: 'Dinheiro',
-    comissaoPct: 50,
-    valorComissao: 25.00,
-    valorCasa: 25.00,
-    horario: '16:15'
-  }
-];
+export const DEMO_LANCAMENTOS: LancamentoCaixa[] = [];
 
 export default function CaixaDiario() {
   const { theme } = useTheme();
