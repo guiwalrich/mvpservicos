@@ -54,83 +54,24 @@ const COLUNAS_KANBAN: { id: EtapaFunil; titulo: string; corBorder: string }[] = 
   { id: 'perdido', titulo: 'Oportunidade Perdida', corBorder: 'border-red-500/40' },
 ];
 
-const LEADS_DEMO: LeadOportunidade[] = [
-  {
-    id: 'ld-1',
-    nome: 'Marcos Vinicius',
-    telefone: '(11) 98111-2233',
-    whatsapp: '11981112233',
-    email: 'marcos.v@gmail.com',
-    servicoInteresse: 'Fechamento de Costas Blackwork',
-    valorEstimado: 1200.00,
-    etapa: 'lead',
-    responsavel: 'Juliana Lima',
-    dataCriacao: '30/07/2026',
-    dataUltimoContato: '30/07/2026',
-    dataFollowUp: '01/08/2026',
-    interacoes: [
-      { id: 'i1', data: '30/07/2026 15:30', tipo: 'WhatsApp', descricao: 'Lead solicitou orçamento pelo Instagram para sessão de 6 horas.', autor: 'Juliana Lima' }
-    ]
-  },
-  {
-    id: 'ld-2',
-    nome: 'Rodrigo Alcantara',
-    telefone: '(11) 97222-3344',
-    whatsapp: '11972223344',
-    email: 'rodrigo.a@outlook.com',
-    servicoInteresse: 'Pacote Dia do Noivo (Barba + Corte + Massagem)',
-    valorEstimado: 350.00,
-    etapa: 'qualificacao',
-    responsavel: 'Carlos Silva',
-    dataCriacao: '28/07/2026',
-    dataUltimoContato: '29/07/2026',
-    dataFollowUp: '31/07/2026',
-    interacoes: [
-      { id: 'i2', data: '29/07/2026 11:00', tipo: 'Telefone', descricao: 'Explicado os serviços inclusos no pacote. Aguardando confirmação da data do casamento.', autor: 'Carlos Silva' }
-    ]
-  },
-  {
-    id: 'ld-3',
-    nome: 'Patrícia Amorim',
-    telefone: '(11) 96333-4455',
-    whatsapp: '11963334455',
-    email: 'patricia.a@yahoo.com',
-    servicoInteresse: 'Pacote Limpeza de Pele + Coloração',
-    valorEstimado: 450.00,
-    etapa: 'negociacao',
-    responsavel: 'Ana Souza',
-    dataCriacao: '25/07/2026',
-    dataUltimoContato: '28/07/2026',
-    dataFollowUp: '01/08/2026',
-    interacoes: [
-      { id: 'i3', data: '28/07/2026 16:20', tipo: 'WhatsApp', descricao: 'Enviado proposta com 10% de desconto para pagamento via PIX.', autor: 'Ana Souza' }
-    ]
-  },
-  {
-    id: 'ld-4',
-    nome: 'Felipe Ramos',
-    telefone: '(11) 95444-5566',
-    whatsapp: '11954445566',
-    email: 'felipe.r@gmail.com',
-    servicoInteresse: 'Corte + Barba Terapia',
-    valorEstimado: 80.00,
-    etapa: 'agendado',
-    responsavel: 'Carlos Silva',
-    dataCriacao: '20/07/2026',
-    dataUltimoContato: '31/07/2026',
-    dataFollowUp: '31/07/2026',
-    interacoes: [
-      { id: 'i4', data: '31/07/2026 09:00', tipo: 'WhatsApp', descricao: 'Agendamento confirmado na agenda principal para hoje às 15h.', autor: 'Carlos Silva' }
-    ]
-  }
-];
+export const LEADS_DEMO: LeadOportunidade[] = [];
 
 export default function CrmComercial() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
+  const empresaLogada = JSON.parse(localStorage.getItem('empresa') || '{}');
+  const userAccountKey = empresaLogada.email ? empresaLogada.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
+
   // State
-  const [leads, setLeads] = useState<LeadOportunidade[]>(LEADS_DEMO);
+  const [leads, setLeads] = useState<LeadOportunidade[]>(() => {
+    const saved = localStorage.getItem(`leads_${userAccountKey}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem(`leads_${userAccountKey}`, JSON.stringify(leads));
+  }, [leads, userAccountKey]);
   const [searchQuery, setSearchQuery] = useState('');
   const [responsavelFilter, setResponsavelFilter] = useState<string>('todos');
 

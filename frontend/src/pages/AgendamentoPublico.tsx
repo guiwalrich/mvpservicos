@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   MapPin,
@@ -44,17 +44,13 @@ export interface ProfissionalPublico {
   avaliacao?: number;
 }
 
-const SERVICOS_PUBLICOS: ServicoPublico[] = [];
-
-const PROFISSIONAIS_PUBLICOS: ProfissionalPublico[] = [
-  {
-    id: 'p0',
-    nome: 'Primeiro Profissional Disponível',
-    especialidade: 'Atendimento imediato',
-    fotoUrl: '',
-    avaliacao: 5.0
-  }
-];
+const FALLBACK_PROF: ProfissionalPublico = {
+  id: 'p0',
+  nome: 'Primeiro Profissional Disponível',
+  especialidade: 'Atendimento imediato',
+  fotoUrl: '',
+  avaliacao: 5.0
+};
 
 const DIAS_CALENDARIO = [
   { diaSemana: 'SEG', diaNum: '03', dataFull: '03/08/2026' },
@@ -76,13 +72,60 @@ const HORARIOS_SLOTS = [
 export default function AgendamentoPublico() {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
+  const { slug } = useParams<{ slug: string }>();
+
+  // Dados da empresa carregados do backend
+  const [empresaNome, setEmpresaNome] = useState('Carregando...');
+  const [empresaIconUrl, setEmpresaIconUrl] = useState('');
+  const [empresaEndereco, setEmpresaEndereco] = useState('');
+  const [, setEmpresaTelefone] = useState('');
+  const [servicos, setServicos] = useState<ServicoPublico[]>([]);
+  const [profissionais, setProfissionais] = useState<ProfissionalPublico[]>([FALLBACK_PROF]);
+  const [, setCarregando] = useState(true);
+
+  useEffect(() => {
+    if (!slug) return;
+    fetch(`/agendar-api/${slug}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.id) {
+          setEmpresaNome(data.nome || 'Estabelecimento');
+          setEmpresaIconUrl(data.iconUrl || data.logo || '');
+          setEmpresaEndereco(data.endereco || '');
+          setEmpresaTelefone(data.telefone || '');
+          if (data.servicos && data.servicos.length > 0) {
+            setServicos(data.servicos.map((s: any) => ({
+              id: String(s.id),
+              nome: s.nome,
+              preco: s.preco,
+              duracaoMin: s.duracao_minutos || 30,
+              categoria: s.categoria || 'Geral',
+              descricao: s.descricao || '',
+              popular: false,
+            })));
+          }
+          if (data.profissionais && data.profissionais.length > 0) {
+            const profs: ProfissionalPublico[] = [FALLBACK_PROF, ...data.profissionais.map((p: any) => ({
+              id: String(p.id),
+              nome: p.nome,
+              especialidade: p.especialidade || 'Profissional',
+              fotoUrl: p.foto_url || '',
+              avaliacao: 5.0,
+            }))];
+            setProfissionais(profs);
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setCarregando(false));
+  }, [slug]);
 
   // Step 1: Serviço, Step 2: Profissional, Step 3: Data & Horário, Step 4: Dados Cliente, Step 5: Confirmação
   const [step, setStep] = useState<number>(1);
 
   // Selection States
   const [selectedServico, setSelectedServico] = useState<ServicoPublico | null>(null);
-  const [selectedProfissional, setSelectedProfissional] = useState<ProfissionalPublico>(PROFISSIONAIS_PUBLICOS[0]);
+  const [selectedProfissional, setSelectedProfissional] = useState<ProfissionalPublico>(FALLBACK_PROF);
   const [selectedDataObj, setSelectedDataObj] = useState(DIAS_CALENDARIO[0]);
   const [selectedHorario, setSelectedHorario] = useState<string>('');
 
@@ -125,7 +168,7 @@ export default function AgendamentoPublico() {
       horario: selectedHorario,
       duracaoMin: selectedServico.duracaoMin,
       profissionalId: selectedProfissional.id === 'p0' ? 'p1' : selectedProfissional.id,
-      profissionalNome: selectedProfissional.id === 'p0' ? 'Carlos Silva' : selectedProfissional.nome,
+      profissionalNome: selectedProfissional.id === 'p0' ? (profissionais[1]?.nome || 'Profissional') : selectedProfissional.nome,
       sala: 'Cadeira 01',
       status: 'Pendente'
     };
@@ -136,7 +179,7 @@ export default function AgendamentoPublico() {
     setStep(5);
   };
 
-  const enderecoTexto = "Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-100";
+  const enderecoTexto = empresaEndereco || 'Endereço não cadastrado';
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoTexto)}`;
   const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(enderecoTexto)}`;
 
@@ -194,12 +237,16 @@ export default function AgendamentoPublico() {
           }`}>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-black border border-white/20 flex items-center justify-center font-black text-white text-lg shadow-md shrink-0">
-                  AY
+                <div className="w-14 h-14 rounded-2xl bg-black border border-white/20 flex items-center justify-center font-black text-white text-lg shadow-md shrink-0 overflow-hidden">
+                  {empresaIconUrl ? (
+                    <img src={empresaIconUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    (empresaNome || 'AY').substring(0, 2).toUpperCase()
+                  )}
                 </div>
                 <div>
                   <h1 className="text-xl font-bold tracking-tight leading-snug flex items-center gap-2">
-                    Studio Agende.yo
+                    {empresaNome}
                     <ShieldCheck size={18} className="text-emerald-400" />
                   </h1>
                   <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1.5 mt-0.5">
@@ -284,7 +331,7 @@ export default function AgendamentoPublico() {
             </div>
 
             <div className="space-y-3">
-              {SERVICOS_PUBLICOS.map((servico) => (
+              {servicos.map((servico) => (
                 <div
                   key={servico.id}
                   onClick={() => handleSelectServico(servico)}
@@ -325,7 +372,7 @@ export default function AgendamentoPublico() {
             </div>
 
             <div className="space-y-3">
-              {PROFISSIONAIS_PUBLICOS.map((prof) => (
+              {profissionais.map((prof) => (
                 <div
                   key={prof.id}
                   onClick={() => handleSelectProfissional(prof)}

@@ -42,77 +42,15 @@ export interface ProfissionalCompleto {
   totalAtendimentos: number;
 }
 
-export const DEMO_PROFISSIONAIS: ProfissionalCompleto[] = [
-  {
-    id: 'p1',
-    nome: 'Carlos Silva',
-    avatar: 'CS',
-    fotoUrl: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=150&auto=format&fit=crop&q=80',
-    especialidade: 'Barbeiro Specialist & Visagismo',
-    telefone: '(11) 98765-4321',
-    whatsapp: '11987654321',
-    email: 'carlos.barber@agende.yo',
-    cpf: '123.456.789-10',
-    comissaoPct: 50,
-    horarioEntrada: '09:00',
-    horarioSaida: '19:00',
-    intervaloAlmoco: '12:00 às 13:00',
-    diasTrabalho: ['Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-    emFerias: false,
-    ativo: true,
-    faturamentoMes: 'R$ 7.840,00',
-    comissaoMes: 'R$ 3.920,00',
-    totalAtendimentos: 98
-  },
-  {
-    id: 'p2',
-    nome: 'Ana Souza',
-    avatar: 'AS',
-    fotoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
-    especialidade: 'Esteticista & Design Facial',
-    telefone: '(11) 97654-3210',
-    whatsapp: '11976543210',
-    email: 'ana.estetica@agende.yo',
-    cpf: '987.654.321-20',
-    comissaoPct: 45,
-    horarioEntrada: '08:00',
-    horarioSaida: '17:00',
-    intervaloAlmoco: '12:00 às 13:00',
-    diasTrabalho: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'],
-    emFerias: false,
-    ativo: true,
-    faturamentoMes: 'R$ 6.450,00',
-    comissaoMes: 'R$ 2.902,50',
-    totalAtendimentos: 43
-  },
-  {
-    id: 'p3',
-    nome: 'Juliana Lima',
-    avatar: 'JL',
-    fotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    especialidade: 'Tatuadora Blackwork & Autoral',
-    telefone: '(11) 96543-2109',
-    whatsapp: '11965432109',
-    email: 'juliana.tattoo@agende.yo',
-    cpf: '456.789.123-30',
-    comissaoPct: 60,
-    horarioEntrada: '10:00',
-    horarioSaida: '20:00',
-    intervaloAlmoco: '14:00 às 15:00',
-    diasTrabalho: ['Qua', 'Qui', 'Sex', 'Sáb'],
-    emFerias: true,
-    feriasInicio: '01/08/2026',
-    feriasFim: '15/08/2026',
-    ativo: true,
-    faturamentoMes: 'R$ 11.200,00',
-    comissaoMes: 'R$ 6.720,00',
-    totalAtendimentos: 32
-  }
-];
+export const DEMO_PROFISSIONAIS: ProfissionalCompleto[] = [];
 
 const DIAS_SEMANA_OPCOES = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
-export default function GestaoProfissionais() {
+interface GestaoProfissionaisProps {
+  userRole?: 'DONO' | 'PROFISSIONAL';
+}
+
+export default function GestaoProfissionais({ userRole = 'DONO' }: GestaoProfissionaisProps) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
@@ -294,20 +232,22 @@ export default function GestaoProfissionais() {
   });
 
   // Métricas Globais da Equipe
-  const totalEquipe = profissionais.length;
+  const lancamentosCaixa: any[] = JSON.parse(localStorage.getItem(`caixa_${userAccountKey}`) || '[]');
+  const totalFaturamentoEquipe = lancamentosCaixa.reduce((acc, l) => acc + (parseFloat(l.valor) || 0), 0);
+  const totalComissoesEquipe = lancamentosCaixa.reduce((acc, l) => acc + (parseFloat(l.valorComissao) || 0), 0);
   const emFeriasCount = profissionais.filter(p => p.emFerias).length;
 
   return (
     <div className="space-y-6">
       
-      {/* Cards de Métricas da Equipe (Espaçados & Limpos) */}
+      {/* Top Cards de Métricas da Equipe (Design Respirável) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className={`p-6 rounded-[24px] border ${isDark ? 'bg-[#121215]/90 border-white/10' : 'bg-white border-neutral-200 shadow-sm'}`}>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold opacity-70">Tamanho da Equipe</span>
-            <UserCheck size={18} className="text-emerald-400" />
+            <span className="text-xs font-semibold opacity-70">Total de Profissionais</span>
+            <UserCheck size={18} className="text-purple-400" />
           </div>
-          <p className="text-3xl font-bold">{totalEquipe}</p>
+          <p className="text-3xl font-bold">{profissionais.length}</p>
           <span className="text-xs opacity-60 mt-1 block">Profissionais cadastrados</span>
         </div>
 
@@ -316,7 +256,7 @@ export default function GestaoProfissionais() {
             <span className="text-xs font-semibold opacity-70">Faturamento Equipe (Mês)</span>
             <TrendingUp size={18} className="text-blue-400" />
           </div>
-          <p className="text-3xl font-bold text-blue-400">R$ 25.490,00</p>
+          <p className="text-3xl font-bold text-blue-400">R$ {totalFaturamentoEquipe.toFixed(2).replace('.', ',')}</p>
           <span className="text-xs opacity-60 mt-1 block">Receita total gerada</span>
         </div>
 
@@ -325,7 +265,7 @@ export default function GestaoProfissionais() {
             <span className="text-xs font-semibold opacity-70">Comissões A Pagar</span>
             <DollarSign size={18} className="text-emerald-400" />
           </div>
-          <p className="text-3xl font-bold text-emerald-400">R$ 13.542,50</p>
+          <p className="text-3xl font-bold text-emerald-400">R$ {totalComissoesEquipe.toFixed(2).replace('.', ',')}</p>
           <span className="text-xs opacity-60 mt-1 block">Repasse acumulado</span>
         </div>
 
@@ -397,14 +337,16 @@ export default function GestaoProfissionais() {
             </button>
           </div>
 
-          <button
-            onClick={() => { resetForm(); setIsNovoProfModalOpen(true); }}
-            className={`h-11 px-5 rounded-2xl border text-xs font-semibold flex items-center gap-2 transition-all shadow-md active:scale-[0.98] ${
-              isDark ? 'bg-white text-black hover:bg-neutral-200 border-white' : 'bg-black text-white hover:bg-neutral-800 border-black'
-            }`}
-          >
-            <Plus size={16} /> Cadastrar Profissional
-          </button>
+          {userRole === 'DONO' && (
+            <button
+              onClick={() => { resetForm(); setIsNovoProfModalOpen(true); }}
+              className={`h-11 px-5 rounded-2xl border text-xs font-semibold flex items-center gap-2 transition-all shadow-md active:scale-[0.98] ${
+                isDark ? 'bg-white text-black hover:bg-neutral-200 border-white' : 'bg-black text-white hover:bg-neutral-800 border-black'
+              }`}
+            >
+              <Plus size={16} /> Cadastrar Profissional
+            </button>
+          )}
         </div>
 
       </div>
@@ -517,27 +459,29 @@ export default function GestaoProfissionais() {
                 <MessageSquare size={14} /> WhatsApp
               </a>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => { setSelectedProf(prof); setIsFeriasModalOpen(true); }}
-                  className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-colors ${
-                    isDark ? 'bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20' : 'bg-amber-50 border-amber-200 text-amber-800'
-                  }`}
-                  title="Agendar Férias / Folga"
-                >
-                  <Palmtree size={14} />
-                </button>
+              {userRole === 'DONO' && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => { setSelectedProf(prof); setIsFeriasModalOpen(true); }}
+                    className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-colors ${
+                      isDark ? 'bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20' : 'bg-amber-50 border-amber-200 text-amber-800'
+                    }`}
+                    title="Agendar Férias / Folga"
+                  >
+                    <Palmtree size={14} />
+                  </button>
 
-                <button
-                  onClick={() => handleOpenEdit(prof)}
-                  className={`p-2.5 rounded-xl border transition-colors ${
-                    isDark ? 'bg-[#1c1c20] border-white/[0.06] text-neutral-300 hover:text-white' : 'bg-neutral-100 border-neutral-200 text-neutral-700 hover:text-black'
-                  }`}
-                  title="Editar Perfil do Profissional"
-                >
-                  <Edit2 size={14} />
-                </button>
-              </div>
+                  <button
+                    onClick={() => handleOpenEdit(prof)}
+                    className={`p-2.5 rounded-xl border transition-colors ${
+                      isDark ? 'bg-[#1c1c20] border-white/[0.06] text-neutral-300 hover:text-white' : 'bg-neutral-100 border-neutral-200 text-neutral-700 hover:text-black'
+                    }`}
+                    title="Editar Perfil do Profissional"
+                  >
+                    <Edit2 size={14} />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}

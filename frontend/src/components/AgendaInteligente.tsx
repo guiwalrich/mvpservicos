@@ -348,14 +348,16 @@ export default function AgendaInteligente({
           </div>
 
           {/* Add Professional Button */}
-          <button
-            onClick={() => setIsNewProfModalOpen(true)}
-            className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
-              isDark ? 'bg-white text-black hover:bg-neutral-200 border-white' : 'bg-black text-white hover:bg-neutral-800 border-black'
-            }`}
-          >
-            <UserPlus size={14} /> Novo Profissional
-          </button>
+          {userRole === 'DONO' && (
+            <button
+              onClick={() => setIsNewProfModalOpen(true)}
+              className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
+                isDark ? 'bg-white text-black hover:bg-neutral-200 border-white' : 'bg-black text-white hover:bg-neutral-800 border-black'
+              }`}
+            >
+              <UserPlus size={14} /> Novo Profissional
+            </button>
+          )}
 
           {/* Block Time Button */}
           <button

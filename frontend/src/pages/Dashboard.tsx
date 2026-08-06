@@ -382,13 +382,17 @@ export default function Dashboard() {
             isDark ? 'bg-[#1c1c20] border-white/[0.06]' : 'bg-neutral-100 border-neutral-200'
           }`}>
             <div className="flex items-center gap-3">
-              <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-semibold text-xs ${
+              <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-semibold text-xs overflow-hidden ${
                 isDark ? 'bg-white/10 border-white/10 text-white' : 'bg-white border-neutral-300 text-black'
               }`}>
-                AG
+                {empresaFotoUrl ? (
+                  <img src={empresaFotoUrl} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  (empresaNome || 'AY').substring(0, 2).toUpperCase()
+                )}
               </div>
               <div className="text-left overflow-hidden">
-                <p className="text-xs font-medium truncate">Studio Agende.yo</p>
+                <p className="text-xs font-medium truncate">{empresaNome || 'Meu Estabelecimento'}</p>
                 <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-500/20 text-emerald-400">ADMIN</span>
               </div>
             </div>
@@ -552,13 +556,15 @@ export default function Dashboard() {
                     <Sparkles size={12} className="opacity-50" />
                   </button>
 
-                  <button
-                    onClick={() => { setActiveTab('profissionais'); setIsQuickActionsOpen(false); }}
-                    className="w-full text-left p-2 rounded-xl hover:bg-white/10 font-semibold flex items-center justify-between"
-                  >
-                    <span>+ Novo Profissional</span>
-                    <UserCheck size={12} className="opacity-50" />
-                  </button>
+                  {userRole === 'DONO' && (
+                    <button
+                      onClick={() => { setActiveTab('profissionais'); setIsQuickActionsOpen(false); }}
+                      className="w-full text-left p-2 rounded-xl hover:bg-white/10 font-semibold flex items-center justify-between"
+                    >
+                      <span>+ Novo Profissional</span>
+                      <UserCheck size={12} className="opacity-50" />
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -653,12 +659,18 @@ export default function Dashboard() {
             <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  { label: 'Faturamento do Dia', value: 'R$ 395,00', change: '+18% vs ontem', icon: DollarSign },
-                  { label: 'Agendamentos Hoje', value: appointments.length.toString(), change: 'Confirmados no Banco', icon: CalendarIcon },
-                  { label: 'Taxa de Presença', value: '98%', change: 'Altíssima eficiência', icon: UserCheck },
-                  { label: 'Clientes Cadastrados', value: clients.length.toString(), change: 'Sincronizados', icon: TrendingUp },
-                ].map((stat, i) => {
+                {(() => {
+                  const faturamentoCalculado = appointments.reduce((acc, a) => {
+                    const val = parseFloat(String(a.valor || 0).replace(/[^0-9,.-]/g, '').replace(',', '.'));
+                    return acc + (isNaN(val) ? 0 : val);
+                  }, 0);
+                  return [
+                    { label: 'Faturamento do Dia', value: `R$ ${faturamentoCalculado.toFixed(2).replace('.', ',')}`, change: appointments.length > 0 ? 'Lançado hoje' : 'Sem lançamentos', icon: DollarSign },
+                    { label: 'Agendamentos Hoje', value: appointments.length.toString(), change: 'Cadastrados na conta', icon: CalendarIcon },
+                    { label: 'Taxa de Presença', value: appointments.length > 0 ? '100%' : '0%', change: appointments.length > 0 ? 'Sem faltas' : 'Sem agendamentos', icon: UserCheck },
+                    { label: 'Clientes Cadastrados', value: clients.length.toString(), change: 'Base da empresa', icon: TrendingUp },
+                  ];
+                })().map((stat, i) => {
                   const Icon = stat.icon;
                   return (
                     <GlassCard key={i}>

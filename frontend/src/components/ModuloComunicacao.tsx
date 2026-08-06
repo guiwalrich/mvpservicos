@@ -40,7 +40,7 @@ const AUTOMACOES_INITIAL: AutomacaoRegra[] = [
     canal: 'WhatsApp',
     ativo: true,
     template: 'Olá {nome_cliente}! Seu agendamento para {servico} com {profissional} foi confirmado para {data_agendamento} às {horario_agendamento}. Te esperamos!',
-    totalEnviados: 482
+    totalEnviados: 0
   },
   {
     id: 'aut-2',
@@ -50,7 +50,7 @@ const AUTOMACOES_INITIAL: AutomacaoRegra[] = [
     canal: 'WhatsApp',
     ativo: true,
     template: 'Passando para lembrar do seu atendimento amanhã ({data_agendamento}) às {horario_agendamento} para {servico} no estabelecimento. Precisa remarcar? Acesse: {link_agendamento}',
-    totalEnviados: 615
+    totalEnviados: 0
   },
   {
     id: 'aut-3',
@@ -60,7 +60,7 @@ const AUTOMACOES_INITIAL: AutomacaoRegra[] = [
     canal: 'WhatsApp',
     ativo: true,
     template: 'Seu horário é daqui a pouco! Às {horario_agendamento} com {profissional}. Endereço: Av. Principal, 1000.',
-    totalEnviados: 390
+    totalEnviados: 0
   },
   {
     id: 'aut-4',
@@ -70,7 +70,7 @@ const AUTOMACOES_INITIAL: AutomacaoRegra[] = [
     canal: 'WhatsApp',
     ativo: true,
     template: 'Olá {nome_cliente}, como foi sua experiência no atendimento com {profissional}? Responda de 1 a 10 para nos ajudar a melhorar!',
-    totalEnviados: 240
+    totalEnviados: 0
   },
   {
     id: 'aut-5',
@@ -80,7 +80,7 @@ const AUTOMACOES_INITIAL: AutomacaoRegra[] = [
     canal: 'WhatsApp',
     ativo: true,
     template: 'Parabéns {nome_cliente}! A equipe deseja um excelente aniversário. Ganhe 15% de desconto no seu próximo serviço agendando esta semana.',
-    totalEnviados: 45
+    totalEnviados: 0
   },
   {
     id: 'aut-6',
@@ -90,7 +90,7 @@ const AUTOMACOES_INITIAL: AutomacaoRegra[] = [
     canal: 'WhatsApp',
     ativo: false,
     template: 'Faz um tempo que não nos vemos, {nome_cliente}! Que tal renovar seu visual? Clique no link para agendar: {link_agendamento}',
-    totalEnviados: 120
+    totalEnviados: 0
   }
 ];
 

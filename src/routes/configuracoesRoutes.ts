@@ -197,4 +197,24 @@ router.post("/icon", async (req: Request, res: Response) => {
   }
 });
 
+// POST /configuracoes/testar-whatsapp - Testa disparo WhatsApp via Evolution API
+router.post("/testar-whatsapp", async (req: Request, res: Response) => {
+  try {
+    const { telefone, mensagem } = req.body;
+    if (!telefone) {
+      return res.status(400).json({ erro: "Telefone de destino é obrigatório" });
+    }
+
+    const { enviarLembreteWhatsApp } = await import("../services/whatsappService");
+    const texto = mensagem || "👋 Olá! Esta é uma mensagem de teste enviada pela plataforma Agende.yo via Evolution API.";
+
+    const resultado = await enviarLembreteWhatsApp(telefone, texto);
+
+    res.json(resultado);
+  } catch (error: any) {
+    console.error("[ERRO POST CONFIGURACOES TESTAR-WHATSAPP]", error);
+    res.status(500).json({ erro: "Erro ao testar envio de mensagem WhatsApp" });
+  }
+});
+
 export default router;
