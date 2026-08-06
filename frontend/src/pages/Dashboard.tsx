@@ -88,9 +88,9 @@ export default function Dashboard() {
   // Estado da Empresa em Configurações (Preenchido com a Conta Real do Usuário)
   const [empresaNome, setEmpresaNome] = useState(empresaLogada.nome || 'Meu Estabelecimento');
   const [empresaSlug, setEmpresaSlug] = useState(empresaLogada.slug || 'meu-estabelecimento');
-  const [empresaEndereco, setEmpresaEndereco] = useState(localStorage.getItem(`empresa_endereco_${userAccountKey}`) || '');
-  const [empresaTelefone, setEmpresaTelefone] = useState(empresaLogada.whatsapp || empresaLogada.telefone || '');
-  const [empresaFotoUrl, setEmpresaFotoUrl] = useState<string>(() => localStorage.getItem(`empresa_logo_url_${userAccountKey}`) || empresaLogada.iconUrl || '');
+  const [empresaEndereco, setEmpresaEndereco] = useState(empresaLogada.endereco || '');
+  const [empresaTelefone, setEmpresaTelefone] = useState(empresaLogada.telefone || empresaLogada.whatsapp || '');
+  const [empresaFotoUrl, setEmpresaFotoUrl] = useState<string>(empresaLogada.iconUrl || '');
   const [empresaLat, setEmpresaLat] = useState<number | undefined>(undefined);
   const [empresaLng, setEmpresaLng] = useState<number | undefined>(undefined);
   const [isUploadingIcon, setIsUploadingIcon] = useState(false);
@@ -120,6 +120,20 @@ export default function Dashboard() {
           if (data.iconUrl) setEmpresaFotoUrl(data.iconUrl);
           if (data.latitude) setEmpresaLat(data.latitude);
           if (data.longitude) setEmpresaLng(data.longitude);
+
+          // Sincroniza localStorage com dados reais do backend
+          const emp = JSON.parse(localStorage.getItem('empresa') || '{}');
+          const merged = {
+            ...emp,
+            nome: data.nome || emp.nome,
+            slug: data.slug || emp.slug,
+            endereco: data.endereco || emp.endereco,
+            telefone: data.telefone || emp.telefone,
+            iconUrl: data.iconUrl || emp.iconUrl,
+            latitude: data.latitude,
+            longitude: data.longitude,
+          };
+          localStorage.setItem('empresa', JSON.stringify(merged));
         }
       })
       .catch(() => {});
@@ -877,7 +891,10 @@ export default function Dashboard() {
                                       });
                                       if (res.data && res.data.iconUrl) {
                                         setEmpresaFotoUrl(res.data.iconUrl);
-                                        localStorage.setItem('empresa_logo_url', res.data.iconUrl);
+                                        // Atualiza iconUrl no objeto empresa do localStorage
+                                        const emp = JSON.parse(localStorage.getItem('empresa') || '{}');
+                                        emp.iconUrl = res.data.iconUrl;
+                                        localStorage.setItem('empresa', JSON.stringify(emp));
                                       }
                                     } catch (err) {
                                       console.error("Erro ao fazer upload do ícone:", err);
@@ -894,7 +911,12 @@ export default function Dashboard() {
                           {empresaFotoUrl && (
                             <button
                               type="button"
-                              onClick={() => { setEmpresaFotoUrl(''); localStorage.removeItem('empresa_logo_url'); }}
+                              onClick={() => {
+                                setEmpresaFotoUrl('');
+                                const emp = JSON.parse(localStorage.getItem('empresa') || '{}');
+                                delete emp.iconUrl;
+                                localStorage.setItem('empresa', JSON.stringify(emp));
+                              }}
                               className="px-3 py-2 rounded-xl border border-rose-500/30 text-rose-400 text-xs font-semibold hover:bg-rose-500/10"
                             >
                               Remover Foto
@@ -962,11 +984,22 @@ export default function Dashboard() {
 
                   <button 
                     onClick={async () => {
-                      localStorage.setItem('empresa_logo_url', empresaFotoUrl);
-                      localStorage.setItem(`empresa_endereco_${userAccountKey}`, empresaEndereco);
+                      // Atualiza o objeto empresa no localStorage para persistir ao recarregar
+                      const empresaAtual = JSON.parse(localStorage.getItem('empresa') || '{}');
+                      const empresaAtualizada = {
+                        ...empresaAtual,
+                        nome: empresaNome,
+                        slug: empresaSlug,
+                        telefone: empresaTelefone,
+                        endereco: empresaEndereco,
+                        iconUrl: empresaFotoUrl,
+                        latitude: empresaLat,
+                        longitude: empresaLng,
+                      };
+                      localStorage.setItem('empresa', JSON.stringify(empresaAtualizada));
 
                       try {
-                        await apiFetch('/configuracoes/empresa', {
+                        const res = await apiFetch('/configuracoes/empresa', {
                           method: 'PUT',
                           body: JSON.stringify({
                             nome: empresaNome,
@@ -978,6 +1011,11 @@ export default function Dashboard() {
                             iconUrl: empresaFotoUrl,
                           }),
                         });
+                        // Se o backend retornou a empresa atualizada, sincroniza
+                        if (res.data?.empresa) {
+                          const merged = { ...empresaAtualizada, ...res.data.empresa };
+                          localStorage.setItem('empresa', JSON.stringify(merged));
+                        }
                       } catch (err) {
                         console.error('Erro ao salvar no backend:', err);
                       }
