@@ -19,8 +19,21 @@ export default function Landing() {
 
   const demoSlots = ['09:00', '10:30', '14:00', '16:30'];
 
-  // Captura posição do mouse para efeito magnético sutil
+  const [isMobile, setIsMobile] = useState(true);
+
+  // Detecta mobile/touch no carregamento do cliente
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024 || 'ontouchstart' in window);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Captura posição do mouse para efeito magnético sutil (apenas desktop)
+  useEffect(() => {
+    if (isMobile) return;
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({
         x: (e.clientX / window.innerWidth - 0.5) * 20,
@@ -29,7 +42,7 @@ export default function Landing() {
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [isMobile]);
 
   // Partículas dinâmicas e determinísticas em React + Framer Motion
   const particles = Array.from({ length: 18 }).map((_, i) => ({
@@ -75,32 +88,34 @@ export default function Landing() {
         />
       </div>
 
-      {/* 21st.dev Style Floating Particles */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        {particles.map((p) => (
-          <motion.div
-            key={p.id}
-            className="absolute rounded-full bg-white/[0.07] pointer-events-none"
-            style={{
-              width: p.size,
-              height: p.size,
-              left: `${p.x}%`,
-              top: `${p.y}%`,
-            }}
-            animate={{
-              y: ['0px', '-100px', '0px'],
-              x: ['0px', '25px', '0px'],
-              opacity: [0.15, 0.6, 0.15],
-            }}
-            transition={{
-              duration: p.duration,
-              repeat: Infinity,
-              delay: p.delay,
-              ease: 'easeInOut',
-            }}
-          />
-        ))}
-      </div>
+      {/* 21st.dev Style Floating Particles (Desativado em celulares para performance e evitar crashes de GPU) */}
+      {!isMobile && (
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {particles.map((p) => (
+            <motion.div
+              key={p.id}
+              className="absolute rounded-full bg-white/[0.07] pointer-events-none"
+              style={{
+                width: p.size,
+                height: p.size,
+                left: `${p.x}%`,
+                top: `${p.y}%`,
+              }}
+              animate={{
+                y: ['0px', '-100px', '0px'],
+                x: ['0px', '25px', '0px'],
+                opacity: [0.15, 0.6, 0.15],
+              }}
+              transition={{
+                duration: p.duration,
+                repeat: Infinity,
+                delay: p.delay,
+                ease: 'easeInOut',
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Navigation */}
       <motion.nav 
@@ -212,8 +227,8 @@ export default function Landing() {
             animate={{ 
               opacity: 1, 
               x: 0,
-              rotateX: mousePosition.y * 0.3,
-              rotateY: -mousePosition.x * 0.3 
+              rotateX: isMobile ? 0 : mousePosition.y * 0.3,
+              rotateY: isMobile ? 0 : -mousePosition.x * 0.3 
             }}
             transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-5 flex justify-center perspective-1000"
