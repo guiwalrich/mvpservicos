@@ -128,9 +128,10 @@ export default function Landing() {
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link 
                 to="/login?tab=registro" 
-                className="text-xs font-bold bg-white text-black px-4.5 py-2.5 rounded-full hover:bg-neutral-200 transition-all shadow-sm"
+                className="text-[11px] sm:text-xs font-bold bg-white text-black px-3.5 sm:px-4.5 py-2.5 rounded-full hover:bg-neutral-200 transition-all shadow-sm whitespace-nowrap"
               >
-                Criar Conta Rápida
+                <span className="sm:hidden">Cadastrar</span>
+                <span className="hidden sm:inline">Criar Conta Rápida</span>
               </Link>
             </motion.div>
           </div>
@@ -161,7 +162,7 @@ export default function Landing() {
                 <span>DESCUBRA O FUTURO DA AGENDA</span>
               </motion.div>
               
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-light text-white tracking-tight leading-[1.05]">
+              <h1 className="text-3xl sm:text-6xl lg:text-7xl font-light text-white tracking-tight leading-[1.05]">
                 Agendamento <br/>
                 <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">Descomplicado</span>
                 <span className="text-neutral-500 text-xs sm:text-sm font-medium align-super ml-2 uppercase tracking-wider block sm:inline">
@@ -169,7 +170,7 @@ export default function Landing() {
                 </span>
               </h1>
               
-              <h2 className="text-3xl sm:text-5xl font-light text-neutral-400 tracking-tight leading-none">
+              <h2 className="text-2xl sm:text-5xl font-light text-neutral-400 tracking-tight leading-none">
                 Gestão <span className="font-semibold text-white">Inteligente</span>
                 <span className="text-neutral-500 text-xs sm:text-sm font-medium align-super ml-2 uppercase tracking-wider block sm:inline">
                   SaaS
@@ -233,7 +234,7 @@ export default function Landing() {
                 />
               </div>
 
-              <div className="rounded-[31px] bg-[#121215]/85 backdrop-blur-3xl p-6 border border-white/[0.04]">
+              <div className="rounded-[31px] bg-[#121215]/85 backdrop-blur-3xl p-4 sm:p-6 border border-white/[0.04]">
                 
                 {/* Header Widget */}
                 <div className="flex items-center gap-3 pb-5 border-b border-white/5 mb-5">
@@ -268,7 +269,7 @@ export default function Landing() {
                     Selecione o Horário
                   </span>
                   
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {demoSlots.map((slot) => (
                       <button
                         key={slot}
