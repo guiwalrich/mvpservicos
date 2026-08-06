@@ -57,4 +57,138 @@ router.put("/", async (req: Request, res: Response) => {
   res.json(configuracao);
 });
 
+// GET /configuracoes/empresa - Retorna os dados do perfil do estabelecimento
+router.get("/empresa", async (req: Request, res: Response) => {
+  try {
+    const empresaId = (req as any).empresa.id;
+    const empresa = await prisma.empresa.findUnique({
+      where: { id: empresaId },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        slug: true,
+        nicho: true,
+        logo: true,
+        iconUrl: true,
+        telefone: true,
+        endereco: true,
+        latitude: true,
+        longitude: true,
+        instagram: true,
+      },
+    });
+
+    if (!empresa) {
+      return res.status(404).json({ erro: "Empresa não encontrada" });
+    }
+
+    res.json(empresa);
+  } catch (error: any) {
+    res.status(500).json({ erro: "Erro ao buscar dados do perfil da empresa" });
+  }
+});
+
+// PUT /configuracoes/empresa - Atualiza dados do perfil do estabelecimento
+router.put("/empresa", async (req: Request, res: Response) => {
+  try {
+    const empresaId = (req as any).empresa.id;
+    const {
+      nome,
+      slug,
+      nicho,
+      telefone,
+      endereco,
+      latitude,
+      longitude,
+      instagram,
+      iconUrl,
+      logo,
+    } = req.body;
+
+    const empresaAtualizada = await prisma.empresa.update({
+      where: { id: empresaId },
+      data: {
+        ...(nome && { nome }),
+        ...(slug && { slug }),
+        ...(nicho && { nicho }),
+        ...(telefone !== undefined && { telefone }),
+        ...(endereco !== undefined && { endereco }),
+        ...(latitude !== undefined && { latitude: latitude ? parseFloat(latitude) : null }),
+        ...(longitude !== undefined && { longitude: longitude ? parseFloat(longitude) : null }),
+        ...(instagram !== undefined && { instagram }),
+        ...(iconUrl !== undefined && { iconUrl }),
+        ...(logo !== undefined && { logo }),
+      },
+    });
+
+    res.json({
+      sucesso: true,
+      mensagem: "Perfil da empresa atualizado com sucesso!",
+      empresa: empresaAtualizada,
+    });
+  } catch (error: any) {
+    console.error("[ERRO PUT CONFIGURACOES EMPRESA]", error);
+    res.status(500).json({ erro: "Erro ao atualizar dados do perfil da empresa" });
+  }
+});
+
+// POST /configuracoes/icon - Upload de ícone/logo da empresa (Salva localmente em public/company-icons)
+router.post("/icon", async (req: Request, res: Response) => {
+  try {
+    const empresaId = (req as any).empresa.id;
+    const { imagemBase64, filename } = req.body;
+
+    if (!imagemBase64) {
+      return res.status(400).json({ erro: "Imagem não fornecida" });
+    }
+
+    // Validação de tamanho (máximo 2MB)
+    const buffer = Buffer.from(
+      imagemBase64.replace(/^data:image\/\w+;base64,/, ""),
+      "base64"
+    );
+
+    if (buffer.length > 2 * 1024 * 1024) {
+      return res.status(400).json({ erro: "A imagem excede o limite máximo permitido de 2 MB." });
+    }
+
+    // Extensão do arquivo
+    let ext = "png";
+    if (imagemBase64.includes("data:image/jpeg") || imagemBase64.includes("data:image/jpg")) ext = "jpg";
+    else if (imagemBase64.includes("data:image/svg+xml")) ext = "svg";
+    else if (imagemBase64.includes("data:image/webp")) ext = "webp";
+
+    const fs = require("fs");
+    const path = require("path");
+    const iconsDir = path.join(process.cwd(), "public", "company-icons");
+
+    if (!fs.existsSync(iconsDir)) {
+      fs.mkdirSync(iconsDir, { recursive: true });
+    }
+
+    const nomeArquivo = `icon-empresa-${empresaId}-${Date.now()}.${ext}`;
+    const caminhoCompleto = path.join(iconsDir, nomeArquivo);
+
+    fs.writeFileSync(caminhoCompleto, buffer);
+
+    const relativeUrl = `/company-icons/${nomeArquivo}`;
+
+    // Atualiza iconUrl no banco de dados da empresa
+    await prisma.empresa.update({
+      where: { id: empresaId },
+      data: { iconUrl: relativeUrl },
+    });
+
+    res.json({
+      sucesso: true,
+      iconUrl: relativeUrl,
+      mensagem: "Ícone da empresa atualizado e salvo localmente com sucesso!",
+    });
+  } catch (error: any) {
+    console.error("[ERRO POST CONFIGURACOES ICON]", error);
+    res.status(500).json({ erro: "Erro ao realizar upload do ícone da empresa" });
+  }
+});
+
 export default router;

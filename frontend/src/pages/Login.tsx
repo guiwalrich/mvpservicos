@@ -236,18 +236,36 @@ export default function Login() {
           headers: { Authorization: `Bearer ${accessToken}` },
         })
           .then(res => res.json())
-          .then(googleUser => {
+          .then(async googleUser => {
             if (googleUser?.email) {
-              localStorage.setItem('token', 'jwt-google-official-auth-ok');
-              localStorage.setItem('empresa', JSON.stringify({
-                nome: googleUser.name || 'Studio Agende.yo',
-                slug: 'studio-agende-yo',
-                email: googleUser.email,
-                fotoUrl: googleUser.picture,
-                googleAuth: true
-              }));
-              setIsSuccess(true);
-              setTimeout(() => navigate('/dashboard'), 800);
+              // Envia dados ao backend para buscar ou criar registro RASCUNHO da empresa
+              const authRes = await apiFetch('/auth/google-auth', {
+                method: 'POST',
+                body: JSON.stringify({
+                  email: googleUser.email,
+                  name: googleUser.name,
+                  picture: googleUser.picture,
+                  sub: googleUser.sub,
+                }),
+              });
+
+              if (authRes.data && authRes.data.sucesso && authRes.data.token) {
+                localStorage.setItem('token', authRes.data.token);
+                localStorage.setItem('empresa', JSON.stringify(authRes.data.empresa));
+                setIsSuccess(true);
+
+                setTimeout(() => {
+                  if (authRes.data.isNewUser) {
+                    // Novo usuário: vai para o dashboard abrindo a aba de configurações para completar cadastro
+                    navigate('/dashboard?tab=configuracoes&novoRascunho=true');
+                  } else {
+                    // Usuário existente: vai direto ao Dashboard
+                    navigate('/dashboard');
+                  }
+                }, 800);
+              } else {
+                setErrorMessage(authRes.error || 'Falha ao autenticar empresa via Google.');
+              }
             }
           })
           .catch(err => {

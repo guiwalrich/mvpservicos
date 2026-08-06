@@ -8,8 +8,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      // Usando import.meta.dirname conforme recomendado pelo Vite mais recente
-      "@": path.resolve(import.meta.dirname || __dirname, "./src"),
+      // Usando import.meta.dirname nativo do ESM/Vite
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
   build: {
@@ -17,8 +17,10 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'framer-motion', 'lucide-react', 'react-router-dom'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
         },
       },
     },

@@ -6,7 +6,11 @@ model Empresa {
   slug            String?         @unique
   nicho           String          @default("barbearia")
   logo            String?
+  iconUrl         String? // URL do icone da empresa
   telefone        String?
+  endereco        String? // endereço completo
+  latitude        Float? // latitude GPS
+  longitude       Float? // longitude GPS
   instagram       String?
   codigo_login    String?
   codigo_expira_em DateTime?

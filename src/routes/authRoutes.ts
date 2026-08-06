@@ -278,7 +278,80 @@ router.get("/me", async (req: Request, res: Response) => {
 });
 
 // ============================================================================
-// 6. DIAGNÓSTICO SMTP
+// 6. AUTENTICAÇÃO VIA GOOGLE (POST /auth/google-auth)
+// ============================================================================
+router.post("/google-auth", async (req: Request, res: Response) => {
+  try {
+    let { email, name, picture, sub, whatsapp } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ erro: "E-mail do usuário Google não foi fornecido." });
+    }
+
+    email = email.trim().toLowerCase();
+
+    // Busca se a empresa já está registrada no sistema pelo e-mail do Google
+    let empresa = await prisma.empresa.findUnique({ where: { email } });
+    let isNewUser = false;
+
+    // Se não existir, cria o REGISTRO RASCUNHO no banco de dados
+    if (!empresa) {
+      isNewUser = true;
+      const trialExpira = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+      const senhaHash = await bcrypt.hash(`GoogleDraftSecret_${Date.now()}_${Math.random()}`, 10);
+
+      const baseSlug = (name || email.split('@')[0]).toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'empresa';
+      let slug = `${baseSlug}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      empresa = await prisma.empresa.create({
+        data: {
+          nome: name || "Meu Estabelecimento",
+          email,
+          senha: senhaHash,
+          nicho: "Barbearia",
+          slug,
+          plano: "trial",
+          status_assinatura: "trial",
+          trial_expira_em: trialExpira,
+          email_verificado: true,
+          iconUrl: picture || null,
+          telefone: whatsapp || null,
+        },
+      });
+    }
+
+    // Emite o Token JWT oficial assinado pelo backend
+    const token = jwt.sign({ id: empresa.id, email: empresa.email }, JWT_SECRET, { expiresIn: "7d" });
+
+    return res.json({
+      sucesso: true,
+      isNewUser,
+      mensagem: isNewUser 
+        ? "Conta rascunho criada via Google com sucesso. Por favor, complete o cadastro da sua empresa."
+        : "Autenticação Google realizada com sucesso!",
+      token,
+      empresa: {
+        id: empresa.id,
+        nome: empresa.nome,
+        email: empresa.email,
+        nicho: empresa.nicho,
+        slug: empresa.slug,
+        plano: empresa.plano,
+        status_assinatura: empresa.status_assinatura,
+        trial_expira_em: empresa.trial_expira_em,
+        iconUrl: empresa.iconUrl,
+        telefone: empresa.telefone,
+        endereco: empresa.endereco,
+      },
+    });
+  } catch (error: any) {
+    console.error("[ERRO AUTENTICACAO GOOGLE BACKEND]", error);
+    return res.status(500).json({ erro: "Erro interno no servidor ao processar autenticação do Google." });
+  }
+});
+
+// ============================================================================
+// 7. DIAGNÓSTICO SMTP
 // ============================================================================
 router.get("/testar-smtp", async (req: Request, res: Response) => {
   const resultado = await testarConexaoSMTP();

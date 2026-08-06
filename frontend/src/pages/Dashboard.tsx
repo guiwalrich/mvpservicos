@@ -35,6 +35,7 @@ import CaixaDiario from '../components/CaixaDiario';
 import ModuloComunicacao from '../components/ModuloComunicacao';
 import RelatoriosObjetivos from '../components/RelatoriosObjetivos';
 import OnboardingWizard from '../components/OnboardingWizard';
+import LocationInput from '../components/LocationInput';
 
 const Logo = ({ className = "w-6 h-6" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" className={className}>
@@ -106,11 +107,42 @@ export default function Dashboard() {
   // Estado da Empresa em Configurações (Preenchido com a Conta Real do Usuário)
   const [empresaNome, setEmpresaNome] = useState(empresaLogada.nome || 'Meu Estabelecimento');
   const [empresaSlug, setEmpresaSlug] = useState(empresaLogada.slug || 'meu-estabelecimento');
-  const [empresaEndereco, setEmpresaEndereco] = useState(localStorage.getItem(`empresa_endereco_${userAccountKey}`) || 'Cadastre seu endereço no mapa');
-  const [empresaTelefone, setEmpresaTelefone] = useState(empresaLogada.whatsapp || '(00) 00000-0000');
-  const [empresaFotoUrl, setEmpresaFotoUrl] = useState<string>(() => localStorage.getItem(`empresa_logo_url_${userAccountKey}`) || '');
+  const [empresaEndereco, setEmpresaEndereco] = useState(localStorage.getItem(`empresa_endereco_${userAccountKey}`) || '');
+  const [empresaTelefone, setEmpresaTelefone] = useState(empresaLogada.whatsapp || empresaLogada.telefone || '');
+  const [empresaFotoUrl, setEmpresaFotoUrl] = useState<string>(() => localStorage.getItem(`empresa_logo_url_${userAccountKey}`) || empresaLogada.iconUrl || '');
+  const [empresaLat, setEmpresaLat] = useState<number | undefined>(undefined);
+  const [empresaLng, setEmpresaLng] = useState<number | undefined>(undefined);
+  const [isUploadingIcon, setIsUploadingIcon] = useState(false);
   const [configSalvaToast, setConfigSalvaToast] = useState(false);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+
+  // Checa URL para parametro tab=configuracoes ou novoRascunho
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab');
+    const rascunhoParam = params.get('novoRascunho');
+    if (tabParam === 'configuracoes' || rascunhoParam === 'true') {
+      setActiveTab('configuracoes');
+    }
+  }, []);
+
+  // Sincroniza dados reais do perfil da Empresa via Backend
+  useEffect(() => {
+    apiFetch('/configuracoes/empresa')
+      .then(res => {
+        const data = res.data;
+        if (data && data.id) {
+          if (data.nome) setEmpresaNome(data.nome);
+          if (data.slug) setEmpresaSlug(data.slug);
+          if (data.endereco) setEmpresaEndereco(data.endereco);
+          if (data.telefone) setEmpresaTelefone(data.telefone);
+          if (data.iconUrl) setEmpresaFotoUrl(data.iconUrl);
+          if (data.latitude) setEmpresaLat(data.latitude);
+          if (data.longitude) setEmpresaLng(data.longitude);
+        }
+      })
+      .catch(() => {});
+  }, []);
   
   // State: Listas de Dados Dinâmicos da Empresa (Começam 100% LIMPOS/ZERADOS para Novos Usuários)
   const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
@@ -839,19 +871,38 @@ export default function Dashboard() {
                           <label className={`cursor-pointer px-4 py-2 rounded-xl border text-xs font-semibold transition-all shadow-sm ${
                             isDark ? 'bg-white text-black hover:bg-neutral-200 border-white' : 'bg-black text-white hover:bg-neutral-800 border-black'
                           }`}>
-                            <span>Carregar Foto do Dispositivo</span>
+                            <span>{isUploadingIcon ? 'Enviando...' : 'Carregar Foto do Dispositivo'}</span>
                             <input
                               type="file"
                               accept="image/*"
                               className="hidden"
-                              onChange={(e) => {
+                              onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
+                                  if (file.size > 2 * 1024 * 1024) {
+                                    alert("A imagem excede o limite máximo permitido de 2 MB.");
+                                    return;
+                                  }
+                                  setIsUploadingIcon(true);
                                   const reader = new FileReader();
-                                  reader.onloadend = () => {
+                                  reader.onloadend = async () => {
                                     const base64 = reader.result as string;
                                     setEmpresaFotoUrl(base64);
-                                    localStorage.setItem('empresa_logo_url', base64);
+                                    
+                                    try {
+                                      const res = await apiFetch('/configuracoes/icon', {
+                                        method: 'POST',
+                                        body: JSON.stringify({ imagemBase64: base64, filename: file.name }),
+                                      });
+                                      if (res.data && res.data.iconUrl) {
+                                        setEmpresaFotoUrl(res.data.iconUrl);
+                                        localStorage.setItem('empresa_logo_url', res.data.iconUrl);
+                                      }
+                                    } catch (err) {
+                                      console.error("Erro ao fazer upload do ícone:", err);
+                                    } finally {
+                                      setIsUploadingIcon(false);
+                                    }
                                   };
                                   reader.readAsDataURL(file);
                                 }
@@ -870,7 +921,7 @@ export default function Dashboard() {
                           )}
                         </div>
 
-                        <p className="text-[11px] opacity-60">Selecione qualquer imagem (PNG, JPG) do seu celular ou computador.</p>
+                        <p className="text-[11px] opacity-60">Selecione qualquer imagem (PNG, JPG, SVG - até 2MB) do seu dispositivo.</p>
                       </div>
                     </div>
                   </div>
@@ -888,14 +939,14 @@ export default function Dashboard() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium opacity-70 mb-2">Endereço Completo (Exibido na Página Pública e Google Maps)</label>
-                    <input
-                      type="text"
+                    <label className="block text-xs font-medium opacity-70 mb-2">Endereço Completo no Mapa (ViaCEP / OpenStreetMap Brasil)</label>
+                    <LocationInput
                       value={empresaEndereco}
-                      onChange={e => setEmpresaEndereco(e.target.value)}
-                      className={`w-full h-12 border rounded-2xl px-4 text-sm focus:outline-none ${
-                        isDark ? 'bg-[#1c1c20] border-white/[0.06]' : 'bg-neutral-100 border-neutral-200'
-                      }`}
+                      onChange={(address, lat, lng) => {
+                        setEmpresaEndereco(address);
+                        if (lat) setEmpresaLat(lat);
+                        if (lng) setEmpresaLng(lng);
+                      }}
                     />
                   </div>
 
@@ -931,6 +982,25 @@ export default function Dashboard() {
                   <button 
                     onClick={async () => {
                       localStorage.setItem('empresa_logo_url', empresaFotoUrl);
+                      localStorage.setItem(`empresa_endereco_${userAccountKey}`, empresaEndereco);
+
+                      try {
+                        await apiFetch('/configuracoes/empresa', {
+                          method: 'PUT',
+                          body: JSON.stringify({
+                            nome: empresaNome,
+                            slug: empresaSlug,
+                            telefone: empresaTelefone,
+                            endereco: empresaEndereco,
+                            latitude: empresaLat,
+                            longitude: empresaLng,
+                            iconUrl: empresaFotoUrl,
+                          }),
+                        });
+                      } catch (err) {
+                        console.error('Erro ao salvar no backend:', err);
+                      }
+
                       setConfigSalvaToast(true);
                       setTimeout(() => setConfigSalvaToast(false), 3000);
                     }}
