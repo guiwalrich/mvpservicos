@@ -85,14 +85,50 @@ export default function AgendamentoPublico() {
 
   useEffect(() => {
     if (!slug) return;
+
+    // Prefill imediato do localStorage se a empresa corresponder ao slug
+    const empLocal = JSON.parse(localStorage.getItem('empresa') || '{}');
+    const userAccountKey = empLocal.email ? empLocal.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default_account';
+    
+    if (empLocal.slug === slug || slug === 'meu-estabelecimento' || slug === 'studio-demo' || slug === empLocal.nome?.toLowerCase().replace(/[^a-z0-9]/g, '-')) {
+      if (empLocal.nome) setEmpresaNome(empLocal.nome);
+      if (empLocal.iconUrl) setEmpresaIconUrl(empLocal.iconUrl);
+      if (empLocal.endereco) setEmpresaEndereco(empLocal.endereco);
+      if (empLocal.telefone || empLocal.whatsapp) setEmpresaTelefone(empLocal.telefone || empLocal.whatsapp);
+
+      const servsLocais = JSON.parse(localStorage.getItem(`servicos_${userAccountKey}`) || '[]');
+      if (servsLocais.length > 0) {
+        setServicos(servsLocais.map((s: any) => ({
+          id: String(s.id),
+          nome: s.name || s.nome,
+          preco: typeof s.price === 'number' ? s.price : parseFloat(String(s.price || 0).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0,
+          duracaoMin: s.durationMin || 30,
+          categoria: s.category || 'Geral',
+          descricao: s.description || '',
+          popular: false,
+        })));
+      }
+
+      const profsLocais = JSON.parse(localStorage.getItem(`profissionais_${userAccountKey}`) || '[]');
+      if (profsLocais.length > 0) {
+        setProfissionais([FALLBACK_PROF, ...profsLocais.map((p: any) => ({
+          id: String(p.id),
+          nome: p.nome,
+          especialidade: p.especialidade || 'Profissional',
+          fotoUrl: p.fotoUrl || '',
+          avaliacao: 5.0,
+        }))]);
+      }
+    }
+
     fetch(`/agendar-api/${slug}`)
       .then(r => r.json())
       .then(data => {
         if (data && data.id) {
-          setEmpresaNome(data.nome || 'Estabelecimento');
-          setEmpresaIconUrl(data.iconUrl || data.logo || '');
-          setEmpresaEndereco(data.endereco || '');
-          setEmpresaTelefone(data.telefone || '');
+          if (data.nome) setEmpresaNome(data.nome);
+          if (data.iconUrl || data.logo) setEmpresaIconUrl(data.iconUrl || data.logo);
+          if (data.endereco) setEmpresaEndereco(data.endereco);
+          if (data.telefone) setEmpresaTelefone(data.telefone);
           if (data.servicos && data.servicos.length > 0) {
             setServicos(data.servicos.map((s: any) => ({
               id: String(s.id),

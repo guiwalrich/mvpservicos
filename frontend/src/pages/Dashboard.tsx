@@ -513,7 +513,7 @@ export default function Dashboard() {
                     : 'opacity-60 hover:opacity-100'
                 }`}
               >
-                Visão Equipe (Carlos Silva)
+                Visão Equipe
               </button>
             </div>
             <div className="relative">
@@ -569,9 +569,9 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* Link para a Página Pública /agendar/studio-agende-yo */}
+            {/* Link para a Página Pública do Estabelecimento Real */}
             <Link
-              to="/agendar/studio-agende-yo"
+              to={`/agendar/${empresaSlug || 'meu-estabelecimento'}`}
               target="_blank"
               className={`h-9 px-3.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
                 isDark ? 'bg-[#1c1c20] border-white/10 text-white hover:bg-white/10' : 'bg-neutral-100 border-neutral-300 text-black hover:bg-neutral-200'

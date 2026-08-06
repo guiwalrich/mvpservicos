@@ -255,11 +255,13 @@ export default function Login() {
                 setIsSuccess(true);
 
                 setTimeout(() => {
-                  if (authRes.data.isNewUser) {
-                    // Novo usuário: vai para o dashboard abrindo a aba de configurações para completar cadastro
+                  const emp = authRes.data.empresa || {};
+                  const precisaCompletar = authRes.data.isNewUser || !emp.telefone || emp.nome === 'Meu Estabelecimento';
+
+                  if (precisaCompletar) {
+                    // Novo usuário ou cadastro incompleto: direciona para o perfil para completar os dados
                     navigate('/dashboard?tab=configuracoes&novoRascunho=true');
                   } else {
-                    // Usuário existente: vai direto ao Dashboard
                     navigate('/dashboard');
                   }
                 }, 800);
