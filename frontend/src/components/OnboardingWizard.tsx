@@ -102,11 +102,14 @@ export default function OnboardingWizard({
   if (!isVisible) return null;
 
   return (
-    <div className={`p-4 sm:p-6 rounded-[24px] sm:rounded-[28px] border relative overflow-hidden transition-all duration-300 shadow-xl ${
-      isDark 
-        ? 'bg-white/[0.03] border-white/[0.08] backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.5)]' 
-        : 'bg-white/70 border-black/[0.06] backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.03)]'
-    }`}>
+    <div 
+      style={{ WebkitBackdropFilter: 'blur(24px)' }}
+      className={`p-4 sm:p-6 rounded-[24px] sm:rounded-[28px] border relative overflow-hidden transition-all duration-300 shadow-xl ${
+        isDark 
+          ? 'bg-white/[0.03] border-white/[0.08] backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.5)]' 
+          : 'bg-white/70 border-black/[0.06] backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.03)]'
+      }`}
+    >
       
       {/* Header do Guia de Onboarding */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

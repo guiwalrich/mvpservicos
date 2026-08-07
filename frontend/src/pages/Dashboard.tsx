@@ -58,7 +58,9 @@ export const DEMO_CLIENTS: any[] = [];
 function GlassCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const { theme } = useTheme();
   return (
-    <div className={`relative rounded-[24px] overflow-hidden transition-all duration-300 border backdrop-blur-xl ${
+    <div 
+      style={{ WebkitBackdropFilter: 'blur(24px)' }}
+      className={`relative rounded-[24px] overflow-hidden transition-all duration-300 border backdrop-blur-xl ${
       theme === 'dark' 
         ? 'bg-white/[0.03] border-white/[0.08] hover:border-white/[0.12] hover:bg-white/[0.05] shadow-[0_12px_40px_rgba(0,0,0,0.5)]' 
         : 'bg-white/70 border-black/[0.06] hover:bg-white/80 shadow-[0_12px_30px_rgba(0,0,0,0.03)]'

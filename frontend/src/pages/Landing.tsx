@@ -63,6 +63,7 @@ export default function Landing() {
       {/* Volumetric ambient background light with smooth float animation */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <motion.div
+          style={{ transform: 'translate3d(0,0,0)', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
           animate={{
             x: [0, 40, -20, 0],
             y: [0, -30, 20, 0],
@@ -72,9 +73,10 @@ export default function Landing() {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute -top-[30%] -left-[10%] w-[70%] h-[60%] rounded-full bg-gradient-to-br from-white/[0.04] to-transparent blur-[130px]"
+          className="absolute -top-[30%] -left-[10%] w-[70%] h-[60%] rounded-full bg-gradient-to-br from-white/[0.04] to-transparent blur-[80px]"
         />
         <motion.div
+          style={{ transform: 'translate3d(0,0,0)', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
           animate={{
             x: [0, -30, 30, 0],
             y: [0, 40, -30, 0],
@@ -84,7 +86,7 @@ export default function Landing() {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-[30%] -right-[20%] w-[60%] h-[50%] rounded-full bg-gradient-to-bl from-white/[0.02] to-transparent blur-[110px]"
+          className="absolute top-[30%] -right-[20%] w-[60%] h-[50%] rounded-full bg-gradient-to-bl from-white/[0.02] to-transparent blur-[70px]"
         />
       </div>
 
@@ -231,7 +233,7 @@ export default function Landing() {
               rotateY: isMobile ? 0 : -mousePosition.x * 0.3 
             }}
             transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 flex justify-center perspective-1000"
+            className={`lg:col-span-5 flex justify-center ${isMobile ? '' : 'perspective-1000'}`}
           >
             <div className="relative w-full max-w-[360px] rounded-[32px] p-[1px] bg-gradient-to-b from-white/20 via-white/5 to-transparent shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
               {/* Border Beam light ray styling */}
@@ -249,7 +251,10 @@ export default function Landing() {
                 />
               </div>
 
-              <div className="rounded-[31px] bg-[#121215]/85 backdrop-blur-3xl p-4 sm:p-6 border border-white/[0.04]">
+              <div 
+                style={{ WebkitBackdropFilter: 'blur(24px)' }}
+                className="rounded-[31px] bg-[#121215]/85 backdrop-blur-3xl p-4 sm:p-6 border border-white/[0.04]"
+              >
                 
                 {/* Header Widget */}
                 <div className="flex items-center gap-3 pb-5 border-b border-white/5 mb-5">
