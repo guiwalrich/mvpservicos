@@ -55,7 +55,7 @@ async function enviarViaResend(
       body: JSON.stringify({
         from: remetente,
         to: [emailDestino],
-        subject: `🔑 Seu código de verificação: ${codigo}`,
+        subject: `Código de verificação do Agende.yo: ${codigo}`,
         html: htmlContent,
         text: textContent,
       }),
@@ -102,7 +102,7 @@ async function enviarViaSMTP(
       from: fromAddress,
       to: emailDestino,
       replyTo: smtpUser,
-      subject: `🔑 Seu código de verificação: ${codigo}`,
+      subject: `Código de verificação do Agende.yo: ${codigo}`,
       html: htmlContent,
       text: textContent,
       headers: {
