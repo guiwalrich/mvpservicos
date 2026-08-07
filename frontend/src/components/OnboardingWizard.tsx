@@ -204,7 +204,6 @@ export default function OnboardingWizard({
                   <button
                     onClick={() => {
                       onNavigateTab(step.tab || 'agenda');
-                      window.history.pushState(null, '', step.route);
                     }}
                     className={`w-full h-9 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all mt-2 ${
                       step.completed
