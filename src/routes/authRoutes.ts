@@ -26,10 +26,43 @@ router.post("/registro", async (req: Request, res: Response) => {
     // Verifica unicidade do e-mail
     const emailExiste = await prisma.empresa.findUnique({ where: { email } });
     if (emailExiste) {
-      return res.status(400).json({ erro: "Este e-mail já está cadastrado no sistema." });
+      if (emailExiste.email_verificado) {
+        return res.status(400).json({ erro: "Este e-mail já está cadastrado no sistema." });
+      }
+
+      // Se a conta existe mas NÃO está verificada, atualiza com os novos dados de registro e gera novo OTP
+      const senha_hash = await bcrypt.hash(senha, 10);
+      const trialExpira = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+      const codigoOTP = gerarCodigoOTP();
+      const expiracaoOTP = new Date(Date.now() + 10 * 60 * 1000);
+
+      const empresa = await prisma.empresa.update({
+        where: { id: emailExiste.id },
+        data: {
+          nome,
+          senha: senha_hash,
+          nicho: nicho || "Barbearia",
+          plano: "trial",
+          status_assinatura: "trial",
+          trial_expira_em: trialExpira,
+          codigo_login: codigoOTP,
+          codigo_expira_em: expiracaoOTP
+        }
+      });
+
+      const resultadoEmail = await enviarCodigoVerificacaoEmail(empresa.email, empresa.nome, codigoOTP);
+
+      return res.status(200).json({
+        sucesso: true,
+        requereCodigo: true,
+        mensagem: "Cadastro pendente localizado. Novo código de verificação enviado ao seu e-mail.",
+        email: empresa.email,
+        erroEmail: !resultadoEmail.sucesso,
+        detalheEmail: resultadoEmail.erro || null
+      });
     }
 
-    // Hash da senha e geração do slug
+    // Hash da senha e geração do slug para novo cadastro
     const senha_hash = await bcrypt.hash(senha, 10);
     let slug = nome.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
     if (!slug) slug = `empresa-${Date.now()}`;
