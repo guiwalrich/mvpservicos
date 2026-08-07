@@ -152,6 +152,56 @@ export default function Dashboard() {
       })
       .catch(() => {});
   }, []);
+
+  // Estados Reativos do Onboarding (Sincronizados em tempo real)
+  const [isPerfilConcluido, setIsPerfilConcluido] = useState(false);
+  const [isServicoConcluido, setIsServicoConcluido] = useState(false);
+  const [isProfissionalConcluido, setIsProfissionalConcluido] = useState(false);
+  const [isAgendamentoTestado, setIsAgendamentoTestado] = useState(false);
+
+  // Re-avalia em tempo real as chaves do localStorage para automarcação imediata das etapas
+  useEffect(() => {
+    const checkCompletion = () => {
+      // 1. Perfil
+      const emp = (() => {
+        try {
+          const stored = localStorage.getItem('empresa');
+          if (stored && stored !== 'undefined') return JSON.parse(stored) || {};
+        } catch (e) {}
+        return {};
+      })();
+      const perfilOk = !!(emp.nome && emp.nome !== 'Meu Estabelecimento' && (emp.telefone || emp.whatsapp) && emp.endereco);
+      setIsPerfilConcluido(perfilOk);
+
+      // 2. Serviços
+      const servs = (() => {
+        try {
+          return JSON.parse(localStorage.getItem(`servicos_${userAccountKey}`) || '[]');
+        } catch (e) { return []; }
+      })();
+      setIsServicoConcluido(servs.length > 0);
+
+      // 3. Profissional
+      const profs = (() => {
+        try {
+          return JSON.parse(localStorage.getItem(`profissionais_${userAccountKey}`) || '[]');
+        } catch (e) { return []; }
+      })();
+      setIsProfissionalConcluido(profs.length > 0);
+
+      // 4. Agendamento
+      const appts = (() => {
+        try {
+          return JSON.parse(localStorage.getItem(`agendamentos_${userAccountKey}`) || '[]');
+        } catch (e) { return []; }
+      })();
+      setIsAgendamentoTestado(appts.length > 0);
+    };
+
+    checkCompletion();
+    const interval = setInterval(checkCompletion, 1000);
+    return () => clearInterval(interval);
+  }, [userAccountKey]);
   
   // State: Listas de Dados Dinâmicos da Empresa (Começam 100% LIMPOS/ZERADOS para Novos Usuários)
   const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
@@ -681,10 +731,10 @@ export default function Dashboard() {
               setSearchParams({ tab });
             }}
             empresaSlug={empresaSlug}
-            isPerfilConcluido={!!(empresaNome && empresaNome !== 'Meu Estabelecimento' && empresaTelefone && empresaEndereco)}
-            isServicoConcluido={services.length > 0}
-            isProfissionalConcluido={JSON.parse(localStorage.getItem(`profissionais_${userAccountKey}`) || '[]').length > 0}
-            isAgendamentoTestado={appointments.length > 0}
+            isPerfilConcluido={isPerfilConcluido}
+            isServicoConcluido={isServicoConcluido}
+            isProfissionalConcluido={isProfissionalConcluido}
+            isAgendamentoTestado={isAgendamentoTestado}
           />
 
           {/* TAB 1: VISÃO GERAL */}
