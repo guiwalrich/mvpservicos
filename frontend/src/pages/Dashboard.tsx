@@ -24,7 +24,7 @@ import {
   Search,
   BarChart3
 } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../lib/api';
 import { useTheme } from '../context/ThemeContext';
 import AgendaInteligente from '../components/AgendaInteligente';
@@ -72,6 +72,16 @@ function GlassCard({ children, className = "" }: { children: React.ReactNode; cl
 
 export default function Dashboard() {
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
+  // Proteção de rota do painel administrativo contra acessos não autenticados
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
   const [activeTab, setActiveTab] = useState<'overview' | 'agenda' | 'servicos' | 'profissionais' | 'clientes' | 'caixa' | 'comunicacao' | 'relatorios' | 'configuracoes'>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);

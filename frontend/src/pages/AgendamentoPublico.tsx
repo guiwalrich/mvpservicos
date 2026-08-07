@@ -52,15 +52,39 @@ const FALLBACK_PROF: ProfissionalPublico = {
   avaliacao: 5.0
 };
 
-const DIAS_CALENDARIO = [
-  { diaSemana: 'SEG', diaNum: '03', dataFull: '03/08/2026' },
-  { diaSemana: 'TER', diaNum: '04', dataFull: '04/08/2026' },
-  { diaSemana: 'QUA', diaNum: '05', dataFull: '05/08/2026' },
-  { diaSemana: 'QUI', diaNum: '06', dataFull: '06/08/2026' },
-  { diaSemana: 'SEX', diaNum: '07', dataFull: '07/08/2026' },
-  { diaSemana: 'SÁB', diaNum: '08', dataFull: '08/08/2026' },
-  { diaSemana: 'DOM', diaNum: '09', dataFull: '09/08/2026' }
-];
+const getDynamicDays = () => {
+  const days = [];
+  const diasSemanaSiglas = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+  
+  for (let i = 0; i < 7; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    
+    const diaSemana = diasSemanaSiglas[d.getDay()];
+    const diaNum = String(d.getDate()).padStart(2, '0');
+    const mesNum = String(d.getMonth() + 1).padStart(2, '0');
+    const anoNum = d.getFullYear();
+    
+    days.push({
+      diaSemana,
+      diaNum,
+      dataFull: `${diaNum}/${mesNum}/${anoNum}`
+    });
+  }
+  return days;
+};
+
+const DIAS_CALENDARIO = getDynamicDays();
+
+const getMonthYearText = (dataFullStr: string) => {
+  const [, mm, yyyy] = dataFullStr.split('/');
+  const meses = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
+  const mesIndex = parseInt(mm, 10) - 1;
+  return `${meses[mesIndex]} de ${yyyy}`;
+};
 
 const HORARIOS_SLOTS = [
   '09:00', '09:30', '10:00',
@@ -269,7 +293,7 @@ export default function AgendamentoPublico() {
             </button>
 
             <Link
-              to="/login"
+              to="/dashboard"
               className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
                 isDark ? 'bg-white text-black hover:bg-neutral-200 border-white' : 'bg-black text-white hover:bg-neutral-800 border-black'
               }`}
@@ -471,7 +495,10 @@ export default function AgendamentoPublico() {
             <div className={`p-4 rounded-[24px] border space-y-3 ${
               isDark ? 'bg-[#121215]/90 border-white/10' : 'bg-white border-neutral-200 shadow-sm'
             }`}>
-              <span className="text-xs font-semibold opacity-70 block">Selecione o Dia</span>
+              <div className="flex justify-between items-center pb-1 border-b border-white/5">
+                <span className="text-xs font-bold opacity-80">{getMonthYearText(selectedDataObj.dataFull)}</span>
+                <span className="text-[10px] font-extrabold uppercase opacity-40 tracking-wider">Selecione o Dia</span>
+              </div>
               <div className="grid grid-cols-7 gap-1 text-center">
                 {DIAS_CALENDARIO.map((d) => {
                   const isSelected = selectedDataObj.dataFull === d.dataFull;
