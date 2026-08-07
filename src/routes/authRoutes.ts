@@ -393,4 +393,24 @@ router.get("/testar-smtp", async (req: Request, res: Response) => {
   res.json(resultado);
 });
 
+// ============================================================================
+// 8. DIAGNÓSTICO DE ENVIO DE E-MAIL (RESEND/SMTP)
+// ============================================================================
+router.get("/testar-email", async (req: Request, res: Response) => {
+  const email = (req.query.email as string) || "seuemail@gmail.com";
+  try {
+    const resultado = await enviarCodigoVerificacaoEmail(email, "Teste Estabelecimento", "999888");
+    res.json({
+      mensagem: "Teste de envio disparado.",
+      apiKeyPresente: !!process.env.RESEND_API_KEY,
+      apiKeyPrefix: process.env.RESEND_API_KEY ? process.env.RESEND_API_KEY.substring(0, 7) + "..." : "Nula",
+      remetenteConfigurado: process.env.RESEND_FROM || "onboarding@resend.dev (Padrão)",
+      destinatario: email,
+      resultado
+    });
+  } catch (error: any) {
+    res.status(500).json({ erro: error.message || error });
+  }
+});
+
 export default router;
